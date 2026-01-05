@@ -1,7 +1,6 @@
 import type { Trade } from '../types';
 
-// Lighter API configuration
-const LIGHTER_API_BASE_URL = import.meta.env.VITE_LIGHTER_API_URL || 'https://mainnet.zklighter.elliot.ai';
+// Lighter API configuration (for frontend checks only, actual API calls go through serverless proxy)
 const LIGHTER_WALLET_ADDRESS = import.meta.env.VITE_LIGHTER_WALLET_ADDRESS || '';
 const LIGHTER_API_KEY = import.meta.env.VITE_LIGHTER_API_KEY || '';
 
