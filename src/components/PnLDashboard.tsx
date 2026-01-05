@@ -80,10 +80,12 @@ export const PnLDashboard = ({ trades }: PnLDashboardProps) => {
                   borderRadius: '8px',
                   color: '#F9FAFB'
                 }}
-                formatter={(value, _name, props: any) => value ? [
-                  `$${value.toFixed(2)} (${props.payload.trades} trades)`,
-                  'P&L'
-                ] : ['', 'P&L']}
+                formatter={(value, _name, props: any) => {
+                  if (typeof value === 'number') {
+                    return [`$${value.toFixed(2)} (${props.payload.trades} trades)`, 'P&L'];
+                  }
+                  return ['', 'P&L'];
+                }}
               />
               <Bar
                 dataKey="pnl"
@@ -118,7 +120,7 @@ export const PnLDashboard = ({ trades }: PnLDashboardProps) => {
                   borderRadius: '8px',
                   color: '#F9FAFB'
                 }}
-                formatter={(value) => value ? `$${value.toFixed(2)}` : ''}
+                formatter={(value) => typeof value === 'number' ? `$${value.toFixed(2)}` : ''}
               />
             </PieChart>
           </ResponsiveContainer>
