@@ -21,7 +21,12 @@ export function useLighterTrades(): UseLighterTradesResult {
 
   const fetchTrades = async () => {
     if (!isConfigured) {
-      setError('Lighter wallet address not configured. Please set VITE_LIGHTER_WALLET_ADDRESS in .env');
+      return;
+    }
+
+    // Skip if running on localhost (CORS restriction)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      console.log('Lighter API skipped on localhost due to CORS. Will work on production.');
       return;
     }
 
@@ -30,8 +35,15 @@ export function useLighterTrades(): UseLighterTradesResult {
 
     try {
       const walletAddress = getWalletAddress();
+      console.log('Fetching trades for wallet:', walletAddress);
       const lighterTrades = await fetchLighterTrades(walletAddress);
+      console.log('Received trades:', lighterTrades);
       setTrades(lighterTrades);
+
+      // If no trades but no error, it means the account exists but has no trades
+      if (lighterTrades.length === 0) {
+        setError('No trades found on Lighter DEX for this wallet');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch trades from Lighter';
       setError(errorMessage);
