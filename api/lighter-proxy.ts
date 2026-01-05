@@ -20,6 +20,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Log environment variables (first few chars only for security)
+    console.log('Environment check:', {
+      hasApiKey: !!LIGHTER_API_KEY,
+      apiKeyLength: LIGHTER_API_KEY?.length || 0,
+      apiKeyPrefix: LIGHTER_API_KEY?.substring(0, 8) || 'missing',
+      baseUrl: LIGHTER_API_BASE_URL,
+    });
+
     const { endpoint, ...params } = req.query;
 
     if (!endpoint || typeof endpoint !== 'string') {
@@ -30,7 +38,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
     const url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
 
-    console.log('Proxying request to:', url);
+    console.log('Proxying request:', {
+      endpoint,
+      params,
+      queryString,
+      fullUrl: url,
+    });
 
     const response = await fetch(url, {
       method: 'GET',
@@ -40,14 +53,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       },
     });
 
+    console.log('Lighter API response:', {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
+
     if (!response.ok) {
-      console.error('Lighter API error:', response.status, response.statusText);
+      // Try to get error details from response body
+      const errorText = await response.text();
+      console.error('Lighter API error details:', errorText);
+
       return res.status(response.status).json({
         error: `Lighter API error: ${response.status} ${response.statusText}`,
+        details: errorText,
       });
     }
 
     const data = await response.json();
+    console.log('Lighter API success, data keys:', Object.keys(data));
     return res.status(200).json(data);
   } catch (error) {
     console.error('Proxy error:', error);
