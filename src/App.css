@@ -57,6 +57,53 @@ body {
   margin: 0 auto;
 }
 
+/* Lighter DEX Status */
+.lighter-status {
+  margin-top: 1rem;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 50px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
+  animation: fadeIn 0.4s ease-out;
+}
+
+.status-indicator.loading {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(59, 130, 246, 0.1) 100%);
+  color: var(--info);
+}
+
+.status-indicator.error {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.1) 100%);
+  color: var(--danger);
+}
+
+.status-indicator.success {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+  color: var(--success);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -941,4 +988,127 @@ body {
 .password-footer p {
   color: var(--text-muted);
   font-size: 0.75rem;
+}
+
+/* Trades Table */
+.trades-table-container {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.trades-table-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  background: var(--bg-tertiary);
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
+}
+
+.trades-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.trades-table thead {
+  background: var(--bg-secondary);
+}
+
+.trades-table thead tr {
+  border-bottom: 2px solid var(--border);
+}
+
+.trades-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.trades-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.trades-table tbody tr:hover {
+  background: var(--bg-secondary);
+}
+
+.trades-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.trades-table td {
+  padding: 1rem;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.date-cell {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.symbol-cell {
+  font-weight: 600;
+}
+
+.symbol-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.symbol-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.price-cell {
+  font-family: 'Monaco', 'Courier New', monospace;
+  color: var(--text-primary);
+}
+
+.quantity-cell {
+  text-align: center;
+  font-weight: 500;
+}
+
+.pnl-cell {
+  font-weight: 700;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.pnl-cell.positive {
+  color: var(--success);
+}
+
+.pnl-cell.negative {
+  color: var(--danger);
+}
+
+/* Responsive Table */
+@media (max-width: 1024px) {
+  .table-wrapper {
+    overflow-x: scroll;
+  }
+
+  .trades-table {
+    min-width: 900px;
+  }
 }
