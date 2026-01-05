@@ -26,7 +26,6 @@ export const KPIMetrics = ({ trades }: KPIMetricsProps) => {
 
     // Calculate average monthly gain
     const startingCapital = 10000;
-    const currentValue = startingCapital + totalPnL;
     const totalPnLPercent = (totalPnL / startingCapital) * 100;
 
     // Estimate months (from first to last trade)

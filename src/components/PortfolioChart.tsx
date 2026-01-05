@@ -37,7 +37,7 @@ export const PortfolioChart = ({ data }: PortfolioChartProps) => {
               borderRadius: '8px',
               color: '#F9FAFB'
             }}
-            formatter={(value: number) => [`$${value.toLocaleString()}`, 'Portfolio Value']}
+            formatter={(value) => value ? [`$${value.toLocaleString()}`, 'Portfolio Value'] : ['', 'Portfolio Value']}
             labelFormatter={(label) => formattedData.find(d => d.date === label)?.fullDate || label}
           />
           <Legend wrapperStyle={{ color: '#9CA3AF' }} />

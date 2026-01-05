@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import type { Trade } from '../types';
 
 interface PnLDashboardProps {
@@ -80,10 +80,10 @@ export const PnLDashboard = ({ trades }: PnLDashboardProps) => {
                   borderRadius: '8px',
                   color: '#F9FAFB'
                 }}
-                formatter={(value: number, name: string, props: any) => [
+                formatter={(value, _name, props: any) => value ? [
                   `$${value.toFixed(2)} (${props.payload.trades} trades)`,
                   'P&L'
-                ]}
+                ] : ['', 'P&L']}
               />
               <Bar
                 dataKey="pnl"
@@ -103,7 +103,7 @@ export const PnLDashboard = ({ trades }: PnLDashboardProps) => {
                 cx="50%"
                 cy="50%"
                 labelLine={false}
-                label={({ name, value, count }) => `${name}: $${value.toFixed(0)} (${count})`}
+                label={(entry: any) => `${entry.name}: $${entry.value.toFixed(0)} (${entry.count})`}
                 outerRadius={100}
                 fill="#8884d8"
                 dataKey="value"
@@ -118,7 +118,7 @@ export const PnLDashboard = ({ trades }: PnLDashboardProps) => {
                   borderRadius: '8px',
                   color: '#F9FAFB'
                 }}
-                formatter={(value: number) => `$${value.toFixed(2)}`}
+                formatter={(value) => value ? `$${value.toFixed(2)}` : ''}
               />
             </PieChart>
           </ResponsiveContainer>

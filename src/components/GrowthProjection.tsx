@@ -117,7 +117,7 @@ export const GrowthProjection = ({ trades, startingCapital = 10000 }: GrowthProj
               borderRadius: '8px',
               color: '#F9FAFB'
             }}
-            formatter={(value: number) => [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, '']}
+            formatter={(value) => value ? [`$${value.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, ''] : ['', '']}
           />
           <Legend wrapperStyle={{ color: '#9CA3AF' }} />
           <Line
