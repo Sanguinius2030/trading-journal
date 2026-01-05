@@ -1,16 +1,21 @@
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f8fafc;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border: #334155;
-  --accent: #8b5cf6;
+  --bg-primary: #e8ecf0;
+  --bg-secondary: #f0f3f7;
+  --bg-tertiary: #ffffff;
+  --text-primary: #4a5568;
+  --text-secondary: #718096;
+  --text-muted: #a0aec0;
+  --border: #e2e8f0;
+  --accent: #ff8c42;
+  --accent-secondary: #8b5cf6;
   --success: #10b981;
   --danger: #ef4444;
   --warning: #f59e0b;
   --info: #3b82f6;
+  --shadow-light: rgba(255, 255, 255, 0.8);
+  --shadow-dark: rgba(174, 174, 192, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
 }
 
 * {
@@ -20,7 +25,7 @@
 }
 
 body {
-  background-color: var(--bg-primary);
+  background: linear-gradient(135deg, #e8ecf0 0%, #dfe4ea 100%);
   color: var(--text-primary);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -37,9 +42,14 @@ body {
 
 /* Header */
 .app-header {
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  background: var(--bg-secondary);
   padding: 2rem;
-  border-bottom: 2px solid var(--border);
+  border-radius: 20px;
+  margin: 1.5rem;
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+  animation: slideDown 0.6s ease-out;
 }
 
 .header-content {
@@ -68,36 +78,42 @@ body {
 
 /* Navigation Tabs */
 .nav-tabs {
-  background-color: var(--bg-secondary);
-  padding: 0 2rem;
-  border-bottom: 1px solid var(--border);
+  background: var(--bg-secondary);
+  padding: 1rem 2rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 1rem;
   max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  margin: 0 1.5rem;
+  border-radius: 20px;
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
 }
 
 .tab {
   background: none;
   border: none;
   color: var(--text-secondary);
-  padding: 1rem 1.5rem;
+  padding: 0.875rem 1.5rem;
   font-size: 1rem;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
-  transition: all 0.2s;
+  border-radius: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 .tab:hover {
   color: var(--text-primary);
-  background-color: rgba(139, 92, 246, 0.1);
+  transform: translateY(-2px);
 }
 
 .tab.active {
   color: var(--accent);
-  border-bottom-color: var(--accent);
   font-weight: 600;
+  background: var(--bg-secondary);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
 }
 
 /* Main Content */
@@ -124,10 +140,25 @@ body {
 .kpi-metrics,
 .growth-projection,
 .pnl-dashboard {
-  background-color: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.chart-container:hover,
+.trades-timeline:hover,
+.kpi-metrics:hover,
+.growth-projection:hover,
+.pnl-dashboard:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    12px 12px 24px var(--shadow-dark),
+    -12px -12px 24px var(--shadow-light);
 }
 
 .chart-container h2,
@@ -148,12 +179,23 @@ body {
 }
 
 .metric-card {
-  background-color: var(--bg-tertiary);
-  padding: 1.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  padding: 1.75rem;
+  border-radius: 16px;
   display: flex;
   gap: 1rem;
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.metric-card:hover {
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
+  transform: scale(1.02);
 }
 
 .metric-card.secondary {
@@ -207,19 +249,37 @@ body {
 }
 
 .trade-card {
-  background-color: var(--bg-tertiary);
-  border-radius: 8px;
-  padding: 1.5rem;
-  border-left: 4px solid var(--accent);
-  transition: transform 0.2s;
+  background: var(--bg-tertiary);
+  border-radius: 16px;
+  padding: 1.75rem;
+  position: relative;
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.trade-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent-secondary) 100%);
+  border-radius: 16px 0 0 16px;
 }
 
 .trade-card:hover {
-  transform: translateX(4px);
+  transform: translateX(8px) scale(1.01);
+  box-shadow:
+    12px 12px 24px var(--shadow-dark),
+    -4px -4px 12px var(--shadow-light);
 }
 
-.trade-card.open {
-  border-left-color: var(--info);
+.trade-card.open::before {
+  background: linear-gradient(180deg, var(--info) 0%, var(--accent-secondary) 100%);
 }
 
 .trade-header {
@@ -250,20 +310,23 @@ body {
 }
 
 .trade-type {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  padding: 0.375rem 1rem;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .trade-type.long {
-  background-color: rgba(16, 185, 129, 0.2);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(16, 185, 129, 0.15) 100%);
   color: var(--success);
 }
 
 .trade-type.short {
-  background-color: rgba(239, 68, 68, 0.2);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.15) 100%);
   color: var(--danger);
 }
 
@@ -316,26 +379,32 @@ body {
 
 .status-badge {
   display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  padding: 0.375rem 1rem;
+  border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
 }
 
 .status-badge.open {
-  background-color: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
   color: var(--info);
 }
 
 .trade-reasoning,
 .trade-notes {
   margin-top: 0.75rem;
-  padding: 0.75rem;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
   font-size: 0.875rem;
   color: var(--text-secondary);
+  box-shadow:
+    inset 3px 3px 6px var(--shadow-dark),
+    inset -3px -3px 6px var(--shadow-light);
 }
 
 .trade-reasoning strong,
@@ -352,29 +421,38 @@ body {
 
 .category,
 .exchange {
-  padding: 0.25rem 0.75rem;
-  border-radius: 4px;
+  padding: 0.375rem 1rem;
+  border-radius: 20px;
   font-size: 0.75rem;
-  background-color: rgba(139, 92, 246, 0.2);
+  background: linear-gradient(135deg, rgba(255, 140, 66, 0.2) 0%, rgba(255, 140, 66, 0.15) 100%);
   color: var(--accent);
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.1),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+  font-weight: 600;
 }
 
 .exchange {
-  background-color: rgba(59, 130, 246, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(59, 130, 246, 0.15) 100%);
   color: var(--info);
 }
 
 /* Growth Projection */
 .projection-summary {
   margin-bottom: 1.5rem;
-  padding: 1rem;
-  background-color: var(--bg-tertiary);
-  border-radius: 8px;
+  padding: 1.5rem;
+  background: var(--bg-tertiary);
+  border-radius: 16px;
   color: var(--text-secondary);
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
+  line-height: 1.6;
 }
 
 .projection-summary strong {
   color: var(--accent);
+  font-weight: 700;
 }
 
 .no-data {
@@ -391,11 +469,22 @@ body {
 }
 
 .scenario {
-  background-color: var(--bg-tertiary);
-  padding: 1.5rem;
-  border-radius: 8px;
+  background: var(--bg-tertiary);
+  padding: 1.75rem;
+  border-radius: 16px;
   text-align: center;
-  border: 1px solid var(--border);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.scenario:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light);
 }
 
 .scenario-label {
@@ -435,13 +524,23 @@ body {
 }
 
 .exchange-item {
-  background-color: var(--bg-tertiary);
-  padding: 1rem 1.5rem;
-  border-radius: 8px;
+  background: var(--bg-tertiary);
+  padding: 1.25rem 1.75rem;
+  border-radius: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--border);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
+  transition: all 0.3s ease;
+}
+
+.exchange-item:hover {
+  transform: translateX(8px);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -4px -4px 12px var(--shadow-light);
 }
 
 .exchange-name {
@@ -475,30 +574,44 @@ body {
 
 /* Trade Journal Form */
 .trade-journal-form {
-  background-color: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light);
+  animation: fadeIn 0.6s ease-out;
 }
 
 .add-trade-button {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1.5rem;
-  background-color: var(--accent);
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--accent) 0%, #ff6b35 100%);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 50px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .add-trade-button:hover {
-  background-color: #7c3aed;
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.add-trade-button:active {
+  transform: translateY(-1px) scale(0.98);
 }
 
 .form-container h3 {
@@ -533,20 +646,26 @@ body {
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 0.75rem;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 12px;
   color: var(--text-primary);
   font-size: 1rem;
   font-family: inherit;
+  box-shadow:
+    inset 4px 4px 8px var(--shadow-dark),
+    inset -4px -4px 8px var(--shadow-light);
+  transition: all 0.3s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  box-shadow:
+    inset 6px 6px 12px var(--shadow-dark),
+    inset -2px -2px 6px var(--shadow-light);
 }
 
 .form-group textarea {
@@ -562,46 +681,98 @@ body {
 
 .cancel-button,
 .submit-button {
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
+  padding: 0.875rem 1.75rem;
+  border-radius: 50px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
 }
 
 .cancel-button {
-  background-color: var(--bg-tertiary);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
+  box-shadow:
+    4px 4px 8px var(--shadow-dark),
+    -4px -4px 8px var(--shadow-light);
 }
 
 .cancel-button:hover {
-  background-color: var(--border);
+  transform: translateY(-2px);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
 }
 
 .submit-button {
-  background-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent) 0%, #ff6b35 100%);
   color: white;
+  box-shadow:
+    4px 4px 8px var(--shadow-dark),
+    -4px -4px 8px var(--shadow-light),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .submit-button:hover {
-  background-color: #7c3aed;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Footer */
 .app-footer {
-  background-color: var(--bg-secondary);
-  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+  margin: 1.5rem;
+  margin-top: 2rem;
+  border-radius: 20px;
   padding: 1.5rem 2rem;
   text-align: center;
   color: var(--text-muted);
   font-size: 0.875rem;
+  box-shadow:
+    6px 6px 12px var(--shadow-dark),
+    -6px -6px 12px var(--shadow-light);
 }
 
 .footer-note {
   margin-top: 0.5rem;
   font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 /* Responsive */
@@ -648,18 +819,20 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background: linear-gradient(135deg, #e8ecf0 0%, #dfe4ea 100%);
   padding: 2rem;
 }
 
 .password-container {
-  background-color: var(--bg-secondary);
-  border-radius: 16px;
+  background: var(--bg-secondary);
+  border-radius: 30px;
   padding: 3rem;
   max-width: 450px;
   width: 100%;
-  border: 1px solid var(--border);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow:
+    15px 15px 30px var(--shadow-dark),
+    -15px -15px 30px var(--shadow-light);
+  animation: fadeIn 0.8s ease-out;
 }
 
 .password-header {
@@ -699,46 +872,65 @@ body {
 
 .password-form .form-group input {
   width: 100%;
-  padding: 0.875rem;
-  background-color: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border: none;
+  border-radius: 50px;
   color: var(--text-primary);
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  box-shadow:
+    inset 6px 6px 12px var(--shadow-dark),
+    inset -6px -6px 12px var(--shadow-light);
 }
 
 .password-form .form-group input:focus {
   outline: none;
-  border-color: var(--accent);
+  box-shadow:
+    inset 8px 8px 16px var(--shadow-dark),
+    inset -4px -4px 12px var(--shadow-light);
 }
 
 .error-message {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--danger);
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.1) 100%);
   color: var(--danger);
-  padding: 0.75rem;
-  border-radius: 6px;
+  padding: 0.875rem 1rem;
+  border-radius: 20px;
   font-size: 0.875rem;
   text-align: center;
+  box-shadow:
+    inset 3px 3px 6px rgba(239, 68, 68, 0.2),
+    inset -3px -3px 6px rgba(255, 255, 255, 0.3);
+  font-weight: 500;
 }
 
 .password-form .submit-button {
   width: 100%;
-  padding: 1rem;
-  background-color: var(--accent);
+  padding: 1.125rem;
+  background: linear-gradient(135deg, var(--accent) 0%, #ff6b35 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
+  border-radius: 50px;
+  font-size: 1.125rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow:
+    8px 8px 16px var(--shadow-dark),
+    -8px -8px 16px var(--shadow-light),
+    inset 0 -3px 10px rgba(0, 0, 0, 0.15);
 }
 
 .password-form .submit-button:hover {
-  background-color: #7c3aed;
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow:
+    10px 10px 20px var(--shadow-dark),
+    -10px -10px 20px var(--shadow-light),
+    inset 0 -3px 10px rgba(0, 0, 0, 0.2);
+}
+
+.password-form .submit-button:active {
+  transform: translateY(-1px) scale(0.98);
 }
 
 .password-footer {
