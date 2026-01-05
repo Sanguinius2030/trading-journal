@@ -24,12 +24,6 @@ export function useLighterTrades(): UseLighterTradesResult {
       return;
     }
 
-    // Skip if running on localhost (CORS restriction)
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      console.log('Lighter API skipped on localhost due to CORS. Will work on production.');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 

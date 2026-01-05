@@ -17,38 +17,26 @@ interface LighterTrade {
 }
 
 /**
- * Get API headers with authentication
- */
-function getHeaders(): HeadersInit {
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
-
-  if (LIGHTER_API_KEY) {
-    headers['x-api-key'] = LIGHTER_API_KEY;
-  }
-
-  return headers;
-}
-
-/**
- * Fetch account ID from Ethereum address
+ * Fetch account ID from Ethereum address using serverless proxy
  */
 async function getAccountByAddress(walletAddress: string): Promise<any> {
-  const response = await fetch(`${LIGHTER_API_BASE_URL}/api/v1/accountsByL1Address?l1Address=${walletAddress}`, {
+  const response = await fetch(`/api/lighter-proxy?endpoint=accountsByL1Address&l1Address=${walletAddress}`, {
     method: 'GET',
-    headers: getHeaders(),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch account: ${response.status} ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `Failed to fetch account: ${response.status} ${response.statusText}`);
   }
 
   return await response.json();
 }
 
 /**
- * Fetch trading history from Lighter DEX
+ * Fetch trading history from Lighter DEX using serverless proxy
  */
 export async function fetchLighterTrades(walletAddress: string): Promise<Trade[]> {
   if (!walletAddress) {
@@ -67,14 +55,17 @@ export async function fetchLighterTrades(walletAddress: string): Promise<Trade[]
 
     const accountId = accountData.accounts[0].id;
 
-    // Now fetch trades for this account
-    const response = await fetch(`${LIGHTER_API_BASE_URL}/api/v1/trades?account=${accountId}`, {
+    // Now fetch trades for this account using proxy
+    const response = await fetch(`/api/lighter-proxy?endpoint=trades&account=${accountId}`, {
       method: 'GET',
-      headers: getHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
-      throw new Error(`Lighter API error: ${response.status} ${response.statusText}`);
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Lighter API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
