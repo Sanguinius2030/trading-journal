@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# Trading Journal
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript trading journal application with Lighter DEX integration.
 
 Currently, two official plugins are available:
 
