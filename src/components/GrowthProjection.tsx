@@ -11,7 +11,11 @@ export const GrowthProjection = ({ trades, startingCapital = 10000 }: GrowthProj
     const closedTrades = trades.filter(t => t.status === 'closed' && t.pnl !== undefined);
 
     if (closedTrades.length === 0) {
-      return [];
+      return {
+        data: [],
+        avgMonthlyReturnPercent: 0,
+        currentValue: startingCapital
+      };
     }
 
     // Calculate current value
