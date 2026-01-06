@@ -18,12 +18,12 @@ interface LighterTrade {
 /**
  * Fetch account ID from Ethereum address using serverless proxy
  * Uses /api/v1/account endpoint with by=l1_address and value=<address>
+ * IMPORTANT: Address must keep original checksummed case (not lowercase)
  */
 async function getAccountByAddress(walletAddress: string): Promise<any> {
-  // Normalize address to lowercase as blockchain APIs often expect lowercase addresses
-  const normalizedAddress = walletAddress.toLowerCase();
   // Use /account endpoint with by and value params (as per Python SDK get_info.py example)
-  const response = await fetch(`/api/lighter-proxy?endpoint=account&by=l1_address&value=${normalizedAddress}`, {
+  // Keep original case - Lighter API requires checksummed address format
+  const response = await fetch(`/api/lighter-proxy?endpoint=account&by=l1_address&value=${walletAddress}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -39,7 +39,8 @@ async function getAccountByAddress(walletAddress: string): Promise<any> {
 }
 
 /**
- * Fetch trading history from Lighter DEX using serverless proxy
+ * Fetch account data from Lighter DEX (positions, balances)
+ * Note: Trade history requires signed authentication which is not yet implemented
  */
 export async function fetchLighterTrades(walletAddress: string): Promise<Trade[]> {
   if (!walletAddress) {
@@ -47,36 +48,36 @@ export async function fetchLighterTrades(walletAddress: string): Promise<Trade[]
   }
 
   try {
-    // First, get the account information from the L1 address
+    // Get the account information from the L1 address
     const accountData = await getAccountByAddress(walletAddress);
+    console.log('Lighter account data:', accountData);
 
-    // If no account found, return empty array (user hasn't traded on Lighter yet)
+    // If no account found, return empty array
     if (!accountData || !accountData.accounts || accountData.accounts.length === 0) {
       console.log('No Lighter account found for this address');
       return [];
     }
 
-    const accountId = accountData.accounts[0].id;
+    const account = accountData.accounts[0];
+    console.log('Account index:', account.index);
+    console.log('Account positions:', account.positions);
 
-    // Now fetch trades for this account using proxy
-    const response = await fetch(`/api/lighter-proxy?endpoint=trades&account=${accountId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || `Lighter API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json();
-
-    // Transform Lighter trades to our Trade format
-    return transformLighterTrades(data.trades || data || []);
+    // Transform positions into trades (open positions)
+    // Each position represents an open trade
+    const positions = account.positions || [];
+    return positions.map((pos: any, index: number) => ({
+      id: `lighter-pos-${index}`,
+      symbol: pos.market_id !== undefined ? `Market ${pos.market_id}` : 'UNKNOWN',
+      type: parseFloat(pos.size || '0') >= 0 ? 'long' : 'short',
+      status: 'open' as const,
+      entryPrice: parseFloat(pos.entry_price || pos.avg_entry_price || '0'),
+      quantity: Math.abs(parseFloat(pos.size || '0')),
+      entryDate: new Date(),
+      exchange: 'Lighter',
+      pnl: parseFloat(pos.unrealized_pnl || '0'),
+    } as Trade));
   } catch (error) {
-    console.error('Error fetching Lighter trades:', error);
+    console.error('Error fetching Lighter account:', error);
     throw error;
   }
 }
