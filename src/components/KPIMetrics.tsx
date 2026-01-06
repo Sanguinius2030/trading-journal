@@ -7,7 +7,9 @@ interface KPIMetricsProps {
 
 export const KPIMetrics = ({ trades }: KPIMetricsProps) => {
   const calculateMetrics = (): KPIMetricsType => {
+    // Filter for trades with P&L data - if none have P&L, show all trades as volume
     const closedTrades = trades.filter(t => t.status === 'closed' && t.pnl !== undefined);
+    const allClosedTrades = trades.filter(t => t.status === 'closed');
     const winningTrades = closedTrades.filter(t => t.pnl! > 0);
     const losingTrades = closedTrades.filter(t => t.pnl! < 0);
 
@@ -30,7 +32,9 @@ export const KPIMetrics = ({ trades }: KPIMetricsProps) => {
 
     // Estimate months (from first to last trade) - safely handle date strings
     const toDate = (d: any) => d instanceof Date ? d : new Date(d);
-    const sortedTrades = closedTrades.sort((a, b) => toDate(a.entryDate).getTime() - toDate(b.entryDate).getTime());
+    // Use allClosedTrades for date range since closedTrades may be empty (no P&L data)
+    const tradesForDateCalc = allClosedTrades.length > 0 ? [...allClosedTrades] : [];
+    const sortedTrades = tradesForDateCalc.sort((a, b) => toDate(a.entryDate).getTime() - toDate(b.entryDate).getTime());
     const lastDate = sortedTrades.length > 0 && sortedTrades[sortedTrades.length - 1].exitDate
       ? toDate(sortedTrades[sortedTrades.length - 1].exitDate)
       : new Date();
@@ -43,7 +47,7 @@ export const KPIMetrics = ({ trades }: KPIMetricsProps) => {
     const avgMonthlyGainPercent = totalPnLPercent / monthsElapsed;
 
     return {
-      totalTrades: closedTrades.length,
+      totalTrades: allClosedTrades.length, // Show all trades, not just those with P&L
       winningTrades: winningTrades.length,
       losingTrades: losingTrades.length,
       winRate,
