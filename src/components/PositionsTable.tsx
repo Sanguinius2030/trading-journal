@@ -81,6 +81,16 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
     return `${sign}${percent.toFixed(2)}%`;
   };
 
+  const formatUsd = (value: number | undefined): string => {
+    if (value === undefined || value === null) return '-';
+    return `$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  const formatLeverage = (leverage: number | undefined): string => {
+    if (leverage === undefined || leverage === null) return '-';
+    return `${leverage.toFixed(1)}x`;
+  };
+
   return (
     <div className="positions-table-container">
       <h2>Positions</h2>
@@ -93,11 +103,12 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
               <th>Symbol</th>
               <th>Side</th>
               <th>Status</th>
-              <th>Qty</th>
+              <th>Size (USD)</th>
               <th>Avg Entry</th>
-              <th>Avg Exit</th>
+              <th>Mark Price</th>
+              <th>Liq. Price</th>
+              <th>Unrealized P&L</th>
               <th>Realized P&L</th>
-              <th>P&L %</th>
               <th>Journal</th>
               <th>Category</th>
               <th>Actions</th>
@@ -134,14 +145,42 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                         {position.status}
                       </span>
                     </td>
-                    <td className="quantity-cell">{position.totalQuantity.toFixed(4)}</td>
-                    <td className="price-cell">{formatPrice(position.avgEntryPrice)}</td>
-                    <td className="price-cell">{formatPrice(position.avgExitPrice)}</td>
-                    <td className={`pnl-cell ${position.realizedPnl !== undefined ? (position.realizedPnl >= 0 ? 'positive' : 'negative') : ''}`}>
-                      {formatPnl(position.realizedPnl)}
+                    <td className="size-cell">
+                      {position.status === 'open' && position.positionSizeUsd
+                        ? formatUsd(position.positionSizeUsd)
+                        : formatUsd(position.totalEntryCost)}
+                      {position.leverage && position.status === 'open' && (
+                        <span className="leverage-badge">{formatLeverage(position.leverage)}</span>
+                      )}
                     </td>
-                    <td className={`pnl-cell ${position.realizedPnlPercent !== undefined ? (position.realizedPnlPercent >= 0 ? 'positive' : 'negative') : ''}`}>
-                      {formatPercent(position.realizedPnlPercent)}
+                    <td className="price-cell">{formatPrice(position.avgEntryPrice)}</td>
+                    <td className="price-cell">
+                      {position.status === 'open'
+                        ? formatPrice(position.currentPrice)
+                        : formatPrice(position.avgExitPrice)}
+                    </td>
+                    <td className="price-cell liq-price">
+                      {position.status === 'open'
+                        ? formatPrice(position.liquidationPrice)
+                        : '-'}
+                    </td>
+                    <td className={`pnl-cell ${position.unrealizedPnl !== undefined ? (position.unrealizedPnl >= 0 ? 'positive' : 'negative') : ''}`}>
+                      {position.status === 'open' ? (
+                        <div className="pnl-with-percent">
+                          <span>{formatPnl(position.unrealizedPnl)}</span>
+                          {position.unrealizedPnlPercent !== undefined && (
+                            <span className="pnl-percent">({formatPercent(position.unrealizedPnlPercent)})</span>
+                          )}
+                        </div>
+                      ) : '-'}
+                    </td>
+                    <td className={`pnl-cell ${position.realizedPnl !== undefined ? (position.realizedPnl >= 0 ? 'positive' : 'negative') : ''}`}>
+                      <div className="pnl-with-percent">
+                        <span>{formatPnl(position.realizedPnl)}</span>
+                        {position.realizedPnlPercent !== undefined && (
+                          <span className="pnl-percent">({formatPercent(position.realizedPnlPercent)})</span>
+                        )}
+                      </div>
                     </td>
                     <td className="journal-cell">
                       {isEditing ? (
@@ -208,7 +247,7 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                   {/* Expanded row showing fills */}
                   {isExpanded && position.fills && position.fills.length > 0 && (
                     <tr className="fills-row">
-                      <td colSpan={12}>
+                      <td colSpan={13}>
                         <div className="fills-container">
                           <h4>Fills ({position.fillsCount})</h4>
                           <table className="fills-table">

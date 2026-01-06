@@ -206,3 +206,53 @@ export function getWalletAddress(): string {
 export function isLighterConfigured(): boolean {
   return !!LIGHTER_AUTH_TOKEN || !!LIGHTER_WALLET_ADDRESS;
 }
+
+/**
+ * Lighter API position data from explorer
+ */
+export interface LighterPosition {
+  market_id: number;
+  side: 'long' | 'short';
+  size: string;
+  entry_price: string;
+  mark_price: string;
+  liquidation_price: string;
+  unrealized_pnl: string;
+  margin: string;
+  leverage: string;
+  funding: string;
+  position_value: string;
+}
+
+/**
+ * Fetch open positions from Lighter explorer API
+ */
+export async function fetchOpenPositions(): Promise<LighterPosition[]> {
+  if (!LIGHTER_ACCOUNT_INDEX) {
+    console.warn('Lighter account index not configured');
+    return [];
+  }
+
+  try {
+    const response = await fetch(
+      `/api/lighter-proxy?endpoint=accounts/${LIGHTER_ACCOUNT_INDEX}/positions`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch positions: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Open positions from Lighter:', data);
+    // The API returns positions array directly or nested
+    return data.positions || data || [];
+  } catch (error) {
+    console.error('Error fetching open positions:', error);
+    return [];
+  }
+}

@@ -5,18 +5,25 @@ import {
   createPosition,
   updatePosition,
   linkTradeToPosition,
+  getSymbolFromMarketId,
   type DBTrade,
   type DBPosition
 } from './supabase';
+import { fetchOpenPositions, type LighterPosition } from './lighterApi';
 
 /**
  * Aggregates individual fills into positions based on open/close cycles.
  * A position closes when net quantity reaches 0, and a new position starts with subsequent trades.
+ * For open positions, merges live data from Lighter API.
  */
 export async function aggregateTradesIntoPositions(): Promise<Position[]> {
   // Get all trades and existing positions
   const dbTrades = await getTradesFromDB();
   const existingPositions = await getPositionsFromDB();
+
+  // Fetch live position data from Lighter
+  const livePositions = await fetchOpenPositions();
+  console.log('Live positions from Lighter:', livePositions);
 
   // Group trades by symbol
   const tradesBySymbol = groupTradesBySymbol(dbTrades);
@@ -32,6 +39,17 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
 
     // Calculate positions for this symbol
     const symbolPositions = calculatePositionsForSymbol(symbol, sortedTrades, existingPositions);
+
+    // Merge live data for open positions
+    for (const position of symbolPositions) {
+      if (position.status === 'open') {
+        const liveData = findLivePositionData(position, livePositions);
+        if (liveData) {
+          mergeWithLiveData(position, liveData);
+        }
+      }
+    }
+
     allPositions.push(...symbolPositions);
   }
 
@@ -39,6 +57,36 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
   allPositions.sort((a, b) => b.openedAt.getTime() - a.openedAt.getTime());
 
   return allPositions;
+}
+
+/**
+ * Find matching live position data from Lighter API
+ */
+function findLivePositionData(position: Position, livePositions: LighterPosition[]): LighterPosition | undefined {
+  return livePositions.find(lp => {
+    const liveSymbol = getSymbolFromMarketId(lp.market_id);
+    const liveSide = lp.side.toUpperCase();
+    return liveSymbol === position.symbol && liveSide === position.side;
+  });
+}
+
+/**
+ * Merge live data from Lighter API into position
+ */
+function mergeWithLiveData(position: Position, liveData: LighterPosition): void {
+  position.positionSizeUsd = parseFloat(liveData.position_value) || undefined;
+  position.currentPrice = parseFloat(liveData.mark_price) || undefined;
+  position.liquidationPrice = parseFloat(liveData.liquidation_price) || undefined;
+  position.margin = parseFloat(liveData.margin) || undefined;
+  position.leverage = parseFloat(liveData.leverage) || undefined;
+  position.funding = parseFloat(liveData.funding) || undefined;
+  position.unrealizedPnl = parseFloat(liveData.unrealized_pnl) || undefined;
+  position.totalQuantity = parseFloat(liveData.size) || position.totalQuantity;
+
+  // Calculate unrealized P&L percent if we have the data
+  if (position.unrealizedPnl !== undefined && position.margin && position.margin > 0) {
+    position.unrealizedPnlPercent = (position.unrealizedPnl / position.margin) * 100;
+  }
 }
 
 /**

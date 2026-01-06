@@ -1194,6 +1194,47 @@ body {
   color: var(--danger);
 }
 
+/* Size cell with leverage */
+.size-cell {
+  white-space: nowrap;
+}
+
+.leverage-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.125rem 0.375rem;
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+/* Liquidation price */
+.liq-price {
+  color: var(--text-muted);
+}
+
+/* P&L with percent */
+.pnl-with-percent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.pnl-percent {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.pnl-cell.positive .pnl-percent {
+  color: var(--success);
+}
+
+.pnl-cell.negative .pnl-percent {
+  color: var(--danger);
+}
+
 /* Journal and Category cells */
 .journal-cell {
   max-width: 200px;

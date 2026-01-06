@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const LIGHTER_API_BASE_URL = process.env.VITE_LIGHTER_API_URL || 'https://mainnet.zklighter.elliot.ai';
+const LIGHTER_EXPLORER_URL = 'https://explorer.elliot.ai';
 const LIGHTER_API_KEY = process.env.VITE_LIGHTER_API_KEY || '';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -36,7 +37,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Build query string
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
-    const url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
+
+    // Use explorer URL for positions endpoint
+    let url: string;
+    if (endpoint.startsWith('accounts/') && endpoint.includes('/positions')) {
+      // Explorer API for positions: /api/accounts/{account_index}/positions
+      url = `${LIGHTER_EXPLORER_URL}/api/${endpoint}`;
+    } else {
+      url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
+    }
 
     console.log('Proxying request:', {
       endpoint,

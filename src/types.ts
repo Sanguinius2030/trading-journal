@@ -55,9 +55,18 @@ export interface Position {
   totalEntryCost: number;
   totalExitRevenue: number;
 
+  // Live data for open positions
+  positionSizeUsd?: number;
+  currentPrice?: number;
+  liquidationPrice?: number;
+  margin?: number;
+  leverage?: number;
+  funding?: number;
+
   realizedPnl?: number;
   realizedPnlPercent?: number;
   unrealizedPnl?: number;
+  unrealizedPnlPercent?: number;
 
   openedAt: Date;
   closedAt?: Date;
