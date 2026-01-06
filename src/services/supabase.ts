@@ -136,3 +136,135 @@ export async function updateTradeNotes(tradeId: string, notes: string, reasoning
     throw error;
   }
 }
+
+// ==================== POSITIONS ====================
+
+export interface DBPosition {
+  id: string;
+  symbol: string;
+  market_id?: number;
+  side: 'LONG' | 'SHORT';
+  status: 'open' | 'closed';
+  total_quantity: number;
+  avg_entry_price?: number;
+  avg_exit_price?: number;
+  total_entry_cost: number;
+  total_exit_revenue: number;
+  realized_pnl?: number;
+  realized_pnl_percent?: number;
+  unrealized_pnl?: number;
+  opened_at?: string;
+  closed_at?: string;
+  journal?: string;
+  category?: string;
+  fills_count: number;
+  exchange: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Fetch all positions from database
+export async function getPositionsFromDB(): Promise<DBPosition[]> {
+  if (!supabase) {
+    console.warn('Supabase not configured');
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from('positions')
+    .select('*')
+    .order('opened_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching positions from DB:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+// Create a new position
+export async function createPosition(position: Partial<DBPosition>): Promise<DBPosition | null> {
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('positions')
+    .insert(position)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating position:', error);
+    throw error;
+  }
+
+  return data;
+}
+
+// Update position (for journal/category edits)
+export async function updatePosition(
+  positionId: string,
+  updates: Partial<Pick<DBPosition, 'journal' | 'category' | 'status' | 'closed_at' | 'avg_exit_price' | 'total_exit_revenue' | 'realized_pnl' | 'realized_pnl_percent' | 'total_quantity' | 'fills_count'>>
+): Promise<void> {
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from('positions')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('id', positionId);
+
+  if (error) {
+    console.error('Error updating position:', error);
+    throw error;
+  }
+}
+
+// Upsert positions (create or update)
+export async function upsertPositions(positions: Partial<DBPosition>[]): Promise<void> {
+  if (!supabase || positions.length === 0) return;
+
+  const { error } = await supabase
+    .from('positions')
+    .upsert(positions, {
+      onConflict: 'id',
+      ignoreDuplicates: false
+    });
+
+  if (error) {
+    console.error('Error upserting positions:', error);
+    throw error;
+  }
+}
+
+// Link a trade to a position
+export async function linkTradeToPosition(tradeId: string, positionId: string): Promise<void> {
+  if (!supabase) return;
+
+  const { error } = await supabase
+    .from('trades')
+    .update({ position_id: positionId })
+    .eq('id', tradeId);
+
+  if (error) {
+    console.error('Error linking trade to position:', error);
+    throw error;
+  }
+}
+
+// Get trades for a specific position
+export async function getTradesForPosition(positionId: string): Promise<DBTrade[]> {
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from('trades')
+    .select('*')
+    .eq('position_id', positionId)
+    .order('entry_date', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching trades for position:', error);
+    throw error;
+  }
+
+  return data || [];
+}

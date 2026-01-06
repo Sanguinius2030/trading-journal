@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { PortfolioChart } from './components/PortfolioChart';
 import { TradesTimeline } from './components/TradesTimeline';
-import { TradesTable } from './components/TradesTable';
+import { PositionsTable } from './components/PositionsTable';
 import { KPIMetrics } from './components/KPIMetrics';
 import { GrowthProjection } from './components/GrowthProjection';
 import { PnLDashboard } from './components/PnLDashboard';
@@ -9,7 +9,9 @@ import { TradeJournalForm } from './components/TradeJournalForm';
 import { PasswordProtection } from './components/PasswordProtection';
 import { portfolioSnapshots } from './mockData';
 import { useLighterTrades } from './hooks/useLighterTrades';
-import type { Trade } from './types';
+import { aggregateTradesIntoPositions } from './services/positionAggregator';
+import { updatePosition } from './services/supabase';
+import type { Trade, Position } from './types';
 import { TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import './App.css';
 
@@ -20,6 +22,10 @@ function App() {
 
   // Fetch trades from Lighter DEX
   const { trades: lighterTrades, loading: lighterLoading, error: lighterError, refetch, isConfigured } = useLighterTrades();
+
+  // Positions state
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [positionsLoading, setPositionsLoading] = useState(false);
 
   // Combine manual trades with Lighter trades
   const [allTrades, setAllTrades] = useState<Trade[]>(manualTrades);
@@ -32,8 +38,40 @@ function App() {
     setAllTrades(combined);
   }, [manualTrades, lighterTrades]);
 
+  // Aggregate trades into positions when trades change
+  useEffect(() => {
+    const loadPositions = async () => {
+      if (lighterTrades.length === 0) return;
+
+      setPositionsLoading(true);
+      try {
+        const aggregatedPositions = await aggregateTradesIntoPositions();
+        setPositions(aggregatedPositions);
+      } catch (error) {
+        console.error('Failed to aggregate positions:', error);
+      } finally {
+        setPositionsLoading(false);
+      }
+    };
+
+    loadPositions();
+  }, [lighterTrades]);
+
   const handleAddTrade = (newTrade: Trade) => {
     setManualTrades([...manualTrades, newTrade]);
+  };
+
+  const handleUpdatePosition = async (positionId: string, updates: { journal?: string; category?: string }) => {
+    try {
+      await updatePosition(positionId, updates);
+      // Update local state
+      setPositions(prev => prev.map(p =>
+        p.id === positionId ? { ...p, ...updates } : p
+      ));
+    } catch (error) {
+      console.error('Failed to update position:', error);
+      throw error;
+    }
   };
 
   return (
@@ -126,7 +164,17 @@ function App() {
 
         {activeTab === 'table' && (
           <div className="table-tab">
-            <TradesTable trades={allTrades} />
+            {positionsLoading ? (
+              <div className="loading-positions">
+                <RefreshCw size={24} className="spinning" />
+                <span>Aggregating positions...</span>
+              </div>
+            ) : (
+              <PositionsTable
+                positions={positions}
+                onUpdatePosition={handleUpdatePosition}
+              />
+            )}
           </div>
         )}
 

@@ -41,3 +41,33 @@ export interface KPIMetrics {
   avgMonthlyGain: number;
   avgMonthlyGainPercent: number;
 }
+
+export interface Position {
+  id: string;
+  symbol: string;
+  marketId?: number;
+  side: 'LONG' | 'SHORT';
+  status: 'open' | 'closed';
+
+  totalQuantity: number;
+  avgEntryPrice: number;
+  avgExitPrice?: number;
+  totalEntryCost: number;
+  totalExitRevenue: number;
+
+  realizedPnl?: number;
+  realizedPnlPercent?: number;
+  unrealizedPnl?: number;
+
+  openedAt: Date;
+  closedAt?: Date;
+
+  journal?: string;
+  category?: string;
+
+  fillsCount: number;
+  exchange: 'Lighter' | 'Hyperliquid';
+
+  // For UI - linked fills
+  fills?: Trade[];
+}
