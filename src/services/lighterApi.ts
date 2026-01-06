@@ -39,7 +39,8 @@ async function fetchTradeHistoryFromAPI(limit: number = 100): Promise<any[]> {
  */
 function transformToDBTrade(trade: any): Partial<DBTrade> {
   const isBuy = trade.bid_account_id === parseInt(LIGHTER_ACCOUNT_INDEX);
-  const timestamp = new Date(trade.timestamp).toISOString();
+  // Lighter timestamp is in milliseconds
+  const timestamp = new Date(Number(trade.timestamp)).toISOString();
 
   return {
     id: `lighter-${trade.trade_id}`,
@@ -62,22 +63,26 @@ function transformToDBTrade(trade: any): Partial<DBTrade> {
  * Transform database trade to app Trade format
  */
 function dbTradeToAppTrade(dbTrade: DBTrade): Trade {
+  // Safely parse date - handle null/undefined
+  const entryDate = dbTrade.entry_date ? new Date(dbTrade.entry_date) : new Date();
+  const exitDate = dbTrade.exit_date ? new Date(dbTrade.exit_date) : undefined;
+
   return {
     id: dbTrade.id,
-    symbol: dbTrade.symbol,
-    type: dbTrade.type,
-    status: dbTrade.status,
-    entryPrice: dbTrade.entry_price,
+    symbol: dbTrade.symbol || 'UNKNOWN',
+    type: dbTrade.type || 'long',
+    status: dbTrade.status || 'closed',
+    entryPrice: dbTrade.entry_price || 0,
     exitPrice: dbTrade.exit_price,
-    quantity: dbTrade.quantity,
-    entryDate: new Date(dbTrade.entry_date),
-    exitDate: dbTrade.exit_date ? new Date(dbTrade.exit_date) : undefined,
+    quantity: dbTrade.quantity || 0,
+    entryDate,
+    exitDate,
     pnl: dbTrade.pnl,
     pnlPercent: dbTrade.pnl_percent,
     notes: dbTrade.notes,
     reasoning: dbTrade.reasoning,
     tradeCategory: dbTrade.trade_category,
-    exchange: dbTrade.exchange as 'Lighter' | 'Hyperliquid',
+    exchange: (dbTrade.exchange as 'Lighter' | 'Hyperliquid') || 'Lighter',
   };
 }
 
