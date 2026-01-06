@@ -22,7 +22,12 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
   const existingPositions = await getPositionsFromDB();
 
   // Fetch live position data from Lighter
-  const livePositions = await fetchOpenPositions();
+  let livePositions = await fetchOpenPositions();
+  // Ensure livePositions is always an array
+  if (!Array.isArray(livePositions)) {
+    console.warn('Live positions is not an array, resetting to empty array:', livePositions);
+    livePositions = [];
+  }
   console.log('Live positions from Lighter:', livePositions);
 
   // Group trades by symbol

@@ -248,9 +248,31 @@ export async function fetchOpenPositions(): Promise<LighterPosition[]> {
     }
 
     const data = await response.json();
-    console.log('Open positions from Lighter:', data);
-    // The API returns positions array directly or nested
-    return data.positions || data || [];
+    console.log('Open positions from Lighter (raw):', data);
+
+    // Handle various API response formats
+    let positions: LighterPosition[] = [];
+
+    if (Array.isArray(data)) {
+      // Direct array
+      positions = data;
+    } else if (data && typeof data === 'object') {
+      // Check for nested positions array
+      if (Array.isArray(data.positions)) {
+        positions = data.positions;
+      } else if (Array.isArray(data.data)) {
+        positions = data.data;
+      } else {
+        // Object keyed by market_id or other keys - convert values to array
+        const values = Object.values(data);
+        if (values.length > 0 && typeof values[0] === 'object') {
+          positions = values as LighterPosition[];
+        }
+      }
+    }
+
+    console.log('Parsed positions:', positions);
+    return positions;
   } catch (error) {
     console.error('Error fetching open positions:', error);
     return [];
