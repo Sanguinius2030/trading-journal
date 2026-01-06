@@ -9,7 +9,7 @@ import {
   type DBTrade,
   type DBPosition
 } from './supabase';
-import { fetchOpenPositions, type LighterPosition } from './lighterApi';
+import { fetchOpenPositions, fetchMarketPrices, type LighterPosition, type MarketInfo } from './lighterApi';
 
 /**
  * Aggregates individual fills into positions based on open/close cycles.
@@ -29,6 +29,10 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
     livePositions = [];
   }
   console.log('Live positions from Lighter:', livePositions);
+
+  // Fetch current market prices for mark price
+  const marketPrices = await fetchMarketPrices();
+  console.log('Market prices:', marketPrices);
 
   // Group trades by symbol
   const tradesBySymbol = groupTradesBySymbol(dbTrades);
@@ -50,7 +54,7 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
       if (position.status === 'open') {
         const liveData = findLivePositionData(position, livePositions);
         if (liveData) {
-          mergeWithLiveData(position, liveData);
+          mergeWithLiveData(position, liveData, marketPrices);
         }
       }
     }
@@ -69,9 +73,9 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
  */
 function findLivePositionData(position: Position, livePositions: LighterPosition[]): LighterPosition | undefined {
   return livePositions.find(lp => {
-    // Handle various field name formats from API
-    const marketId = lp.market_id ?? (lp as any).marketId ?? (lp as any).market;
-    const liveSymbol = getSymbolFromMarketId(marketId);
+    // API uses market_index not market_id
+    const marketIndex = lp.market_index ?? (lp as any).market_id ?? (lp as any).marketId;
+    const liveSymbol = getSymbolFromMarketId(marketIndex);
 
     // Handle different side field formats
     const side = lp.side ?? (lp as any).direction ?? (lp as any).positionSide;
@@ -81,27 +85,71 @@ function findLivePositionData(position: Position, livePositions: LighterPosition
     }
     const liveSide = String(side).toUpperCase();
 
+    console.log('Matching position:', {
+      positionSymbol: position.symbol,
+      liveSymbol,
+      positionSide: position.side,
+      liveSide,
+      marketIndex
+    });
+
     return liveSymbol === position.symbol && liveSide === position.side;
   });
 }
 
 /**
  * Merge live data from Lighter API into position
+ * API provides: market_index, pnl, side, size, entry_price
  */
-function mergeWithLiveData(position: Position, liveData: LighterPosition): void {
-  position.positionSizeUsd = parseFloat(liveData.position_value) || undefined;
-  position.currentPrice = parseFloat(liveData.mark_price) || undefined;
-  position.liquidationPrice = parseFloat(liveData.liquidation_price) || undefined;
-  position.margin = parseFloat(liveData.margin) || undefined;
-  position.leverage = parseFloat(liveData.leverage) || undefined;
-  position.funding = parseFloat(liveData.funding) || undefined;
-  position.unrealizedPnl = parseFloat(liveData.unrealized_pnl) || undefined;
-  position.totalQuantity = parseFloat(liveData.size) || position.totalQuantity;
+function mergeWithLiveData(
+  position: Position,
+  liveData: LighterPosition,
+  marketPrices: Record<number, MarketInfo>
+): void {
+  const size = parseFloat(liveData.size) || 0;
+  const entryPrice = parseFloat(liveData.entry_price) || 0;
+  const marketIndex = liveData.market_index;
 
-  // Calculate unrealized P&L percent if we have the data
-  if (position.unrealizedPnl !== undefined && position.margin && position.margin > 0) {
-    position.unrealizedPnlPercent = (position.unrealizedPnl / position.margin) * 100;
+  // Calculate position size in USD: size * entry_price
+  position.positionSizeUsd = size * entryPrice;
+
+  // Use pnl field (not unrealized_pnl) from API
+  position.unrealizedPnl = parseFloat(liveData.pnl) || undefined;
+
+  // Update quantity from live data
+  position.totalQuantity = size || position.totalQuantity;
+
+  // Get mark price from markets API if available
+  const marketInfo = marketPrices[marketIndex];
+  if (marketInfo) {
+    position.currentPrice = parseFloat(marketInfo.mark_price) || undefined;
+    console.log('Got mark price from markets API:', marketInfo.mark_price);
+  } else if (liveData.mark_price) {
+    // Fallback to position data if available
+    position.currentPrice = parseFloat(liveData.mark_price);
   }
+
+  // These fields may not be available from basic explorer API
+  position.liquidationPrice = liveData.liquidation_price ? parseFloat(liveData.liquidation_price) : undefined;
+  position.margin = liveData.margin ? parseFloat(liveData.margin) : undefined;
+  position.leverage = liveData.leverage ? parseFloat(liveData.leverage) : undefined;
+  position.funding = liveData.funding ? parseFloat(liveData.funding) : undefined;
+
+  // Calculate unrealized P&L percent based on position size
+  if (position.unrealizedPnl !== undefined && position.positionSizeUsd && position.positionSizeUsd > 0) {
+    position.unrealizedPnlPercent = (position.unrealizedPnl / position.positionSizeUsd) * 100;
+  }
+
+  console.log('Merged live data:', {
+    symbol: position.symbol,
+    marketIndex,
+    size,
+    entryPrice,
+    positionSizeUsd: position.positionSizeUsd,
+    currentPrice: position.currentPrice,
+    unrealizedPnl: position.unrealizedPnl,
+    unrealizedPnlPercent: position.unrealizedPnlPercent
+  });
 }
 
 /**

@@ -105,6 +105,7 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
               <th>Status</th>
               <th>Size (USD)</th>
               <th>Avg Entry</th>
+              <th>Avg Close</th>
               <th>Mark Price</th>
               <th>Liq. Price</th>
               <th>Unrealized P&L</th>
@@ -155,9 +156,14 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                     </td>
                     <td className="price-cell">{formatPrice(position.avgEntryPrice)}</td>
                     <td className="price-cell">
+                      {position.status === 'closed'
+                        ? formatPrice(position.avgExitPrice)
+                        : '-'}
+                    </td>
+                    <td className="price-cell">
                       {position.status === 'open'
                         ? formatPrice(position.currentPrice)
-                        : formatPrice(position.avgExitPrice)}
+                        : '-'}
                     </td>
                     <td className="price-cell liq-price">
                       {position.status === 'open'
@@ -247,7 +253,7 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                   {/* Expanded row showing fills */}
                   {isExpanded && position.fills && position.fills.length > 0 && (
                     <tr className="fills-row">
-                      <td colSpan={13}>
+                      <td colSpan={14}>
                         <div className="fills-container">
                           <h4>Fills ({position.fillsCount})</h4>
                           <table className="fills-table">

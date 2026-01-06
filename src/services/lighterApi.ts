@@ -209,19 +209,105 @@ export function isLighterConfigured(): boolean {
 
 /**
  * Lighter API position data from explorer
+ * Note: API returns market_index (not market_id) and pnl (not unrealized_pnl)
  */
 export interface LighterPosition {
-  market_id: number;
+  market_index: number;
   side: 'long' | 'short';
   size: string;
   entry_price: string;
+  pnl: string;
+  // These fields may come from extended API or need to be fetched separately
+  mark_price?: string;
+  liquidation_price?: string;
+  margin?: string;
+  leverage?: string;
+  funding?: string;
+}
+
+/**
+ * Market info from Lighter API
+ */
+export interface MarketInfo {
+  market_index: number;
   mark_price: string;
-  liquidation_price: string;
-  unrealized_pnl: string;
-  margin: string;
-  leverage: string;
-  funding: string;
-  position_value: string;
+  index_price: string;
+  last_price: string;
+}
+
+// Cache for market prices (refresh every 30 seconds)
+let marketPricesCache: Record<number, MarketInfo> = {};
+let marketPricesCacheTime = 0;
+const CACHE_TTL = 30000; // 30 seconds
+
+/**
+ * Fetch current market prices from Lighter API
+ */
+export async function fetchMarketPrices(): Promise<Record<number, MarketInfo>> {
+  // Return cached data if still valid
+  const now = Date.now();
+  if (now - marketPricesCacheTime < CACHE_TTL && Object.keys(marketPricesCache).length > 0) {
+    return marketPricesCache;
+  }
+
+  try {
+    const response = await fetch(
+      `/api/lighter-proxy?endpoint=markets`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
+    if (!response.ok) {
+      console.warn('Failed to fetch market prices:', response.status);
+      return marketPricesCache;
+    }
+
+    const data = await response.json();
+    console.log('Market prices response:', data);
+
+    // Parse markets data - format may vary
+    const markets: Record<number, MarketInfo> = {};
+
+    if (Array.isArray(data)) {
+      data.forEach((m: any) => {
+        const idx = m.market_index ?? m.marketIndex ?? m.id;
+        if (idx !== undefined) {
+          markets[idx] = {
+            market_index: idx,
+            mark_price: m.mark_price ?? m.markPrice ?? m.price ?? '0',
+            index_price: m.index_price ?? m.indexPrice ?? '0',
+            last_price: m.last_price ?? m.lastPrice ?? m.price ?? '0'
+          };
+        }
+      });
+    } else if (data && typeof data === 'object') {
+      // Check for markets array or object
+      const marketsList = data.markets || data.data || Object.values(data);
+      if (Array.isArray(marketsList)) {
+        marketsList.forEach((m: any) => {
+          const idx = m.market_index ?? m.marketIndex ?? m.id;
+          if (idx !== undefined) {
+            markets[idx] = {
+              market_index: idx,
+              mark_price: m.mark_price ?? m.markPrice ?? m.price ?? '0',
+              index_price: m.index_price ?? m.indexPrice ?? '0',
+              last_price: m.last_price ?? m.lastPrice ?? m.price ?? '0'
+            };
+          }
+        });
+      }
+    }
+
+    marketPricesCache = markets;
+    marketPricesCacheTime = now;
+
+    return markets;
+  } catch (error) {
+    console.error('Error fetching market prices:', error);
+    return marketPricesCache;
+  }
 }
 
 /**
@@ -251,14 +337,18 @@ export async function fetchOpenPositions(): Promise<LighterPosition[]> {
     console.log('Open positions from Lighter (raw):', data);
 
     // Handle various API response formats
+    // API returns: { positions: { "120": { market_index: 120, pnl: "-6.07", side: "long", size: "1000.00", entry_price: "3.076775" } } }
     let positions: LighterPosition[] = [];
 
     if (Array.isArray(data)) {
       // Direct array
       positions = data;
     } else if (data && typeof data === 'object') {
-      // Check for nested positions array
-      if (Array.isArray(data.positions)) {
+      // Check for nested positions object (keyed by market_index)
+      if (data.positions && typeof data.positions === 'object' && !Array.isArray(data.positions)) {
+        // Convert object values to array: { "120": {...}, "121": {...} } -> [...]
+        positions = Object.values(data.positions) as LighterPosition[];
+      } else if (Array.isArray(data.positions)) {
         positions = data.positions;
       } else if (Array.isArray(data.data)) {
         positions = data.data;
