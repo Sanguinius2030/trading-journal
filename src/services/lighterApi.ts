@@ -61,27 +61,41 @@ function transformToDBTrade(trade: any): Partial<DBTrade> {
 
 /**
  * Transform database trade to app Trade format
+ * Returns null if trade data is invalid
  */
-function dbTradeToAppTrade(dbTrade: DBTrade): Trade {
+function dbTradeToAppTrade(dbTrade: DBTrade): Trade | null {
+  // Skip invalid trades
+  if (!dbTrade || !dbTrade.id) {
+    console.warn('Invalid trade data:', dbTrade);
+    return null;
+  }
+
   // Safely parse date - handle null/undefined
   const entryDate = dbTrade.entry_date ? new Date(dbTrade.entry_date) : new Date();
   const exitDate = dbTrade.exit_date ? new Date(dbTrade.exit_date) : undefined;
+
+  // Ensure numeric values are numbers, not null
+  const entryPrice = Number(dbTrade.entry_price) || 0;
+  const quantity = Number(dbTrade.quantity) || 0;
+  const exitPrice = dbTrade.exit_price != null ? Number(dbTrade.exit_price) : undefined;
+  const pnl = dbTrade.pnl != null ? Number(dbTrade.pnl) : undefined;
+  const pnlPercent = dbTrade.pnl_percent != null ? Number(dbTrade.pnl_percent) : undefined;
 
   return {
     id: dbTrade.id,
     symbol: dbTrade.symbol || 'UNKNOWN',
     type: dbTrade.type || 'long',
     status: dbTrade.status || 'closed',
-    entryPrice: dbTrade.entry_price || 0,
-    exitPrice: dbTrade.exit_price,
-    quantity: dbTrade.quantity || 0,
+    entryPrice,
+    exitPrice,
+    quantity,
     entryDate,
     exitDate,
-    pnl: dbTrade.pnl,
-    pnlPercent: dbTrade.pnl_percent,
-    notes: dbTrade.notes,
-    reasoning: dbTrade.reasoning,
-    tradeCategory: dbTrade.trade_category,
+    pnl,
+    pnlPercent,
+    notes: dbTrade.notes || undefined,
+    reasoning: dbTrade.reasoning || undefined,
+    tradeCategory: dbTrade.trade_category || undefined,
     exchange: (dbTrade.exchange as 'Lighter' | 'Hyperliquid') || 'Lighter',
   };
 }
@@ -150,7 +164,8 @@ export async function fetchLighterTrades(): Promise<Trade[]> {
     // Return trades from database
     if (supabase) {
       const dbTrades = await getTradesFromDB();
-      return dbTrades.map(dbTradeToAppTrade);
+      // Filter out any null results from invalid trades
+      return dbTrades.map(dbTradeToAppTrade).filter((t): t is Trade => t !== null);
     }
 
     // Fallback: fetch directly from API if no database
