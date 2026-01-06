@@ -21,8 +21,8 @@ interface LighterTrade {
 async function getAccountByAddress(walletAddress: string): Promise<any> {
   // Normalize address to lowercase as blockchain APIs often expect lowercase addresses
   const normalizedAddress = walletAddress.toLowerCase();
-  // The API expects two parameters: 'by' and 'value' (not just l1_address)
-  const response = await fetch(`/api/lighter-proxy?endpoint=accountsByL1Address&by=l1_address&value=${normalizedAddress}`, {
+  // Use l1_address parameter as per Python SDK
+  const response = await fetch(`/api/lighter-proxy?endpoint=accountsByL1Address&l1_address=${normalizedAddress}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',

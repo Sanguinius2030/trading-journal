@@ -45,12 +45,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       fullUrl: url,
     });
 
+    // Note: accountsByL1Address is a public endpoint that doesn't require API key
+    // Only add API key header if we have one AND it's needed for authenticated endpoints
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+    };
+
+    // Some endpoints may need API key - add it for authenticated endpoints
+    const authenticatedEndpoints = ['trades', 'accountActiveOrders', 'accountInactiveOrders'];
+    if (LIGHTER_API_KEY && authenticatedEndpoints.some(e => endpoint.includes(e))) {
+      headers['x-api-key'] = LIGHTER_API_KEY;
+    }
+
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': LIGHTER_API_KEY,
-      },
+      headers,
     });
 
     console.log('Lighter API response:', {
