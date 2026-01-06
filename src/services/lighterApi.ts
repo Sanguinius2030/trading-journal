@@ -4,17 +4,6 @@ import type { Trade } from '../types';
 const LIGHTER_WALLET_ADDRESS = import.meta.env.VITE_LIGHTER_WALLET_ADDRESS || '';
 const LIGHTER_API_KEY = import.meta.env.VITE_LIGHTER_API_KEY || '';
 
-interface LighterTrade {
-  id: string;
-  market: string;
-  side: 'buy' | 'sell';
-  price: string;
-  size: string;
-  timestamp: number;
-  pnl?: string;
-  // Add more fields as needed based on actual API response
-}
-
 /**
  * Fetch account ID from Ethereum address using serverless proxy
  * Uses /api/v1/account endpoint with by=l1_address and value=<address>
@@ -80,36 +69,6 @@ export async function fetchLighterTrades(walletAddress: string): Promise<Trade[]
     console.error('Error fetching Lighter account:', error);
     throw error;
   }
-}
-
-/**
- * Transform Lighter trade format to our application's Trade type
- */
-function transformLighterTrades(lighterTrades: LighterTrade[]): Trade[] {
-  return lighterTrades.map((trade, index) => {
-    const price = parseFloat(trade.price);
-    const size = parseFloat(trade.size);
-    const pnl = trade.pnl ? parseFloat(trade.pnl) : undefined;
-
-    // Determine if it's a long or short based on the side
-    const type: 'long' | 'short' = trade.side === 'buy' ? 'long' : 'short';
-
-    return {
-      id: trade.id || `lighter-${index}`,
-      symbol: trade.market || 'UNKNOWN',
-      type,
-      status: pnl !== undefined ? 'closed' : 'open',
-      entryPrice: price,
-      exitPrice: pnl !== undefined ? price + (pnl / size) : undefined,
-      quantity: size,
-      entryDate: new Date(trade.timestamp),
-      exitDate: pnl !== undefined ? new Date(trade.timestamp) : undefined,
-      pnl,
-      pnlPercent: pnl !== undefined ? (pnl / (price * size)) * 100 : undefined,
-      exchange: 'Lighter',
-      // Add notes/reasoning if available from API
-    } as Trade;
-  });
 }
 
 /**
