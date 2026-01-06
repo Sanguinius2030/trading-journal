@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { fetchLighterTrades, getWalletAddress, isLighterConfigured } from '../services/lighterApi';
+import { fetchLighterTrades, isLighterConfigured } from '../services/lighterApi';
 import type { Trade } from '../types';
 
 interface UseLighterTradesResult {
@@ -28,10 +28,9 @@ export function useLighterTrades(): UseLighterTradesResult {
     setError(null);
 
     try {
-      const walletAddress = getWalletAddress();
-      console.log('Fetching trades for wallet:', walletAddress);
-      const lighterTrades = await fetchLighterTrades(walletAddress);
-      console.log('Received trades:', lighterTrades);
+      console.log('Fetching trades from Lighter...');
+      const lighterTrades = await fetchLighterTrades();
+      console.log('Received trades:', lighterTrades.length);
       setTrades(lighterTrades);
 
       // If no trades but no error, it means the account exists but has no trades
