@@ -17,12 +17,13 @@ interface LighterTrade {
 
 /**
  * Fetch account ID from Ethereum address using serverless proxy
+ * Uses /api/v1/account endpoint with by=l1_address and value=<address>
  */
 async function getAccountByAddress(walletAddress: string): Promise<any> {
   // Normalize address to lowercase as blockchain APIs often expect lowercase addresses
   const normalizedAddress = walletAddress.toLowerCase();
-  // Use l1_address parameter as per Python SDK
-  const response = await fetch(`/api/lighter-proxy?endpoint=accountsByL1Address&l1_address=${normalizedAddress}`, {
+  // Use /account endpoint with by and value params (as per Python SDK get_info.py example)
+  const response = await fetch(`/api/lighter-proxy?endpoint=account&by=l1_address&value=${normalizedAddress}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
