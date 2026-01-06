@@ -6,6 +6,7 @@ import {
   updatePosition,
   linkTradeToPosition,
   getSymbolFromMarketId,
+  upsertPositions,
   type DBTrade,
   type DBPosition
 } from './supabase';
@@ -65,7 +66,61 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
   // Sort all positions by opened date (newest first)
   allPositions.sort((a, b) => b.openedAt.getTime() - a.openedAt.getTime());
 
+  // Save positions to database (preserves journal/category for future loads)
+  await savePositionsToDatabase(allPositions, existingPositions);
+
   return allPositions;
+}
+
+/**
+ * Save positions to database, preserving user-entered journal/category
+ */
+async function savePositionsToDatabase(positions: Position[], existingPositions: DBPosition[]): Promise<void> {
+  const positionsToSave: Partial<DBPosition>[] = [];
+
+  for (const position of positions) {
+    // Check if this position already exists in DB (by matching symbol + opened_at within 1 second)
+    const existingPos = existingPositions.find(ep =>
+      ep.symbol === position.symbol &&
+      ep.opened_at &&
+      Math.abs(new Date(ep.opened_at).getTime() - position.openedAt.getTime()) < 1000
+    );
+
+    // Use existing ID if found, otherwise use the generated ID
+    const positionId = existingPos?.id || position.id;
+
+    positionsToSave.push({
+      id: positionId,
+      symbol: position.symbol,
+      market_id: position.marketId,
+      side: position.side,
+      status: position.status,
+      total_quantity: position.totalQuantity,
+      avg_entry_price: position.avgEntryPrice,
+      avg_exit_price: position.avgExitPrice,
+      total_entry_cost: position.totalEntryCost,
+      total_exit_revenue: position.totalExitRevenue,
+      realized_pnl: position.realizedPnl,
+      realized_pnl_percent: position.realizedPnlPercent,
+      opened_at: position.openedAt.toISOString(),
+      closed_at: position.closedAt?.toISOString(),
+      // Preserve existing journal/category - don't overwrite with undefined
+      journal: position.journal ?? existingPos?.journal,
+      category: position.category ?? existingPos?.category,
+      fills_count: position.fillsCount,
+      exchange: position.exchange
+    });
+
+    // Update position ID to match database
+    position.id = positionId;
+  }
+
+  try {
+    await upsertPositions(positionsToSave);
+    console.log(`Saved ${positionsToSave.length} positions to database`);
+  } catch (error) {
+    console.error('Error saving positions to database:', error);
+  }
 }
 
 /**

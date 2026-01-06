@@ -15,8 +15,9 @@ const LIGHTER_ACCOUNT_INDEX = import.meta.env.VITE_LIGHTER_ACCOUNT_INDEX || '132
 
 /**
  * Fetch trade history from Lighter API
+ * Default limit increased to 1000 to capture more historical trades
  */
-async function fetchTradeHistoryFromAPI(limit: number = 100): Promise<any[]> {
+async function fetchTradeHistoryFromAPI(limit: number = 1000): Promise<any[]> {
   const response = await fetch(
     `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${limit}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
     {
@@ -117,7 +118,7 @@ export async function syncTradesToDB(): Promise<number> {
 
   try {
     console.log('Fetching trades from Lighter API...');
-    const apiTrades = await fetchTradeHistoryFromAPI(100);
+    const apiTrades = await fetchTradeHistoryFromAPI(1000);
     console.log(`Fetched ${apiTrades.length} trades from API`);
 
     if (apiTrades.length === 0) return 0;
