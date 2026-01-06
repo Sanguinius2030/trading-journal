@@ -28,7 +28,7 @@ export const PortfolioChart = ({ data }: PortfolioChartProps) => {
           <YAxis
             stroke="#9CA3AF"
             tick={{ fill: '#9CA3AF' }}
-            tickFormatter={(value) => `$${value.toLocaleString()}`}
+            tickFormatter={(value) => `$${(value ?? 0).toLocaleString()}`}
           />
           <Tooltip
             contentStyle={{
@@ -37,7 +37,7 @@ export const PortfolioChart = ({ data }: PortfolioChartProps) => {
               borderRadius: '8px',
               color: '#F9FAFB'
             }}
-            formatter={(value) => value ? [`$${value.toLocaleString()}`, 'Portfolio Value'] : ['', 'Portfolio Value']}
+            formatter={(value: any) => value != null ? [`$${value.toLocaleString()}`, 'Portfolio Value'] : ['', 'Portfolio Value']}
             labelFormatter={(label) => formattedData.find(d => d.date === label)?.fullDate || label}
           />
           <Legend wrapperStyle={{ color: '#9CA3AF' }} />
