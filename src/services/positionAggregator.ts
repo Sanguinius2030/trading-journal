@@ -119,6 +119,9 @@ function mergeWithLiveData(
   // Update quantity from live data
   position.totalQuantity = size || position.totalQuantity;
 
+  // Use entry price from live API data (this is the accurate avg entry from Lighter)
+  position.avgEntryPrice = entryPrice || position.avgEntryPrice;
+
   // Get mark price from markets API if available
   const marketInfo = marketPrices[marketIndex];
   if (marketInfo) {
@@ -145,6 +148,7 @@ function mergeWithLiveData(
     marketIndex,
     size,
     entryPrice,
+    avgEntryPrice: position.avgEntryPrice,
     positionSizeUsd: position.positionSizeUsd,
     currentPrice: position.currentPrice,
     unrealizedPnl: position.unrealizedPnl,
