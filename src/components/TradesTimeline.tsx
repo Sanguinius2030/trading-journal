@@ -43,14 +43,14 @@ export const TradesTimeline = ({ trades }: TradesTimelineProps) => {
             <div className="trade-details">
               <div className="detail-row">
                 <span className="label">Entry:</span>
-                <span className="value">${trade.entryPrice.toLocaleString()} × {trade.quantity}</span>
-                <span className="date">{format(trade.entryDate, 'MMM dd, yyyy')}</span>
+                <span className="value">${(trade.entryPrice || 0).toLocaleString()} × {trade.quantity || 0}</span>
+                <span className="date">{format(trade.entryDate instanceof Date ? trade.entryDate : new Date(trade.entryDate), 'MMM dd, yyyy')}</span>
               </div>
               {trade.exitPrice && trade.exitDate && (
                 <div className="detail-row">
                   <span className="label">Exit:</span>
-                  <span className="value">${trade.exitPrice.toLocaleString()} × {trade.quantity}</span>
-                  <span className="date">{format(trade.exitDate, 'MMM dd, yyyy')}</span>
+                  <span className="value">${(trade.exitPrice || 0).toLocaleString()} × {trade.quantity || 0}</span>
+                  <span className="date">{format(trade.exitDate instanceof Date ? trade.exitDate : new Date(trade.exitDate), 'MMM dd, yyyy')}</span>
                 </div>
               )}
               {trade.status === 'open' && (

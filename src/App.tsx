@@ -7,14 +7,15 @@ import { GrowthProjection } from './components/GrowthProjection';
 import { PnLDashboard } from './components/PnLDashboard';
 import { TradeJournalForm } from './components/TradeJournalForm';
 import { PasswordProtection } from './components/PasswordProtection';
-import { mockTrades as initialTrades, portfolioSnapshots } from './mockData';
+import { portfolioSnapshots } from './mockData';
 import { useLighterTrades } from './hooks/useLighterTrades';
 import type { Trade } from './types';
 import { TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import './App.css';
 
 function App() {
-  const [manualTrades, setManualTrades] = useState<Trade[]>(initialTrades);
+  // Start with empty manual trades - Lighter trades come from the API
+  const [manualTrades, setManualTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'trades' | 'table' | 'analysis' | 'projection'>('overview');
 
   // Fetch trades from Lighter DEX
