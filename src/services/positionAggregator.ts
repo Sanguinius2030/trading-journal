@@ -69,8 +69,18 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
  */
 function findLivePositionData(position: Position, livePositions: LighterPosition[]): LighterPosition | undefined {
   return livePositions.find(lp => {
-    const liveSymbol = getSymbolFromMarketId(lp.market_id);
-    const liveSide = lp.side.toUpperCase();
+    // Handle various field name formats from API
+    const marketId = lp.market_id ?? (lp as any).marketId ?? (lp as any).market;
+    const liveSymbol = getSymbolFromMarketId(marketId);
+
+    // Handle different side field formats
+    const side = lp.side ?? (lp as any).direction ?? (lp as any).positionSide;
+    if (!side) {
+      console.warn('Position missing side field:', lp);
+      return false;
+    }
+    const liveSide = String(side).toUpperCase();
+
     return liveSymbol === position.symbol && liveSide === position.side;
   });
 }

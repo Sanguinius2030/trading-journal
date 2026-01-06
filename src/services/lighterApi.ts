@@ -272,6 +272,11 @@ export async function fetchOpenPositions(): Promise<LighterPosition[]> {
     }
 
     console.log('Parsed positions:', positions);
+    // Log the actual field names from first position to debug
+    if (positions.length > 0) {
+      console.log('Position fields:', Object.keys(positions[0]));
+      console.log('First position:', positions[0]);
+    }
     return positions;
   } catch (error) {
     console.error('Error fetching open positions:', error);
