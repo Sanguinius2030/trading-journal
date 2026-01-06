@@ -28,10 +28,15 @@ export const KPIMetrics = ({ trades }: KPIMetricsProps) => {
     const startingCapital = 10000;
     const totalPnLPercent = (totalPnL / startingCapital) * 100;
 
-    // Estimate months (from first to last trade)
-    const sortedTrades = closedTrades.sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
+    // Estimate months (from first to last trade) - safely handle date strings
+    const toDate = (d: any) => d instanceof Date ? d : new Date(d);
+    const sortedTrades = closedTrades.sort((a, b) => toDate(a.entryDate).getTime() - toDate(b.entryDate).getTime());
+    const lastDate = sortedTrades.length > 0 && sortedTrades[sortedTrades.length - 1].exitDate
+      ? toDate(sortedTrades[sortedTrades.length - 1].exitDate)
+      : new Date();
+    const firstDate = sortedTrades.length > 0 ? toDate(sortedTrades[0].entryDate) : new Date();
     const monthsElapsed = sortedTrades.length > 0
-      ? Math.max(1, (sortedTrades[sortedTrades.length - 1].exitDate!.getTime() - sortedTrades[0].entryDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
+      ? Math.max(1, (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60 * 24 * 30))
       : 1;
 
     const avgMonthlyGain = totalPnL / monthsElapsed;

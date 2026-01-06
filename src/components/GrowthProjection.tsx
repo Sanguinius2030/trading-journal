@@ -23,10 +23,13 @@ export const GrowthProjection = ({ trades, startingCapital = 10000 }: GrowthProj
     const currentValue = startingCapital + totalPnL;
     const totalReturnPercent = (totalPnL / startingCapital) * 100;
 
-    // Calculate time elapsed
-    const sortedTrades = [...closedTrades].sort((a, b) => a.entryDate.getTime() - b.entryDate.getTime());
-    const firstTradeDate = sortedTrades[0].entryDate;
-    const lastTradeDate = sortedTrades[sortedTrades.length - 1].exitDate!;
+    // Calculate time elapsed - safely handle date strings
+    const toDate = (d: any) => d instanceof Date ? d : new Date(d);
+    const sortedTrades = [...closedTrades].sort((a, b) => toDate(a.entryDate).getTime() - toDate(b.entryDate).getTime());
+    const firstTradeDate = toDate(sortedTrades[0].entryDate);
+    const lastTradeDate = sortedTrades[sortedTrades.length - 1].exitDate
+      ? toDate(sortedTrades[sortedTrades.length - 1].exitDate)
+      : new Date();
     const monthsElapsed = Math.max(1, (lastTradeDate.getTime() - firstTradeDate.getTime()) / (1000 * 60 * 60 * 24 * 30));
 
     // Calculate average monthly return

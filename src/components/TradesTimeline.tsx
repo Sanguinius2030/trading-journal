@@ -7,9 +7,11 @@ interface TradesTimelineProps {
 }
 
 export const TradesTimeline = ({ trades }: TradesTimelineProps) => {
-  const sortedTrades = [...trades].sort((a, b) =>
-    b.entryDate.getTime() - a.entryDate.getTime()
-  );
+  const sortedTrades = [...trades].sort((a, b) => {
+    const dateA = a.entryDate instanceof Date ? a.entryDate : new Date(a.entryDate);
+    const dateB = b.entryDate instanceof Date ? b.entryDate : new Date(b.entryDate);
+    return dateB.getTime() - dateA.getTime();
+  });
 
   return (
     <div className="trades-timeline">
