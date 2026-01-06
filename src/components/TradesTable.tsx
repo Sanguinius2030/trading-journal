@@ -58,11 +58,11 @@ export const TradesTable = ({ trades }: TradesTableProps) => {
                     {trade.status}
                   </span>
                 </td>
-                <td className="price-cell">${trade.entryPrice.toLocaleString()}</td>
+                <td className="price-cell">${(trade.entryPrice || 0).toLocaleString()}</td>
                 <td className="price-cell">
                   {trade.exitPrice ? `$${trade.exitPrice.toLocaleString()}` : '-'}
                 </td>
-                <td className="quantity-cell">{trade.quantity}</td>
+                <td className="quantity-cell">{trade.quantity || 0}</td>
                 <td className={`pnl-cell ${trade.pnl !== undefined ? (trade.pnl >= 0 ? 'positive' : 'negative') : ''}`}>
                   {trade.pnl !== undefined ? (
                     `${trade.pnl >= 0 ? '+' : ''}$${trade.pnl.toLocaleString()}`
