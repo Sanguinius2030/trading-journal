@@ -206,29 +206,54 @@ export async function updatePosition(
   positionId: string,
   updates: Partial<Pick<DBPosition, 'journal' | 'category' | 'status' | 'closed_at' | 'avg_exit_price' | 'total_exit_revenue' | 'realized_pnl' | 'realized_pnl_percent' | 'total_quantity' | 'fills_count'>>
 ): Promise<void> {
-  if (!supabase) return;
+  console.log('updatePosition called:', { positionId, updates, supabaseConfigured: !!supabase });
 
-  const { error } = await supabase
+  if (!supabase) {
+    console.error('Supabase not configured!');
+    throw new Error('Database not configured');
+  }
+
+  const { data, error } = await supabase
     .from('positions')
     .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('id', positionId);
+    .eq('id', positionId)
+    .select();
+
+  console.log('Supabase update result:', { data, error });
 
   if (error) {
     console.error('Error updating position:', error);
     throw error;
   }
+
+  if (!data || data.length === 0) {
+    console.warn('No rows updated - position may not exist in database yet');
+  }
 }
 
 // Upsert positions (create or update)
 export async function upsertPositions(positions: Partial<DBPosition>[]): Promise<void> {
-  if (!supabase || positions.length === 0) return;
+  console.log('upsertPositions called with', positions.length, 'positions');
+  if (!supabase) {
+    console.error('Supabase not configured for upsertPositions');
+    return;
+  }
+  if (positions.length === 0) {
+    console.log('No positions to upsert');
+    return;
+  }
 
-  const { error } = await supabase
+  console.log('Upserting positions:', positions.map(p => ({ id: p.id, symbol: p.symbol, journal: p.journal, category: p.category })));
+
+  const { data, error } = await supabase
     .from('positions')
     .upsert(positions, {
       onConflict: 'id',
       ignoreDuplicates: false
-    });
+    })
+    .select();
+
+  console.log('Upsert result:', { data, error });
 
   if (error) {
     console.error('Error upserting positions:', error);

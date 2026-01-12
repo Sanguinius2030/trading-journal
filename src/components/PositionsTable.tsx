@@ -50,12 +50,14 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
   };
 
   const saveEdits = async (positionId: string) => {
+    console.log('saveEdits called:', { positionId, editValues });
     setSaving(true);
     try {
       await onUpdatePosition(positionId, {
         journal: editValues.journal || undefined,
         category: editValues.category || undefined
       });
+      console.log('Save successful');
       setEditingId(null);
     } catch (error) {
       console.error('Failed to save position:', error);

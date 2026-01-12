@@ -62,14 +62,17 @@ function App() {
   };
 
   const handleUpdatePosition = async (positionId: string, updates: { journal?: string; category?: string }) => {
+    console.log('handleUpdatePosition called:', { positionId, updates });
     try {
       await updatePosition(positionId, updates);
+      console.log('Position updated successfully in database');
       // Update local state
       setPositions(prev => prev.map(p =>
         p.id === positionId ? { ...p, ...updates } : p
       ));
     } catch (error) {
       console.error('Failed to update position:', error);
+      alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
       throw error;
     }
   };
