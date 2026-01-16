@@ -321,6 +321,8 @@ export async function fetchOpenPositions(): Promise<LighterPosition[]> {
   }
 
   try {
+    // Try the explorer API first
+    console.log('Fetching positions from explorer API for account:', LIGHTER_ACCOUNT_INDEX);
     const response = await fetch(
       `/api/lighter-proxy?endpoint=accounts/${LIGHTER_ACCOUNT_INDEX}/positions`,
       {
@@ -328,6 +330,8 @@ export async function fetchOpenPositions(): Promise<LighterPosition[]> {
         headers: { 'Content-Type': 'application/json' },
       }
     );
+
+    console.log('Positions API response status:', response.status);
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));

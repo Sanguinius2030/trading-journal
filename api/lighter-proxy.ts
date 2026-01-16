@@ -42,7 +42,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let url: string;
     if (endpoint.startsWith('accounts/') && endpoint.includes('/positions')) {
       // Explorer API for positions: /api/accounts/{account_index}/positions
+      // Try both URL formats
       url = `${LIGHTER_EXPLORER_URL}/api/${endpoint}`;
+      console.log('Using explorer URL for positions:', url);
+    } else if (endpoint === 'markets') {
+      // Markets endpoint
+      url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
+      console.log('Using base URL for markets:', url);
     } else {
       url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
     }
@@ -58,12 +64,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Only add API key header if we have one AND it's needed for authenticated endpoints
     const headers: Record<string, string> = {
       'Accept': 'application/json',
+      'User-Agent': 'TradingJournal/1.0',
     };
 
     // Some endpoints may need API key - add it for authenticated endpoints
     const authenticatedEndpoints = ['trades', 'accountActiveOrders', 'accountInactiveOrders'];
     if (LIGHTER_API_KEY && authenticatedEndpoints.some(e => endpoint.includes(e))) {
       headers['x-api-key'] = LIGHTER_API_KEY;
+    }
+
+    // Explorer API may need different headers
+    if (endpoint.startsWith('accounts/')) {
+      headers['Origin'] = 'https://explorer.elliot.ai';
+      headers['Referer'] = 'https://explorer.elliot.ai/';
     }
 
     const response = await fetch(url, {
