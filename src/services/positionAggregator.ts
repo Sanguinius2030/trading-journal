@@ -1,3 +1,4 @@
+import { v5 as uuidv5 } from 'uuid';
 import type { Trade, Position } from '../types';
 import {
   getTradesFromDB,
@@ -12,32 +13,16 @@ import {
 } from './supabase';
 import { fetchOpenPositions, fetchMarketPrices, type LighterPosition, type MarketInfo } from './lighterApi';
 
+// Namespace UUID for generating deterministic position IDs
+const POSITION_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
+
 /**
- * Generate a deterministic UUID from position data
+ * Generate a deterministic UUID v5 from position data
  * This ensures the same position always gets the same ID
  */
 function generatePositionId(symbol: string, openedAt: Date, side: string): string {
-  // Create a deterministic hash from position data
   const input = `${symbol}-${side}-${openedAt.toISOString()}`;
-  let hash1 = 0, hash2 = 0, hash3 = 0, hash4 = 0, hash5 = 0;
-
-  for (let i = 0; i < input.length; i++) {
-    const char = input.charCodeAt(i);
-    hash1 = ((hash1 << 5) - hash1 + char) >>> 0;
-    hash2 = ((hash2 << 7) - hash2 + char) >>> 0;
-    hash3 = ((hash3 << 11) - hash3 + char) >>> 0;
-    hash4 = ((hash4 << 13) - hash4 + char) >>> 0;
-    hash5 = ((hash5 << 17) - hash5 + char) >>> 0;
-  }
-
-  // Format as UUID
-  const p1 = hash1.toString(16).padStart(8, '0').slice(0, 8);
-  const p2 = hash2.toString(16).padStart(4, '0').slice(0, 4);
-  const p3 = hash3.toString(16).padStart(4, '0').slice(0, 4);
-  const p4 = hash4.toString(16).padStart(4, '0').slice(0, 4);
-  const p5 = (hash5.toString(16) + hash1.toString(16)).padStart(12, '0').slice(0, 12);
-
-  return `${p1}-${p2}-${p3}-${p4}-${p5}`;
+  return uuidv5(input, POSITION_NAMESPACE);
 }
 
 /**
