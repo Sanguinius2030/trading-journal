@@ -14,25 +14,51 @@ const LIGHTER_AUTH_TOKEN = import.meta.env.VITE_LIGHTER_AUTH_TOKEN || '';
 const LIGHTER_ACCOUNT_INDEX = import.meta.env.VITE_LIGHTER_ACCOUNT_INDEX || '132275';
 
 /**
- * Fetch trade history from Lighter API
- * Default limit increased to 1000 to capture more historical trades
+ * Fetch trade history from Lighter API with pagination
+ * Fetches all trades by making multiple requests if needed
  */
-async function fetchTradeHistoryFromAPI(limit: number = 1000): Promise<any[]> {
-  const response = await fetch(
-    `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${limit}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
-    {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    }
-  );
+async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]> {
+  const allTrades: any[] = [];
+  const batchSize = 1000; // Max per request
+  let offset = 0;
+  let hasMore = true;
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || `Failed to fetch trades: ${response.status}`);
+  console.log('Fetching all trades from Lighter API...');
+
+  while (hasMore && allTrades.length < maxTrades) {
+    const response = await fetch(
+      `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `Failed to fetch trades: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const trades = data.trades || [];
+
+    console.log(`Fetched batch: offset=${offset}, got ${trades.length} trades`);
+
+    if (trades.length === 0) {
+      hasMore = false;
+    } else {
+      allTrades.push(...trades);
+      offset += trades.length;
+
+      // If we got less than batchSize, we've reached the end
+      if (trades.length < batchSize) {
+        hasMore = false;
+      }
+    }
   }
 
-  const data = await response.json();
-  return data.trades || [];
+  console.log(`Total trades fetched: ${allTrades.length}`);
+  return allTrades;
 }
 
 /**
@@ -118,7 +144,7 @@ export async function syncTradesToDB(): Promise<number> {
 
   try {
     console.log('Fetching trades from Lighter API...');
-    const apiTrades = await fetchTradeHistoryFromAPI(1000);
+    const apiTrades = await fetchTradeHistoryFromAPI(5000);
     console.log(`Fetched ${apiTrades.length} trades from API`);
 
     if (apiTrades.length === 0) return 0;
