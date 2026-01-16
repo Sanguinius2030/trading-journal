@@ -79,10 +79,74 @@ export async function aggregateTradesIntoPositions(): Promise<Position[]> {
   // Sort all positions by opened date (newest first)
   allPositions.sort((a, b) => b.openedAt.getTime() - a.openedAt.getTime());
 
+  // Add live positions that don't have trade history
+  const liveOnlyPositions = createLiveOnlyPositions(livePositions, allPositions, marketPrices);
+  allPositions.unshift(...liveOnlyPositions);
+
   // Save positions to database (preserves journal/category for future loads)
   await savePositionsToDatabase(allPositions, existingPositions);
 
   return allPositions;
+}
+
+/**
+ * Create Position objects for live positions that don't have trade history
+ */
+function createLiveOnlyPositions(
+  livePositions: LighterPosition[],
+  existingPositions: Position[],
+  marketPrices: Record<number, MarketInfo>
+): Position[] {
+  const newPositions: Position[] = [];
+
+  for (const lp of livePositions) {
+    const marketIndex = lp.market_index ?? (lp as any).market_id;
+    const symbol = getSymbolFromMarketId(marketIndex);
+    const side = String(lp.side ?? '').toUpperCase() as 'LONG' | 'SHORT';
+
+    // Check if we already have this position from trade history
+    const exists = existingPositions.some(
+      p => p.symbol === symbol && p.side === side && p.status === 'open'
+    );
+
+    if (!exists && side) {
+      const size = parseFloat(lp.size) || 0;
+      const entryPrice = parseFloat(lp.entry_price) || 0;
+      const pnl = parseFloat(lp.pnl) || 0;
+      const positionSizeUsd = Math.abs(size * entryPrice);
+
+      // Get mark price from markets API
+      const marketInfo = marketPrices[marketIndex];
+      const markPrice = marketInfo ? parseFloat(marketInfo.mark_price) : undefined;
+
+      const position: Position = {
+        id: generatePositionId(symbol, new Date(), side),
+        symbol,
+        marketId: marketIndex,
+        side,
+        status: 'open',
+        totalQuantity: Math.abs(size),
+        avgEntryPrice: entryPrice,
+        totalEntryCost: positionSizeUsd,
+        totalExitRevenue: 0,
+        realizedPnl: 0,
+        openedAt: new Date(),
+        fillsCount: 0,
+        exchange: 'Lighter',
+        fills: [],
+        // Live data
+        positionSizeUsd,
+        currentPrice: markPrice,
+        unrealizedPnl: pnl,
+        unrealizedPnlPercent: positionSizeUsd > 0 ? (pnl / positionSizeUsd) * 100 : 0,
+      };
+
+      console.log('Created live-only position:', { symbol, side, size, entryPrice, pnl });
+      newPositions.push(position);
+    }
+  }
+
+  return newPositions;
 }
 
 /**
