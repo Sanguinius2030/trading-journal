@@ -35,8 +35,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing endpoint parameter' });
     }
 
+    // Get auth token from custom header if provided
+    const authToken = req.headers['x-lighter-auth'] as string | undefined;
+
+    // If auth token in header, add it to params for the API call
+    if (authToken) {
+      (params as any).auth = authToken;
+    }
+
     // Build query string - URLSearchParams handles encoding
-    // Note: params are already decoded by Vercel, we just need to pass them through
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
 
     // Use explorer URL for positions endpoint
@@ -57,7 +64,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Proxying request:', {
       endpoint,
       params,
-      rawAuth: req.query.auth,
+      authFromHeader: authToken,
+      authFromQuery: req.query.auth,
       queryString,
       fullUrl: url,
     });
