@@ -1,4 +1,3 @@
-import { v5 as uuidv5 } from 'uuid';
 import type { Trade, Position } from '../types';
 import {
   getTradesFromDB,
@@ -13,16 +12,13 @@ import {
 } from './supabase';
 import { fetchOpenPositions, fetchMarketPrices, type LighterPosition, type MarketInfo } from './lighterApi';
 
-// Namespace UUID for generating deterministic position IDs
-const POSITION_NAMESPACE = '6ba7b810-9dad-11d1-80b4-00c04fd430c8';
-
 /**
- * Generate a deterministic UUID v5 from position data
- * This ensures the same position always gets the same ID
+ * Generate a simple deterministic ID from position data
+ * Format: symbol-side-YYYY-MM-DDTHH-MM-SS
  */
 function generatePositionId(symbol: string, openedAt: Date, side: string): string {
-  const input = `${symbol}-${side}-${openedAt.toISOString()}`;
-  return uuidv5(input, POSITION_NAMESPACE);
+  const timestamp = openedAt.toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  return `${symbol}-${side}-${timestamp}`;
 }
 
 /**
