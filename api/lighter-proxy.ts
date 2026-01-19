@@ -35,7 +35,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(400).json({ error: 'Missing endpoint parameter' });
     }
 
-    // Build query string including all params (auth, account_index, etc.)
+    // Build query string - URLSearchParams handles encoding
+    // Note: params are already decoded by Vercel, we just need to pass them through
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
 
     // Use explorer URL for positions endpoint
@@ -56,6 +57,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log('Proxying request:', {
       endpoint,
       params,
+      rawAuth: req.query.auth,
       queryString,
       fullUrl: url,
     });
