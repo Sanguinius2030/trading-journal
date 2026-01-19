@@ -23,11 +23,15 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
   let offset = 0;
   let hasMore = true;
 
-  console.log('Fetching all trades from Lighter API...');
+  // Start date: January 12, 2026
+  const startDate = new Date('2026-01-12T00:00:00Z');
+  const startTimestamp = Math.floor(startDate.getTime() / 1000);
+
+  console.log(`Fetching all trades from Lighter API starting from: ${startDate.toISOString()} (timestamp: ${startTimestamp})`);
 
   while (hasMore && allTrades.length < maxTrades) {
     const response = await fetch(
-      `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
+      `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}&start_time=${startTimestamp}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -57,7 +61,7 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
     }
   }
 
-  console.log(`Total trades fetched: ${allTrades.length}`);
+  console.log(`Total trades fetched: ${allTrades.length} (from ${startDate.toISOString()})`);
   return allTrades;
 }
 

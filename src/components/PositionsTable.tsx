@@ -105,6 +105,8 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
               <th>Symbol</th>
               <th>Side</th>
               <th>Status</th>
+              <th>Opened</th>
+              <th>Closed</th>
               <th>Size (USD)</th>
               <th>Avg Entry</th>
               <th>Avg Close</th>
@@ -147,6 +149,12 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                       <span className={`status-badge ${position.status}`}>
                         {position.status}
                       </span>
+                    </td>
+                    <td className="date-cell">
+                      {format(position.openedAt, 'MMM dd, yyyy')}
+                    </td>
+                    <td className="date-cell">
+                      {position.closedAt ? format(position.closedAt, 'MMM dd, yyyy') : '-'}
                     </td>
                     <td className="size-cell">
                       {position.status === 'open' && position.positionSizeUsd
@@ -255,7 +263,7 @@ export const PositionsTable = ({ positions, onUpdatePosition }: PositionsTablePr
                   {/* Expanded row showing fills */}
                   {isExpanded && position.fills && position.fills.length > 0 && (
                     <tr className="fills-row">
-                      <td colSpan={14}>
+                      <td colSpan={16}>
                         <div className="fills-container">
                           <h4>Fills ({position.fillsCount})</h4>
                           <table className="fills-table">
