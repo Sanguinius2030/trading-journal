@@ -29,17 +29,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       baseUrl: LIGHTER_API_BASE_URL,
     });
 
-    const { endpoint, auth, account_index, ...params } = req.query;
+    const { endpoint, ...params } = req.query;
 
     if (!endpoint || typeof endpoint !== 'string') {
       return res.status(400).json({ error: 'Missing endpoint parameter' });
     }
 
-    // Extract auth token and account_index, don't include in query string
-    const authToken = typeof auth === 'string' ? auth : undefined;
-    const accountIndex = typeof account_index === 'string' ? account_index : undefined;
-
-    // Build query string from remaining params only
+    // Build query string including all params (auth, account_index, etc.)
     const queryString = new URLSearchParams(params as Record<string, string>).toString();
 
     // Use explorer URL for positions endpoint
@@ -71,14 +67,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'User-Agent': 'TradingJournal/1.0',
     };
 
-    // Some endpoints may need API key - add it for authenticated endpoints
-    const authenticatedEndpoints = ['trades', 'accountActiveOrders', 'accountInactiveOrders'];
-
-    // Use auth token from query params if provided, otherwise use API key from env
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-      console.log('Using auth token from request');
-    } else if (LIGHTER_API_KEY && authenticatedEndpoints.some(e => endpoint.includes(e))) {
+    // Add API key from environment if available
+    if (LIGHTER_API_KEY) {
       headers['x-api-key'] = LIGHTER_API_KEY;
       console.log('Using API key from environment');
     }
