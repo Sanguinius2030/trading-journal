@@ -57,6 +57,19 @@ function App() {
     loadPositions();
   }, [lighterTrades]);
 
+  const handleRefreshPositions = async () => {
+    setPositionsLoading(true);
+    try {
+      // Refetch trades first
+      await refetch();
+      // Positions will be re-aggregated via useEffect
+    } catch (error) {
+      console.error('Failed to refresh:', error);
+    } finally {
+      setPositionsLoading(false);
+    }
+  };
+
   const handleAddTrade = (newTrade: Trade) => {
     setManualTrades([...manualTrades, newTrade]);
   };
@@ -173,10 +186,32 @@ function App() {
                 <span>Aggregating positions...</span>
               </div>
             ) : (
-              <PositionsTable
-                positions={positions}
-                onUpdatePosition={handleUpdatePosition}
-              />
+              <>
+                <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
+                  <button
+                    onClick={handleRefreshPositions}
+                    className="refresh-button"
+                    style={{
+                      padding: '0.5rem 1rem',
+                      background: '#ff6b35',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    <RefreshCw size={16} />
+                    Refresh Positions
+                  </button>
+                </div>
+                <PositionsTable
+                  positions={positions}
+                  onUpdatePosition={handleUpdatePosition}
+                />
+              </>
             )}
           </div>
         )}
