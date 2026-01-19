@@ -30,9 +30,10 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
   console.log(`Fetching all trades from Lighter API starting from: ${startDate.toISOString()} (timestamp: ${startTimestamp})`);
 
   while (hasMore && allTrades.length < maxTrades) {
-    // Pass all params through - the proxy will forward them to the Lighter API
+    // URL encode the auth token to handle special characters like colons
+    const encodedAuth = encodeURIComponent(LIGHTER_AUTH_TOKEN);
     const response = await fetch(
-      `/api/lighter-proxy?endpoint=trades&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
+      `/api/lighter-proxy?endpoint=trades&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${encodedAuth}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
