@@ -25,13 +25,14 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
 
   // Start date: January 12, 2026
   const startDate = new Date('2026-01-12T00:00:00Z');
-  const startTimestamp = Math.floor(startDate.getTime() / 1000);
+  const startTimestamp = Math.floor(startDate.getTime());
 
   console.log(`Fetching all trades from Lighter API starting from: ${startDate.toISOString()} (timestamp: ${startTimestamp})`);
 
   while (hasMore && allTrades.length < maxTrades) {
+    // Try without start_time first to see if API accepts it - if not, filter client-side
     const response = await fetch(
-      `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}&start_time=${startTimestamp}`,
+      `/api/lighter-proxy?endpoint=trades&sort_by=timestamp&limit=${batchSize}&offset=${offset}&account_index=${LIGHTER_ACCOUNT_INDEX}&auth=${LIGHTER_AUTH_TOKEN}`,
       {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -40,6 +41,7 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error('API error details:', errorData);
       throw new Error(errorData.error || `Failed to fetch trades: ${response.status}`);
     }
 
@@ -48,14 +50,28 @@ async function fetchTradeHistoryFromAPI(maxTrades: number = 5000): Promise<any[]
 
     console.log(`Fetched batch: offset=${offset}, got ${trades.length} trades`);
 
+    // Filter trades by start date (client-side filtering)
+    const filteredTrades = trades.filter((t: any) => {
+      const tradeTimestamp = Number(t.timestamp);
+      return tradeTimestamp >= startTimestamp;
+    });
+
+    console.log(`Filtered to ${filteredTrades.length} trades after start date`);
+
     if (trades.length === 0) {
       hasMore = false;
     } else {
-      allTrades.push(...trades);
+      allTrades.push(...filteredTrades);
       offset += trades.length;
 
       // If we got less than batchSize, we've reached the end
       if (trades.length < batchSize) {
+        hasMore = false;
+      }
+
+      // Stop if all trades in batch are before start date
+      if (filteredTrades.length === 0 && trades.length > 0) {
+        console.log('All trades in batch are before start date, stopping...');
         hasMore = false;
       }
     }
