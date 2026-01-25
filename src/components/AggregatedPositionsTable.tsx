@@ -14,6 +14,7 @@ interface Trade {
   size: number;
   price: number;
   usd_amount: number;
+  fee: number;
   position_before: number;
   position_after: number;
 }
@@ -32,6 +33,7 @@ interface AggregatedPosition {
   avg_exit_price: number | null;
   total_entry_value: number;
   total_exit_value: number;
+  total_fees: number;
   pnl: number | null;
   realized_pnl: number;  // For open positions: realized P&L from partial closes
   position_type: 'LONG' | 'SHORT';
@@ -1406,6 +1408,7 @@ export function AggregatedPositionsTable() {
                                     <th>Size</th>
                                     <th>Price</th>
                                     <th>USD Amount</th>
+                                    <th>Fees</th>
                                     <th>Position Before</th>
                                     <th>Position After</th>
                                   </tr>
@@ -1422,6 +1425,7 @@ export function AggregatedPositionsTable() {
                                       <td className="number-cell">{trade.size.toFixed(4)}</td>
                                       <td className="number-cell">${trade.price.toFixed(2)}</td>
                                       <td className="number-cell">${trade.usd_amount.toFixed(2)}</td>
+                                      <td className="number-cell fee-cell">{(trade.fee || 0) > 0.001 ? `$${(trade.fee || 0).toFixed(2)}` : '—'}</td>
                                       <td className="number-cell">{trade.position_before.toFixed(4)}</td>
                                       <td className="number-cell">{trade.position_after.toFixed(4)}</td>
                                     </tr>

@@ -25,6 +25,11 @@ interface RawTrade {
   taker_entry_quote_before: string;
   maker_position_size_before: string;
   maker_entry_quote_before: string;
+  // Fee fields (scaled integers, divide by 10000 to get USD)
+  taker_fee?: number;
+  maker_fee?: number;
+  // Trade type: "trade" or "liquidation"
+  type?: string;
   // Flag to identify liquidation-derived trades
   is_liquidation?: boolean;
 }
@@ -65,6 +70,7 @@ interface AggregatedPosition {
     size: number;
     price: number;
     usd_amount: number;
+    fee: number;
     position_before: number;
     position_after: number;
   }>;
@@ -336,6 +342,7 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
     let totalBuySize = 0;
     let totalSellValue = 0;
     let totalSellSize = 0;
+    let totalFees = 0;
 
     marketTrades.forEach(trade => {
       const isMaker = trade.is_maker_ask
@@ -349,6 +356,24 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
       const tradeSize = parseFloat(trade.size);
       const tradePrice = parseFloat(trade.price);
       const tradeValue = parseFloat(trade.usd_amount) || (tradeSize * tradePrice);
+
+      // Get fee - liquidations have a different fee structure (1% of trade value)
+      // Regular trades: fee stored as scaled integer (divide by 10000 to get USD)
+      // Liquidations: only the TAKER (liquidated party) pays 1% fee, not the counterparty (maker)
+      const isLiquidation = trade.type === 'liquidation' || trade.is_liquidation;
+      let tradeFee: number;
+      if (isLiquidation && !isMaker) {
+        // Only the taker (liquidated party) pays the 1% fee
+        tradeFee = tradeValue * 0.01;
+      } else if (isLiquidation && isMaker) {
+        // Counterparty (maker) doesn't pay liquidation fee
+        tradeFee = 0;
+      } else {
+        // Regular trade fees are scaled integers
+        tradeFee = isMaker
+          ? (trade.maker_fee || 0) / 10000
+          : (trade.taker_fee || 0) / 10000;
+      }
 
       const isBuyer = trade.bid_account_id === accountIndex;
       const side: 'BUY' | 'SELL' = isBuyer ? 'BUY' : 'SELL';
@@ -364,6 +389,7 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
         size: tradeSize,
         price: tradePrice,
         usd_amount: tradeValue,
+        fee: tradeFee,
         position_before: positionBefore,
         position_after: positionAfter
       };
@@ -374,6 +400,7 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
         totalBuySize = 0;
         totalSellValue = 0;
         totalSellSize = 0;
+        totalFees = tradeFee;
 
         if (isBuyer) {
           totalBuyValue += tradeValue;
@@ -399,7 +426,7 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
           total_exit_value: 0,
           total_size: tradeSize,
           pnl: null,
-          total_fees: 0,
+          total_fees: totalFees,
           position_type: positionAfter > 0 ? 'LONG' : 'SHORT',
           is_closed: false,
           trade_count: 1
@@ -416,6 +443,10 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
           totalSellSize += tradeSize;
         }
 
+        // Track fees
+        totalFees += tradeFee;
+        currentPosition.total_fees = totalFees;
+
         const currentAbsPosition = Math.abs(positionAfter);
         if (currentAbsPosition > maxAbsPosition) {
           maxAbsPosition = currentAbsPosition;
@@ -427,7 +458,8 @@ function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, st
           currentPosition.exit_time = trade.timestamp;
           currentPosition.exit_date = formatDateTime(trade.timestamp);
           currentPosition.is_closed = true;
-          currentPosition.pnl = totalSellValue - totalBuyValue;
+          // Subtract fees from P&L
+          currentPosition.pnl = totalSellValue - totalBuyValue - totalFees;
 
           if (currentPosition.position_type === 'LONG') {
             currentPosition.total_entry_value = totalBuyValue;
@@ -504,15 +536,27 @@ interface AccountBalance {
 
 async function fetchAccountBalance(accountIndex: number, authToken: string): Promise<AccountBalance | null> {
   try {
-    const url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${authToken}`;
-    const response = await fetch(url);
+    // Account endpoint - try without auth first (public data), then with auth
+    let url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}`;
+    console.log('Fetching account balance for index:', accountIndex);
+
+    let response = await fetch(url);
+
+    // If unauthorized, try with auth token
+    if (response.status === 401 || response.status === 403) {
+      console.log('Account endpoint requires auth, retrying with token...');
+      url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${encodeURIComponent(authToken)}`;
+      response = await fetch(url);
+    }
 
     if (!response.ok) {
-      console.error('Failed to fetch account balance:', response.status);
+      console.error('Failed to fetch account balance:', response.status, await response.text().catch(() => ''));
       return null;
     }
 
     const data = await response.json();
+    console.log('Account API response:', JSON.stringify(data).slice(0, 500));
+
     const account = Array.isArray(data) ? data[0] : data;
 
     if (!account) {
@@ -528,12 +572,23 @@ async function fetchAccountBalance(accountIndex: number, authToken: string): Pro
       });
     }
 
-    return {
+    // Log the fields we're parsing to debug
+    console.log('Parsing balance fields:', {
+      total_asset_value: account.total_asset_value,
+      collateral: account.collateral,
+      available_balance: account.available_balance,
+      margin_used: account.margin_used
+    });
+
+    const balance = {
       account_equity: parseFloat(account.total_asset_value || account.collateral || '0'),
-      available_balance: parseFloat(account.available_balance || '0'),
+      available_balance: parseFloat(account.available_balance || account.collateral || '0'),
       unrealized_pnl: totalUnrealizedPnl,
       margin_used: parseFloat(account.margin_used || '0'),
     };
+
+    console.log('Parsed balance:', balance);
+    return balance;
   } catch (error) {
     console.error('Error fetching account balance:', error);
     return null;
@@ -624,6 +679,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (userId && supabaseUrl && supabaseServiceKey) {
       console.log('User authenticated:', userId);
       const settings = await getUserSettings(userId);
+      console.log('User settings:', settings ? {
+        has_account_index: !!settings.lighter_account_index,
+        account_index: settings.lighter_account_index,
+        has_auth_token: !!settings.lighter_auth_token,
+        auth_token_length: settings.lighter_auth_token?.length || 0
+      } : 'null');
 
       if (settings?.lighter_account_index && settings?.lighter_auth_token) {
         accountIndex = settings.lighter_account_index;
@@ -631,9 +692,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.log('Using user credentials for account:', accountIndex);
       } else {
         console.log('User has no Lighter credentials, using fallback');
+        console.log('Fallback account index:', FALLBACK_ACCOUNT_INDEX);
+        console.log('Fallback auth token available:', !!FALLBACK_AUTH_TOKEN, 'length:', FALLBACK_AUTH_TOKEN?.length || 0);
       }
     } else {
       console.log('No auth or Supabase not configured, using fallback credentials');
+      console.log('Fallback account index:', FALLBACK_ACCOUNT_INDEX);
+      console.log('Fallback auth token available:', !!FALLBACK_AUTH_TOKEN, 'length:', FALLBACK_AUTH_TOKEN?.length || 0);
     }
 
     // Validate we have credentials
@@ -659,15 +724,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Aggregate into positions (trades already include liquidation events)
     const allPositions = aggregatePositions(trades, marketSymbols, accountIndex);
+    console.log(`Aggregated ${allPositions.length} positions from ${trades.length} trades`);
 
     // Filter to positions starting from Dec 19th, 2025 and exclude unknown markets
     const startDate = new Date('2025-12-19T00:00:00Z').getTime();
+    const beforeFilter = allPositions.length;
+    const afterDateFilter = allPositions.filter(p => p.entry_time >= startDate).length;
+    const afterMarketFilter = allPositions.filter(p => !p.market_symbol.startsWith('Market ')).length;
+
     const positions = allPositions.filter(p =>
       p.entry_time >= startDate &&
       !p.market_symbol.startsWith('Market ')
     );
 
-    console.log(`Filtered to ${positions.length} positions (from ${allPositions.length} total)`);
+    console.log(`Filtering: total=${beforeFilter}, after date filter=${afterDateFilter}, after market filter=${afterMarketFilter}, final=${positions.length}`);
+    console.log(`Date filter: positions after ${new Date(startDate).toISOString()}`);
+
+    // Log first and last position dates for debugging
+    if (allPositions.length > 0) {
+      const sortedByEntry = [...allPositions].sort((a, b) => a.entry_time - b.entry_time);
+      console.log(`Earliest position: ${new Date(sortedByEntry[0].entry_time).toISOString()}`);
+      console.log(`Latest position: ${new Date(sortedByEntry[sortedByEntry.length - 1].entry_time).toISOString()}`);
+    }
 
     // If authenticated, save to Supabase
     if (userId && supabaseUrl && supabaseServiceKey) {

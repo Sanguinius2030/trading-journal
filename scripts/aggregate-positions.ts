@@ -22,6 +22,9 @@ interface RawTrade {
   maker_position_size_before: string;
   maker_entry_quote_before: string;
   maker_initial_margin_fraction_before: number;
+  taker_fee?: number;
+  maker_fee?: number;
+  type?: string;  // "trade" or "liquidation"
   is_liquidation?: boolean;
 }
 
@@ -61,6 +64,7 @@ interface AggregatedPosition {
     size: number;
     price: number;
     usd_amount: number;
+    fee: number;
     position_before: number;
     position_after: number;
   }>;
@@ -69,6 +73,7 @@ interface AggregatedPosition {
   avg_exit_price: number | null;
   total_entry_value: number;
   total_exit_value: number;
+  total_fees: number;  // Total trading fees paid
   pnl: number | null;
   realized_pnl: number;  // For open positions: realized P&L from partial closes
   position_type: 'LONG' | 'SHORT';
@@ -192,6 +197,7 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
     let totalBuySize = 0;   // Total size bought
     let totalSellValue = 0; // Total USD received selling
     let totalSellSize = 0;  // Total size sold
+    let totalFees = 0;      // Total trading fees
 
     marketTrades.forEach(trade => {
       // Determine if we were maker or taker
@@ -207,6 +213,24 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
       const tradeSize = parseFloat(trade.size);
       const tradePrice = parseFloat(trade.price);
       const tradeValue = parseFloat(trade.usd_amount) || (tradeSize * tradePrice);
+
+      // Get fee - liquidations have a different fee structure (1% of trade value)
+      // Regular trades: fee stored as scaled integer (divide by 10000 to get USD)
+      // Liquidations: only the TAKER (liquidated party) pays 1% fee, not the counterparty (maker)
+      const isLiquidation = trade.type === 'liquidation' || trade.is_liquidation;
+      let tradeFee: number;
+      if (isLiquidation && !isMaker) {
+        // Only the taker (liquidated party) pays the 1% fee
+        tradeFee = tradeValue * 0.01;
+      } else if (isLiquidation && isMaker) {
+        // Counterparty (maker) doesn't pay liquidation fee
+        tradeFee = 0;
+      } else {
+        // Regular trade fees are scaled integers
+        tradeFee = isMaker
+          ? (trade.maker_fee || 0) / 10000
+          : (trade.taker_fee || 0) / 10000;
+      }
 
       // Determine if we're buying or selling
       const isBuyer = trade.bid_account_id === accountIndex;
@@ -224,6 +248,7 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
         size: tradeSize,
         price: tradePrice,
         usd_amount: tradeValue,
+        fee: tradeFee,
         position_before: positionBefore,
         position_after: positionAfter
       };
@@ -236,6 +261,7 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
         totalBuySize = 0;
         totalSellValue = 0;
         totalSellSize = 0;
+        totalFees = tradeFee;
 
         // Track this trade
         if (isBuyer) {
@@ -260,6 +286,7 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
           avg_exit_price: null,
           total_entry_value: tradeValue,
           total_exit_value: 0,
+          total_fees: totalFees,
           pnl: null,
           realized_pnl: 0,
           position_type: positionAfter > 0 ? 'LONG' : 'SHORT',
@@ -278,6 +305,10 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
           totalSellSize += tradeSize;
         }
 
+        // Track fees
+        totalFees += tradeFee;
+        currentPosition.total_fees = totalFees;
+
         // Update max position size
         const currentAbsPosition = Math.abs(positionAfter);
         if (currentAbsPosition > maxAbsPosition) {
@@ -291,14 +322,14 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
           currentPosition.exit_date = formatDateTime(trade.timestamp);
           currentPosition.is_closed = true;
 
-          // Calculate PnL based on cash flows
+          // Calculate PnL based on cash flows minus fees
           // For a SHORT position: we sell first, then buy back
-          //   PnL = totalSellValue - totalBuyValue (positive if we sold high, bought low)
+          //   PnL = totalSellValue - totalBuyValue - fees (positive if we sold high, bought low)
           // For a LONG position: we buy first, then sell
-          //   PnL = totalSellValue - totalBuyValue (positive if we sold high after buying low)
-          // Actually it's always: PnL = totalSellValue - totalBuyValue
-          currentPosition.pnl = totalSellValue - totalBuyValue;
-          currentPosition.realized_pnl = totalSellValue - totalBuyValue;
+          //   PnL = totalSellValue - totalBuyValue - fees (positive if we sold high after buying low)
+          // Always: PnL = totalSellValue - totalBuyValue - totalFees
+          currentPosition.pnl = totalSellValue - totalBuyValue - totalFees;
+          currentPosition.realized_pnl = totalSellValue - totalBuyValue - totalFees;
 
           // Calculate average entry and exit prices
           if (currentPosition.position_type === 'LONG') {
@@ -326,19 +357,25 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
       // Calculate current average prices
       if (currentPosition.position_type === 'LONG') {
         currentPosition.avg_entry_price = totalBuySize > 0 ? totalBuyValue / totalBuySize : 0;
-        // For LONG: realized PnL from partial sells = sellValue - (proportional buyValue)
-        // Simplified: if we bought $1000 of 10 units, sold 3 units for $350, realized = $350 - ($1000 * 3/10) = $50
+        // For LONG: realized PnL from partial sells = sellValue - (proportional buyValue) - fees
+        // Simplified: if we bought $1000 of 10 units, sold 3 units for $350, realized = $350 - ($1000 * 3/10) - fees
         if (totalSellSize > 0 && totalBuySize > 0) {
           const avgBuyPrice = totalBuyValue / totalBuySize;
-          currentPosition.realized_pnl = totalSellValue - (totalSellSize * avgBuyPrice);
+          currentPosition.realized_pnl = totalSellValue - (totalSellSize * avgBuyPrice) - totalFees;
+        } else {
+          // No partial closes yet, but still have fees from entry
+          currentPosition.realized_pnl = -totalFees;
         }
       } else {
         currentPosition.avg_entry_price = totalSellSize > 0 ? totalSellValue / totalSellSize : 0;
-        // For SHORT: realized PnL from partial buys = (proportional sellValue) - buyValue
-        // Simplified: if we shorted $1000 of 10 units, bought back 3 units for $280, realized = ($1000 * 3/10) - $280 = $20
+        // For SHORT: realized PnL from partial buys = (proportional sellValue) - buyValue - fees
+        // Simplified: if we shorted $1000 of 10 units, bought back 3 units for $280, realized = ($1000 * 3/10) - $280 - fees
         if (totalBuySize > 0 && totalSellSize > 0) {
           const avgSellPrice = totalSellValue / totalSellSize;
-          currentPosition.realized_pnl = (totalBuySize * avgSellPrice) - totalBuyValue;
+          currentPosition.realized_pnl = (totalBuySize * avgSellPrice) - totalBuyValue - totalFees;
+        } else {
+          // No partial closes yet, but still have fees from entry
+          currentPosition.realized_pnl = -totalFees;
         }
       }
       positions.push(currentPosition);
@@ -362,13 +399,47 @@ async function main() {
     console.log(`\nLoaded ${tradesData.length} raw trades`);
     console.log(`Loaded ${liquidationsData.length} liquidations`);
 
-    // NOTE: The /trades endpoint already includes liquidations as regular trades,
-    // so we don't need to add them again. We keep the liquidation data for
-    // reference/reporting purposes, but don't convert them to synthetic trades.
-    // If we did, we'd double-count them and break position calculations.
-    console.log(`Liquidations are already included in trade data - no conversion needed`);
+    // Build a set of trade IDs that correspond to liquidations
+    // by matching liquidation data (time, price, size) to trades
+    const liquidationTradeIds = new Set<number>();
+    liquidationsData.forEach(liq => {
+      const liqTime = liq.executed_at;
+      const liqPrice = parseFloat(liq.trade.price);
+      const liqSize = parseFloat(liq.trade.size);
 
-    const allTrades = tradesData;
+      // Find trades within 2 seconds of liquidation time with matching size
+      // For "partial" liquidations: price matches
+      // For "deleverage" liquidations: trade has price 0, match by exact time + size + market
+      const matchingTrade = tradesData.find(t => {
+        const timeDiff = Math.abs(t.timestamp - liqTime);
+        const tradePrice = parseFloat(t.price);
+        const sizeDiff = Math.abs(parseFloat(t.size) - liqSize);
+        const sameMarket = t.market_id === liq.market_id;
+
+        // For deleverage: exact timestamp, same market, same size, price is 0
+        if (liq.type === 'deleverage') {
+          return timeDiff < 100 && sameMarket && sizeDiff < 0.001 && tradePrice === 0;
+        }
+
+        // For partial: match by time, price, and size
+        const priceDiff = Math.abs(tradePrice - liqPrice);
+        return timeDiff < 2000 && priceDiff < 10 && sizeDiff < 0.001;
+      });
+
+      if (matchingTrade) {
+        liquidationTradeIds.add(matchingTrade.trade_id);
+        console.log(`  Matched ${liq.type} liquidation ${liq.id} -> trade ${matchingTrade.trade_id}`);
+      } else {
+        console.log(`  WARNING: No match for ${liq.type} liquidation ${liq.id}`);
+      }
+    });
+    console.log(`Identified ${liquidationTradeIds.size} liquidation trades`);
+
+    // Mark trades that are liquidations
+    const allTrades = tradesData.map(t => ({
+      ...t,
+      is_liquidation: liquidationTradeIds.has(t.trade_id)
+    }));
 
     // Aggregate ALL trades into positions first
     const allPositions = aggregatePositions(allTrades);
@@ -406,9 +477,11 @@ async function main() {
         console.log(`  Exit: ${pos.exit_date} @ $${pos.avg_exit_price?.toFixed(2)}`);
         console.log(`  Entry Value: $${pos.total_entry_value.toFixed(2)}`);
         console.log(`  Exit Value: $${pos.total_exit_value.toFixed(2)}`);
+        console.log(`  Fees: $${pos.total_fees.toFixed(2)}`);
         console.log(`  PnL: $${pos.pnl?.toFixed(2)} (${pos.pnl! > 0 ? '✓' : '✗'})`);
       } else {
         console.log(`  Status: OPEN`);
+        console.log(`  Fees paid: $${pos.total_fees.toFixed(2)}`);
       }
       console.log(`  Trades: ${pos.trades.length}`);
       console.log('');
