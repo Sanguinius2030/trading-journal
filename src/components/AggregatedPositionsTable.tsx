@@ -123,7 +123,7 @@ export function AggregatedPositionsTable() {
   // Convert balance to the expected format
   const balanceData: BalanceData | null = balance ? {
     unrealized_pnl: balance.unrealized_pnl || 0,
-    positions: undefined,
+    positions: balance.positions,
   } : null;
 
   const [annotations, setAnnotations] = useState<Map<string, PositionAnnotation>>(new Map());

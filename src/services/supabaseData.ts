@@ -19,12 +19,21 @@ export interface Position {
   trade_count: number;
 }
 
+export interface BalancePosition {
+  market_id: number;
+  symbol: string;
+  position: string;
+  unrealized_pnl: string;
+  position_value: string;
+}
+
 export interface AccountBalance {
   account_equity: number;
   available_balance: number;
   unrealized_pnl: number;
   margin_used: number;
   updated_at: string;
+  positions?: BalancePosition[];
 }
 
 export interface PositionsData {
@@ -59,7 +68,8 @@ export async function fetchPositionsFromJson(): Promise<PositionsData> {
       available_balance: parseFloat(balData.free_margin) || parseFloat(balData.balance) || balData.available_balance || 0,
       unrealized_pnl: balData.unrealized_pnl || 0,
       margin_used: parseFloat(balData.margin_used) || 0,
-      updated_at: balData.fetched_at || balData.updated_at || new Date().toISOString()
+      updated_at: balData.fetched_at || balData.updated_at || new Date().toISOString(),
+      positions: balData.positions || undefined
     };
   }
 
