@@ -25,6 +25,28 @@ interface RawTrade {
   taker_entry_quote_before: string;
   maker_position_size_before: string;
   maker_entry_quote_before: string;
+  // Flag to identify liquidation-derived trades
+  is_liquidation?: boolean;
+}
+
+interface RawLiquidation {
+  id: number;
+  type: string; // 'partial' or 'deleverage'
+  market_id: number;
+  trade: {
+    price: string;
+    size: string;
+    taker_fee: string;
+    maker_fee: string;
+  };
+  info: {
+    positions: Array<{
+      market_id: number;
+      symbol: string;
+      position: string;
+    }>;
+  };
+  executed_at: number;
 }
 
 interface AggregatedPosition {
@@ -177,6 +199,116 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
   allTrades.sort((a, b) => a.timestamp - b.timestamp);
 
   return allTrades;
+}
+
+async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
+  const allLiquidations: RawLiquidation[] = [];
+  const BATCH_SIZE = 100;
+  const MAX_LIQUIDATIONS = 1000;
+  let cursor: string | undefined = undefined;
+
+  console.log(`Fetching liquidations for account ${accountIndex}...`);
+
+  while (allLiquidations.length < MAX_LIQUIDATIONS) {
+    const params = new URLSearchParams({
+      auth: authToken,
+      account_index: accountIndex.toString(),
+      limit: BATCH_SIZE.toString(),
+    });
+    if (cursor) {
+      params.set('cursor', cursor);
+    }
+
+    const url = `${LIGHTER_API_URL}/api/v1/liquidations?${params}`;
+
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries < maxRetries) {
+      try {
+        response = await fetch(url);
+        if (response.status === 429) {
+          retries++;
+          const waitTime = Math.pow(2, retries) * 1000;
+          console.log(`Rate limited. Waiting ${waitTime/1000}s...`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else {
+          break;
+        }
+      } catch (err) {
+        retries++;
+        if (retries >= maxRetries) throw err;
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+
+    if (!response || !response.ok) {
+      console.error('Failed to fetch liquidations:', response?.status);
+      break;
+    }
+
+    const data = await response.json();
+
+    if (!data.liquidations || data.liquidations.length === 0) {
+      break;
+    }
+
+    allLiquidations.push(...data.liquidations);
+    console.log(`Fetched ${allLiquidations.length} liquidations so far...`);
+
+    if (data.next_cursor) {
+      cursor = data.next_cursor;
+    } else {
+      break;
+    }
+
+    if (data.liquidations.length < BATCH_SIZE) {
+      break;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+  }
+
+  console.log(`Total liquidations fetched: ${allLiquidations.length}`);
+  return allLiquidations;
+}
+
+// Convert liquidations to synthetic trades for position aggregation
+function liquidationsToTrades(liquidations: RawLiquidation[], accountIndex: number): RawTrade[] {
+  return liquidations.map(liq => {
+    // Find the position for this market to determine position state
+    const marketPosition = liq.info.positions.find(p => p.market_id === liq.market_id);
+    // The position in info.positions is the position AFTER the liquidation
+    const positionAfter = marketPosition ? parseFloat(marketPosition.position) : 0;
+    const size = parseFloat(liq.trade.size);
+    const price = parseFloat(liq.trade.price);
+
+    // Determine if this was a long or short position being liquidated
+    // If positionAfter is positive (long), we were liquidated by selling, so we were even more long before
+    // If positionAfter is negative (short), we were liquidated by buying, so we were even more short before
+    const wasLong = positionAfter >= 0;
+    const positionBefore = wasLong ? positionAfter + size : positionAfter - size;
+
+    return {
+      trade_id: liq.id + 900000000, // Offset to avoid ID collisions
+      timestamp: liq.executed_at,
+      size: liq.trade.size,
+      price: liq.trade.price,
+      usd_amount: String(size * price),
+      market_id: liq.market_id,
+      // For a long being liquidated: we're selling (ask), so is_maker_ask depends on account
+      // For a short being liquidated: we're buying (bid)
+      is_maker_ask: wasLong, // If long, we're the ask (seller)
+      bid_account_id: wasLong ? 0 : accountIndex, // If short liquidated, we're the buyer
+      ask_account_id: wasLong ? accountIndex : 0, // If long liquidated, we're the seller
+      taker_position_size_before: String(positionBefore),
+      taker_entry_quote_before: '0', // Not available from liquidation data
+      maker_position_size_before: '0',
+      maker_entry_quote_before: '0',
+      is_liquidation: true,
+    };
+  });
 }
 
 function aggregatePositions(trades: RawTrade[], marketSymbols: Record<number, string>, accountIndex: number): AggregatedPosition[] {
@@ -519,7 +651,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const trades = await fetchAllTrades(accountIndex, authToken);
     console.log(`Fetched ${trades.length} total trades`);
 
-    // Aggregate into positions
+    // Note: The /trades endpoint already includes liquidations as regular trades.
+    // We fetch liquidation data for informational purposes but don't convert them
+    // to synthetic trades as that would cause double-counting.
+    const liquidations = await fetchLiquidations(accountIndex, authToken);
+    console.log(`Fetched ${liquidations.length} liquidations (already included in trade data)`);
+
+    // Aggregate into positions (trades already include liquidation events)
     const allPositions = aggregatePositions(trades, marketSymbols, accountIndex);
 
     // Filter to positions starting from Dec 19th, 2025 and exclude unknown markets

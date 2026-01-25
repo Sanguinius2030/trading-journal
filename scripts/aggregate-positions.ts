@@ -22,6 +22,27 @@ interface RawTrade {
   maker_position_size_before: string;
   maker_entry_quote_before: string;
   maker_initial_margin_fraction_before: number;
+  is_liquidation?: boolean;
+}
+
+interface RawLiquidation {
+  id: number;
+  type: string;
+  market_id: number;
+  trade: {
+    price: string;
+    size: string;
+    taker_fee: string;
+    maker_fee: string;
+  };
+  info: {
+    positions: Array<{
+      market_id: number;
+      symbol: string;
+      position: string;
+    }>;
+  };
+  executed_at: number;
 }
 
 interface AggregatedPosition {
@@ -57,6 +78,57 @@ interface AggregatedPosition {
 // Market symbols cache
 let marketSymbols: Map<number, string> = new Map();
 
+const ACCOUNT_INDEX = 132275;
+
+/**
+ * Convert liquidations to synthetic trades for position aggregation
+ */
+function liquidationsToTrades(liquidations: RawLiquidation[]): RawTrade[] {
+  return liquidations.map(liq => {
+    // Find the position for this market to determine position before
+    const marketPosition = liq.info.positions.find(p => p.market_id === liq.market_id);
+    // The position in info.positions is the position AFTER the liquidation
+    // We need to calculate position before
+    const positionAfter = marketPosition ? parseFloat(marketPosition.position) : 0;
+    const size = parseFloat(liq.trade.size);
+    const price = parseFloat(liq.trade.price);
+    const usdAmount = size * price;
+
+    // If positionAfter is positive (long), we were liquidated by selling, so we were even more long before
+    // If positionAfter is negative (short), we were liquidated by buying, so we were even more short before
+    // If positionAfter is ~0, the liquidation closed our position
+    const wasLong = positionAfter >= 0;
+    const positionBefore = wasLong ? positionAfter + size : positionAfter - size;
+
+    // Create a synthetic trade that represents the liquidation
+    // Use negative trade_id to avoid conflicts with real trades
+    const syntheticTrade: RawTrade = {
+      trade_id: -liq.id, // Negative to avoid ID conflicts
+      timestamp: liq.executed_at,
+      size: liq.trade.size,
+      price: liq.trade.price,
+      usd_amount: String(usdAmount),
+      market_id: liq.market_id,
+      // Set up the trade direction based on position
+      is_maker_ask: false, // We're always taker in liquidation
+      // For long position liquidation: we're selling, so we're the ask (seller)
+      // For short position liquidation: we're buying, so we're the bid (buyer)
+      bid_account_id: wasLong ? 0 : ACCOUNT_INDEX,
+      ask_account_id: wasLong ? ACCOUNT_INDEX : 0,
+      // Position sizes
+      taker_position_size_before: String(positionBefore),
+      taker_entry_quote_before: '0',
+      taker_initial_margin_fraction_before: 0,
+      maker_position_size_before: '0',
+      maker_entry_quote_before: '0',
+      maker_initial_margin_fraction_before: 0,
+      is_liquidation: true
+    };
+
+    return syntheticTrade;
+  });
+}
+
 async function loadMarketSymbols(): Promise<void> {
   try {
     const client = new ApiClient('https://mainnet.zklighter.elliot.ai');
@@ -91,7 +163,7 @@ function formatDateTime(timestamp: number): string {
 
 function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
   const positions: AggregatedPosition[] = [];
-  const accountIndex = 132275;
+  const accountIndex = ACCOUNT_INDEX;
 
   // Group trades by market_id
   const tradesByMarket = new Map<number, RawTrade[]>();
@@ -284,12 +356,22 @@ async function main() {
     // Read the raw trades data
     const tradesPath = path.join(__dirname, '..', 'data', 'sdk-trades.json');
     const jsonData = JSON.parse(fs.readFileSync(tradesPath, 'utf-8'));
-    const tradesData = jsonData.trades || jsonData;
+    const tradesData: RawTrade[] = jsonData.trades || jsonData;
+    const liquidationsData: RawLiquidation[] = jsonData.liquidations || [];
 
     console.log(`\nLoaded ${tradesData.length} raw trades`);
+    console.log(`Loaded ${liquidationsData.length} liquidations`);
+
+    // NOTE: The /trades endpoint already includes liquidations as regular trades,
+    // so we don't need to add them again. We keep the liquidation data for
+    // reference/reporting purposes, but don't convert them to synthetic trades.
+    // If we did, we'd double-count them and break position calculations.
+    console.log(`Liquidations are already included in trade data - no conversion needed`);
+
+    const allTrades = tradesData;
 
     // Aggregate ALL trades into positions first
-    const allPositions = aggregatePositions(tradesData);
+    const allPositions = aggregatePositions(allTrades);
 
     // Then filter to only include positions that STARTED on or after December 19th, 2025
     // Also filter out unknown/test markets (market_symbol starting with "Market ")
