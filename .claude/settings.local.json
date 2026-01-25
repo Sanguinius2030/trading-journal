@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev:*)",
+      "Bash(timeout:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsx:*)",
+      "Bash(copy:*)",
+      "Bash(npx tsc:*)",
+      "Bash(cat:*)",
+      "Bash(dir /s /b \"C:\\\\Users\\\\svenb\\\\Downloads\\\\gilroy-extracted\\\\*.otf\" \"C:\\\\Users\\\\svenb\\\\Downloads\\\\gilroy-extracted\\\\*.woff\" \"C:\\\\Users\\\\svenb\\\\Downloads\\\\gilroy-extracted\\\\*.ttf\")",
+      "Bash(powershell:*)",
+      "Bash(dir:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:api:*)",
+      "Bash(gh auth status:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

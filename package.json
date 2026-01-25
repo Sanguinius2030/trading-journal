@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "npx tsx server/dev-server.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync": "npx tsx scripts/fetch-all-trades.ts && npx tsx scripts/aggregate-positions.ts && copy data\\aggregated-positions.json public\\aggregated-positions.json"
   },
   "dependencies": {
     "@oraichain/lighter-ts-sdk": "^1.1.5",

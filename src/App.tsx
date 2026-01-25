@@ -1,240 +1,255 @@
-import { useState, useEffect } from 'react';
-import { PortfolioChart } from './components/PortfolioChart';
-import { TradesTimeline } from './components/TradesTimeline';
-import { PositionsTable } from './components/PositionsTable';
-import { KPIMetrics } from './components/KPIMetrics';
+import { useState } from 'react';
+import { AggregatedPositionsTable } from './components/AggregatedPositionsTable';
+import { KPISidebar } from './components/KPISidebar';
+import { CalendarHeatmap } from './components/CalendarHeatmap';
+import { CalendarTab } from './components/CalendarTab';
+import { StatsTab } from './components/StatsTab';
+import { ChartsTab } from './components/ChartsTab';
 import { GrowthProjection } from './components/GrowthProjection';
-import { PnLDashboard } from './components/PnLDashboard';
-import { TradeJournalForm } from './components/TradeJournalForm';
-import { PasswordProtection } from './components/PasswordProtection';
-import { portfolioSnapshots } from './mockData';
-import { useLighterTrades } from './hooks/useLighterTrades';
-import { aggregateTradesIntoPositions } from './services/positionAggregator';
-import { updatePosition } from './services/supabase';
-import type { Trade, Position } from './types';
-import { TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
+import { TaxTab } from './components/TaxTab';
+import { AuthProvider, useAuthContext, isAuthRequired } from './components/Auth/AuthProvider';
+import { LoginPage } from './components/Auth/LoginPage';
+import { SettingsPage } from './components/Settings/SettingsPage';
+import { TrendingUp, RefreshCw, LayoutDashboard, Target, Calendar, BarChart3, LineChart, Receipt, Settings, LogOut, Loader2 } from 'lucide-react';
 import './App.css';
 
-function App() {
-  // Start with empty manual trades - Lighter trades come from the API
-  const [manualTrades, setManualTrades] = useState<Trade[]>([]);
-  const [activeTab, setActiveTab] = useState<'overview' | 'trades' | 'table' | 'analysis' | 'projection'>('overview');
+type Tab = 'dashboard' | 'stats' | 'charts' | 'calendar' | 'projection' | 'tax' | 'settings';
 
-  // Fetch trades from Lighter DEX
-  const { trades: lighterTrades, loading: lighterLoading, error: lighterError, refetch, isConfigured } = useLighterTrades();
+function AppContent() {
+  const { user, loading, signOut, session } = useAuthContext();
+  const [activeTab, setActiveTab] = useState<Tab>('dashboard');
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Positions state
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [positionsLoading, setPositionsLoading] = useState(false);
+  // Show loading spinner while checking auth
+  if (loading) {
+    return (
+      <div className="app-loading">
+        <Loader2 size={48} className="spinning" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
-  // Combine manual trades with Lighter trades
-  const [allTrades, setAllTrades] = useState<Trade[]>(manualTrades);
+  // In production, require authentication
+  if (isAuthRequired() && !user) {
+    return <LoginPage />;
+  }
 
-  useEffect(() => {
-    // Combine and deduplicate trades
-    const combined = [...manualTrades, ...lighterTrades];
-    // Sort by entry date (newest first)
-    combined.sort((a, b) => new Date(b.entryDate).getTime() - new Date(a.entryDate).getTime());
-    setAllTrades(combined);
-  }, [manualTrades, lighterTrades]);
+  const handleSyncData = async () => {
+    if (isSyncing) return;
 
-  // Aggregate trades into positions when trades change
-  useEffect(() => {
-    const loadPositions = async () => {
-      if (lighterTrades.length === 0) return;
+    setIsSyncing(true);
+    setSyncStatus(null);
 
-      setPositionsLoading(true);
-      try {
-        const aggregatedPositions = await aggregateTradesIntoPositions();
-        setPositions(aggregatedPositions);
-      } catch (error) {
-        console.error('Failed to aggregate positions:', error);
-      } finally {
-        setPositionsLoading(false);
+    try {
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json',
+      };
+
+      // In production, include auth token
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
       }
-    };
 
-    loadPositions();
-  }, [lighterTrades]);
+      const response = await fetch('/api/sync-trades', {
+        method: 'POST',
+        headers,
+      });
 
-  const handleRefreshPositions = async () => {
-    setPositionsLoading(true);
-    try {
-      // Refetch trades first
-      await refetch();
-      // Positions will be re-aggregated via useEffect
+      if (!response.ok) {
+        // If API not available (local dev without Vercel), show instructions
+        if (response.status === 404) {
+          throw new Error('Run "npx tsx scripts/fetch-all-trades.ts && npx tsx scripts/aggregate-positions.ts" to refresh data locally');
+        }
+        throw new Error(`Sync failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Store the synced data in localStorage for persistence
+      localStorage.setItem('aggregated-positions', JSON.stringify(data));
+
+      setSyncStatus({
+        type: 'success',
+        message: `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)`
+      });
+
+      // Increment refresh key to trigger component re-mount and data re-fetch
+      setTimeout(() => {
+        setRefreshKey(prev => prev + 1);
+        // Clear success message after components refresh
+        setTimeout(() => setSyncStatus(null), 2000);
+      }, 800);
     } catch (error) {
-      console.error('Failed to refresh:', error);
+      console.error('Sync error:', error);
+      setSyncStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'Failed to sync data'
+      });
     } finally {
-      setPositionsLoading(false);
+      setIsSyncing(false);
     }
   };
 
-  const handleAddTrade = (newTrade: Trade) => {
-    setManualTrades([...manualTrades, newTrade]);
-  };
-
-  const handleUpdatePosition = async (positionId: string, updates: { journal?: string; category?: string }) => {
-    console.log('handleUpdatePosition called:', { positionId, updates });
-    try {
-      await updatePosition(positionId, updates);
-      console.log('Position updated successfully in database');
-      // Update local state
-      setPositions(prev => prev.map(p =>
-        p.id === positionId ? { ...p, ...updates } : p
-      ));
-    } catch (error) {
-      console.error('Failed to update position:', error);
-      alert(`Failed to save: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      throw error;
-    }
+  const handleLogout = async () => {
+    await signOut();
   };
 
   return (
-    <PasswordProtection>
-      <div className="app">
+    <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <div className="logo">
-            <TrendingUp size={32} />
-            <h1>Trading Journal</h1>
+          <div className="header-top">
+            <div className="logo">
+              <TrendingUp size={32} />
+              <h1>Trading Journal</h1>
+            </div>
+            <div className="header-actions">
+              <button
+                className={`sync-button ${isSyncing ? 'syncing' : ''}`}
+                onClick={handleSyncData}
+                disabled={isSyncing}
+              >
+                <RefreshCw size={18} className={isSyncing ? 'spinning' : ''} />
+                {isSyncing ? 'Syncing...' : 'Refresh Data'}
+              </button>
+              {user && (
+                <button className="logout-button" onClick={handleLogout} title="Logout">
+                  <LogOut size={18} />
+                </button>
+              )}
+            </div>
           </div>
           <p className="subtitle">Track, Analyze, and Optimize Your Trading Performance</p>
-
-          {/* Lighter DEX Status */}
-          <div className="lighter-status">
-            {isConfigured && (
-              <>
-                {lighterLoading && (
-                  <div className="status-indicator loading">
-                    <RefreshCw size={16} className="spinning" />
-                    <span>Syncing Lighter trades...</span>
-                  </div>
-                )}
-                {lighterError && (
-                  <div className="status-indicator error">
-                    <AlertCircle size={16} />
-                    <span>{lighterError}</span>
-                  </div>
-                )}
-                {!lighterLoading && !lighterError && lighterTrades.length > 0 && (
-                  <div className="status-indicator success">
-                    <RefreshCw size={16} onClick={refetch} style={{ cursor: 'pointer' }} />
-                    <span>{lighterTrades.length} trades from Lighter DEX</span>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+          {user && (
+            <p className="user-email">{user.email}</p>
+          )}
+          {syncStatus && (
+            <div className={`sync-status ${syncStatus.type}`}>
+              {syncStatus.message}
+            </div>
+          )}
         </div>
       </header>
 
-      <nav className="nav-tabs">
+      {/* Tab Navigation */}
+      <nav className="tab-navigation">
         <button
-          className={`tab ${activeTab === 'overview' ? 'active' : ''}`}
-          onClick={() => setActiveTab('overview')}
+          className={`tab-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dashboard')}
         >
-          Overview
+          <LayoutDashboard size={18} />
+          Dashboard
         </button>
         <button
-          className={`tab ${activeTab === 'trades' ? 'active' : ''}`}
-          onClick={() => setActiveTab('trades')}
+          className={`tab-button ${activeTab === 'stats' ? 'active' : ''}`}
+          onClick={() => setActiveTab('stats')}
         >
-          Trade Journal
+          <BarChart3 size={18} />
+          Stats
         </button>
         <button
-          className={`tab ${activeTab === 'table' ? 'active' : ''}`}
-          onClick={() => setActiveTab('table')}
+          className={`tab-button ${activeTab === 'charts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('charts')}
         >
-          Table View
+          <LineChart size={18} />
+          Charts
         </button>
         <button
-          className={`tab ${activeTab === 'analysis' ? 'active' : ''}`}
-          onClick={() => setActiveTab('analysis')}
+          className={`tab-button ${activeTab === 'calendar' ? 'active' : ''}`}
+          onClick={() => setActiveTab('calendar')}
         >
-          P&L Analysis
+          <Calendar size={18} />
+          Calendar
         </button>
         <button
-          className={`tab ${activeTab === 'projection' ? 'active' : ''}`}
+          className={`tab-button ${activeTab === 'projection' ? 'active' : ''}`}
           onClick={() => setActiveTab('projection')}
         >
+          <Target size={18} />
           Projection
         </button>
+        <button
+          className={`tab-button ${activeTab === 'tax' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tax')}
+        >
+          <Receipt size={18} />
+          Tax
+        </button>
+        {user && (
+          <button
+            className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            <Settings size={18} />
+            Settings
+          </button>
+        )}
       </nav>
 
-      <main className="main-content">
-        {activeTab === 'overview' && (
-          <div className="overview-tab">
-            <KPIMetrics trades={allTrades} />
-            <PortfolioChart data={portfolioSnapshots} />
-            <TradeJournalForm onAddTrade={handleAddTrade} />
+      {activeTab === 'dashboard' && (
+        <main className="app-layout" key={`dashboard-${refreshKey}`}>
+          <KPISidebar />
+          <div className="main-column">
+            <div className="positions-tab">
+              <AggregatedPositionsTable />
+            </div>
           </div>
-        )}
+          <CalendarHeatmap />
+        </main>
+      )}
 
-        {activeTab === 'trades' && (
-          <div className="trades-tab">
-            <TradeJournalForm onAddTrade={handleAddTrade} />
-            <TradesTimeline trades={allTrades} />
-          </div>
-        )}
+      {activeTab === 'stats' && (
+        <main className="stats-layout" key={`stats-${refreshKey}`}>
+          <StatsTab />
+        </main>
+      )}
 
-        {activeTab === 'table' && (
-          <div className="table-tab">
-            {positionsLoading ? (
-              <div className="loading-positions">
-                <RefreshCw size={24} className="spinning" />
-                <span>Aggregating positions...</span>
-              </div>
-            ) : (
-              <>
-                <div style={{ marginBottom: '1rem', textAlign: 'right' }}>
-                  <button
-                    onClick={handleRefreshPositions}
-                    className="refresh-button"
-                    style={{
-                      padding: '0.5rem 1rem',
-                      background: '#ff6b35',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}
-                  >
-                    <RefreshCw size={16} />
-                    Refresh Positions
-                  </button>
-                </div>
-                <PositionsTable
-                  positions={positions}
-                  onUpdatePosition={handleUpdatePosition}
-                />
-              </>
-            )}
-          </div>
-        )}
+      {activeTab === 'charts' && (
+        <main className="charts-layout" key={`charts-${refreshKey}`}>
+          <ChartsTab />
+        </main>
+      )}
 
-        {activeTab === 'analysis' && (
-          <div className="analysis-tab">
-            <PnLDashboard trades={allTrades} />
-          </div>
-        )}
+      {activeTab === 'calendar' && (
+        <main className="calendar-layout" key={`calendar-${refreshKey}`}>
+          <CalendarTab />
+        </main>
+      )}
 
-        {activeTab === 'projection' && (
-          <div className="projection-tab">
-            <GrowthProjection trades={allTrades} />
-          </div>
-        )}
-      </main>
+      {activeTab === 'projection' && (
+        <main className="projection-layout" key={`projection-${refreshKey}`}>
+          <GrowthProjection />
+        </main>
+      )}
+
+      {activeTab === 'tax' && (
+        <main className="tax-layout" key={`tax-${refreshKey}`}>
+          <TaxTab />
+        </main>
+      )}
+
+      {activeTab === 'settings' && user && (
+        <main className="settings-layout" key={`settings-${refreshKey}`}>
+          <SettingsPage />
+        </main>
+      )}
 
       <footer className="app-footer">
         <p>Trading Journal - Built with React & TypeScript</p>
-        <p className="footer-note">Data from Hyperliquid & Lighter DEXs</p>
+        <p className="footer-note">Data from Lighter DEX</p>
       </footer>
     </div>
-    </PasswordProtection>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

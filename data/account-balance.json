@@ -1,0 +1,193 @@
+{
+  "account_index": 132275,
+  "balance": "2605.090855",
+  "margin_balance": "2605.090855",
+  "free_margin": "2605.090855",
+  "margin_used": "0",
+  "unrealized_pnl": 0,
+  "positions": [
+    {
+      "market_id": 0,
+      "symbol": "ETH",
+      "position": "0.0000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 1,
+      "symbol": "BTC",
+      "position": "0.00000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 2,
+      "symbol": "SOL",
+      "position": "0.000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 3,
+      "symbol": "DOGE",
+      "position": "0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 7,
+      "symbol": "XRP",
+      "position": "0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 9,
+      "symbol": "AVAX",
+      "position": "0.00",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 16,
+      "symbol": "SUI",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 21,
+      "symbol": "FARTCOIN",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 24,
+      "symbol": "HYPE",
+      "position": "0.00",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 25,
+      "symbol": "BNB",
+      "position": "0.00",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 29,
+      "symbol": "ENA",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 32,
+      "symbol": "SEI",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 39,
+      "symbol": "ADA",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 45,
+      "symbol": "PUMP",
+      "position": "0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 47,
+      "symbol": "PENGU",
+      "position": "0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 48,
+      "symbol": "PAXG",
+      "position": "0.0000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 49,
+      "symbol": "EIGEN",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 58,
+      "symbol": "BCH",
+      "position": "0.000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 71,
+      "symbol": "XPL",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 77,
+      "symbol": "XMR",
+      "position": "0.000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 83,
+      "symbol": "ASTER",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 90,
+      "symbol": "ZEC",
+      "position": "0.000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 96,
+      "symbol": "EURUSD",
+      "position": "0.0",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 120,
+      "symbol": "LIT",
+      "position": "0.00",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 126,
+      "symbol": "RIVER",
+      "position": "0.000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    },
+    {
+      "market_id": 128,
+      "symbol": "SPY",
+      "position": "0.0000",
+      "unrealized_pnl": "0.000000",
+      "position_value": "-0.000000"
+    }
+  ],
+  "fetched_at": "2026-01-25T11:35:45.751Z"
+}
