@@ -51,12 +51,15 @@ export async function fetchPositionsFromJson(): Promise<PositionsData> {
   let balance: AccountBalance | null = null;
   if (balResponse?.ok) {
     const balData = await balResponse.json();
+    // Map from local JSON format (strings) to AccountBalance format (numbers)
+    // Local JSON has: margin_balance, balance, free_margin, margin_used (all strings)
+    // Supabase format has: account_equity, available_balance, margin_used (numbers)
     balance = {
-      account_equity: balData.account_equity || 0,
-      available_balance: balData.available_balance || 0,
+      account_equity: parseFloat(balData.margin_balance) || balData.account_equity || 0,
+      available_balance: parseFloat(balData.free_margin) || parseFloat(balData.balance) || balData.available_balance || 0,
       unrealized_pnl: balData.unrealized_pnl || 0,
-      margin_used: balData.margin_used || 0,
-      updated_at: balData.updated_at || new Date().toISOString()
+      margin_used: parseFloat(balData.margin_used) || 0,
+      updated_at: balData.fetched_at || balData.updated_at || new Date().toISOString()
     };
   }
 
