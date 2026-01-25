@@ -30,18 +30,35 @@ export function useAuth(): AuthState & AuthActions {
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<UserSettings | null>(null);
 
-  // Load user settings from Supabase
+  // Load user settings from Supabase with timeout
   const loadSettings = useCallback(async (userId: string) => {
+    // Set defaults first so app works even if DB fails
+    const defaults: UserSettings = {
+      lighter_account_index: null,
+      lighter_auth_token: null,
+      starting_capital: 10000,
+      currency: 'USD',
+      timezone: 'Europe/Berlin',
+    };
+
     try {
-      const { data, error } = await supabase
+      // Add 5 second timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Settings load timeout')), 5000)
+      );
+
+      const queryPromise = supabase
         .from('user_settings')
         .select('*')
         .eq('user_id', userId)
         .single();
 
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as Awaited<typeof queryPromise>;
+
       if (error && error.code !== 'PGRST116') {
         // PGRST116 is "not found" - that's ok for new users
         console.error('Failed to load user settings:', error);
+        setSettings(defaults);
         return;
       }
 
@@ -54,17 +71,11 @@ export function useAuth(): AuthState & AuthActions {
           timezone: data.timezone || 'Europe/Berlin',
         });
       } else {
-        // Set defaults for new users
-        setSettings({
-          lighter_account_index: null,
-          lighter_auth_token: null,
-          starting_capital: 10000,
-          currency: 'USD',
-          timezone: 'Europe/Berlin',
-        });
+        setSettings(defaults);
       }
     } catch (err) {
       console.error('Failed to load user settings:', err);
+      setSettings(defaults);
     }
   }, []);
 
@@ -137,7 +148,7 @@ export function useAuth(): AuthState & AuthActions {
     setSettings(null);
   }, []);
 
-  // Update user settings
+  // Update user settings with timeout
   const updateSettings = useCallback(
     async (newSettings: Partial<UserSettings>) => {
       if (!user) {
@@ -145,7 +156,12 @@ export function useAuth(): AuthState & AuthActions {
       }
 
       try {
-        const { error } = await supabase
+        // Add 10 second timeout to prevent hanging
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Save timeout - please try again')), 10000)
+        );
+
+        const upsertPromise = supabase
           .from('user_settings')
           .upsert(
             {
@@ -156,11 +172,13 @@ export function useAuth(): AuthState & AuthActions {
             { onConflict: 'user_id' }
           );
 
+        const { error } = await Promise.race([upsertPromise, timeoutPromise]);
+
         if (error) {
           return { error: new Error(error.message) };
         }
 
-        // Update local state
+        // Update local state optimistically
         setSettings((prev) => (prev ? { ...prev, ...newSettings } : null));
         return { error: null };
       } catch (err) {
