@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import {
-  TrendingUp, TrendingDown, Target, Activity, Flame, BarChart3,
-  ArrowUpRight, ArrowDownRight
+  Target, BarChart3, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
 
 interface Trade {

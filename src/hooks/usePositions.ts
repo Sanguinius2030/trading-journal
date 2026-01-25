@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { fetchPositions, Position, PositionsData } from '../services/supabaseData';
+import { fetchPositions } from '../services/supabaseData';
+import type { Position, PositionsData } from '../services/supabaseData';
 import { useAuthContext } from '../components/Auth/AuthProvider';
 
 interface UsePositionsReturn {
