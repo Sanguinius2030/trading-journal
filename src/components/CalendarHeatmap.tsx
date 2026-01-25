@@ -1,15 +1,12 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { Calendar } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface Position {
   entry_time: number;
   entry_date: string;
   pnl: number | null;
   is_closed: boolean;
-}
-
-interface BalanceData {
-  unrealized_pnl: number;
 }
 
 interface DayData {
@@ -24,29 +21,13 @@ interface DayData {
 }
 
 export function CalendarHeatmap() {
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
+  const { positions: rawPositions, balance } = usePositions();
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load positions
-        const posResponse = await fetch('/aggregated-positions.json');
-        const posData = await posResponse.json();
-        setPositions(posData.positions);
+  // Cast positions to the local type
+  const positions = rawPositions as unknown as Position[];
 
-        // Load balance data for unrealized P&L
-        const balResponse = await fetch('/data/account-balance.json');
-        if (balResponse.ok) {
-          const balData = await balResponse.json();
-          setBalanceData(balData);
-        }
-      } catch (error) {
-        console.error('Failed to load data:', error);
-      }
-    };
-    loadData();
-  }, []);
+  // Convert balance to the expected format
+  const balanceData = balance ? { unrealized_pnl: balance.unrealized_pnl || 0 } : null;
 
   const days = useMemo(() => {
     const now = new Date();

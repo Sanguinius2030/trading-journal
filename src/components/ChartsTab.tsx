@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { LineChart, TrendingUp, TrendingDown, Target, Timer, Calendar, PieChart, Activity, DollarSign } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface AggregatedPosition {
   position_id: string;
@@ -17,8 +18,9 @@ interface AggregatedPosition {
 const STARTING_CAPITAL = 10000;
 
 export function ChartsTab() {
-  const [positions, setPositions] = useState<AggregatedPosition[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { positions: rawPositions, loading } = usePositions();
+  const positions = rawPositions as unknown as AggregatedPosition[];
+
   const [hoveredEquityPoint, setHoveredEquityPoint] = useState<number | null>(null);
   const [hoveredDrawdownPoint, setHoveredDrawdownPoint] = useState<number | null>(null);
   const [hoveredWinRatePoint, setHoveredWinRatePoint] = useState<number | null>(null);
@@ -33,21 +35,6 @@ export function ChartsTab() {
   const [marketAnimated, setMarketAnimated] = useState(false);
   const [dayAnimated, setDayAnimated] = useState(false);
   const equityPathRef = useRef<SVGPathElement>(null);
-
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        const data = await response.json();
-        setPositions(data.positions || []);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPositions();
-  }, []);
 
   // Sort positions by exit time for chronological charts
   const sortedPositions = useMemo(() => {

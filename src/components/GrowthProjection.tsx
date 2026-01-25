@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Target, TrendingUp, Calendar, Zap } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface Position {
   entry_time: number;
@@ -34,21 +35,10 @@ const MILESTONES = [
 ];
 
 export function GrowthProjection() {
-  const [positions, setPositions] = useState<Position[]>([]);
-  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+  const { positions: rawPositions } = usePositions();
+  const positions = rawPositions as unknown as Position[];
 
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        const data = await response.json();
-        setPositions(data.positions);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-      }
-    };
-    loadPositions();
-  }, []);
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
 
   const { avgDailyReturnPct, currentPortfolio, tradingDays, totalDays } = useMemo(() => {
     const now = new Date();

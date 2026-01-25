@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { FileText, Download, Calculator, AlertTriangle, CheckCircle, Euro, RefreshCw } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface AggregatedPosition {
   position_id: string;
@@ -62,34 +63,17 @@ function parseDateString(dateStr: string): { day: number; month: number; year: n
 }
 
 export function TaxTab() {
-  const [positions, setPositions] = useState<AggregatedPosition[]>([]);
+  const { positions: rawPositions, loading } = usePositions();
+  const positions = rawPositions as unknown as AggregatedPosition[];
+
   const [selectedYear, setSelectedYear] = useState<number>(2025);
-  const [loading, setLoading] = useState(true);
   const [loadingRates, setLoadingRates] = useState(false);
   const [exchangeRates, setExchangeRates] = useState<ExchangeRateCache>({});
   const [ratesError, setRatesError] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
-  // Load positions
+  // Load cached exchange rates on mount
   useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log('Tax Tab - Loaded positions:', data.positions?.length || 0);
-        setPositions(data.positions || []);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadPositions();
-
-    // Load cached exchange rates
     const cached = localStorage.getItem(RATE_CACHE_KEY);
     if (cached) {
       try {

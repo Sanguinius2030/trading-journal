@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import {
   Target, BarChart3, ArrowUpRight, ArrowDownRight
 } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface Trade {
   trade_id: number;
@@ -39,24 +40,10 @@ interface PositionAnnotation {
 }
 
 export function StatsTab() {
-  const [positions, setPositions] = useState<AggregatedPosition[]>([]);
-  const [annotations, setAnnotations] = useState<Map<string, PositionAnnotation>>(new Map());
-  const [loading, setLoading] = useState(true);
+  const { positions: rawPositions, loading } = usePositions();
+  const positions = rawPositions as unknown as AggregatedPosition[];
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        const data = await response.json();
-        setPositions(data.positions || []);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+  const [annotations, setAnnotations] = useState<Map<string, PositionAnnotation>>(new Map());
 
   // Load annotations from Supabase
   useEffect(() => {

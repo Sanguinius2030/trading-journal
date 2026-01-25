@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { TrendingUp, TrendingDown, Target, Activity, Flame, BarChart3, Wallet, Settings, X, Check } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface Trade {
   trade_id: number;
@@ -147,9 +148,11 @@ function calculateKPIs(positions: AggregatedPosition[]): KPIData {
 }
 
 export function KPISidebar() {
-  const [positions, setPositions] = useState<AggregatedPosition[]>([]);
-  const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { positions: rawPositions, loading, balance } = usePositions();
+
+  // Cast positions to the local type
+  const positions = rawPositions as unknown as AggregatedPosition[];
+
   const [externalBalance, setExternalBalance] = useState<number>(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     return stored ? parseFloat(stored) : 8055;
@@ -163,30 +166,16 @@ export function KPISidebar() {
   const [tempExternalValue, setTempExternalValue] = useState('');
   const [tempFeesValue, setTempFeesValue] = useState('');
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load positions
-        const posResponse = await fetch('/aggregated-positions.json');
-        if (posResponse.ok) {
-          const data = await posResponse.json();
-          setPositions(data.positions || []);
-        }
-
-        // Load balance data
-        const balResponse = await fetch('/data/account-balance.json');
-        if (balResponse.ok) {
-          const data = await balResponse.json();
-          setBalanceData(data);
-        }
-      } catch (error) {
-        console.error('Failed to load data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadData();
-  }, []);
+  // Convert balance to the expected format
+  const balanceData: BalanceData | null = balance ? {
+    account_index: 0,
+    balance: String(balance.available_balance || 0),
+    margin_balance: String(balance.account_equity || 0),
+    free_margin: String(balance.available_balance || 0),
+    margin_used: String(balance.margin_used || 0),
+    unrealized_pnl: balance.unrealized_pnl || 0,
+    fetched_at: balance.updated_at || new Date().toISOString(),
+  } : null;
 
   const kpis = useMemo(() => calculateKPIs(positions), [positions]);
 

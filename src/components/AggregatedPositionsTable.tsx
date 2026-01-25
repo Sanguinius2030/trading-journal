@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { usePositions } from '../hooks/usePositions';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
@@ -114,12 +115,20 @@ const STARTING_CAPITAL = 10000;
 const FEES_STORAGE_KEY = 'trading-journal-fees-expenses';
 
 export function AggregatedPositionsTable() {
-  const [positions, setPositions] = useState<AggregatedPosition[]>([]);
+  const { positions: rawPositions, loading, balance } = usePositions();
+
+  // Cast positions to the local type
+  const positions = rawPositions as unknown as AggregatedPosition[];
+
+  // Convert balance to the expected format
+  const balanceData: BalanceData | null = balance ? {
+    unrealized_pnl: balance.unrealized_pnl || 0,
+    positions: undefined,
+  } : null;
+
   const [annotations, setAnnotations] = useState<Map<string, PositionAnnotation>>(new Map());
   const [dailyJournals, setDailyJournals] = useState<Map<string, DailyJournal>>(new Map());
   const [weeklyJournals, setWeeklyJournals] = useState<Map<string, WeeklyJournal>>(new Map());
-  const [balanceData, setBalanceData] = useState<BalanceData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [feesExpenses, setFeesExpenses] = useState<number>(() => {
     const stored = localStorage.getItem(FEES_STORAGE_KEY);
     return stored ? parseFloat(stored) : 0;
@@ -190,38 +199,6 @@ export function AggregatedPositionsTable() {
     return Array.from(markets).sort();
   }, [positions]);
 
-  // Load aggregated positions
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        const data = await response.json();
-        setPositions(data.positions);
-        setLoading(false);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-        setLoading(false);
-      }
-    };
-
-    loadPositions();
-  }, []);
-
-  // Load balance data for unrealized P&L
-  useEffect(() => {
-    const loadBalanceData = async () => {
-      try {
-        const response = await fetch('/data/account-balance.json');
-        if (response.ok) {
-          const data = await response.json();
-          setBalanceData(data);
-        }
-      } catch (error) {
-        console.error('Failed to load balance data:', error);
-      }
-    };
-    loadBalanceData();
-  }, []);
 
   // Load annotations from Supabase
   useEffect(() => {

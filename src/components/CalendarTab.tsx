@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Calendar, TrendingUp, TrendingDown } from 'lucide-react';
+import { usePositions } from '../hooks/usePositions';
 
 interface Position {
   entry_time: number;
@@ -23,22 +24,11 @@ interface DayData {
 }
 
 export function CalendarTab() {
-  const [positions, setPositions] = useState<Position[]>([]);
+  const { positions: rawPositions } = usePositions();
+  const positions = rawPositions as unknown as Position[];
+
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDay, setSelectedDay] = useState<DayData | null>(null);
-
-  useEffect(() => {
-    const loadPositions = async () => {
-      try {
-        const response = await fetch('/aggregated-positions.json');
-        const data = await response.json();
-        setPositions(data.positions);
-      } catch (error) {
-        console.error('Failed to load positions:', error);
-      }
-    };
-    loadPositions();
-  }, []);
 
   // Build PnL map by date
   const pnlByDate = useMemo(() => {
