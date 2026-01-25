@@ -69,8 +69,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .eq('user_id', userId)
       .single();
 
-    if (balanceError && balanceError.code !== 'PGRST116') {
-      console.error('Failed to fetch balance:', balanceError);
+    if (balanceError) {
+      if (balanceError.code === 'PGRST116') {
+        console.log('No balance record found for user (expected for first sync)');
+      } else {
+        console.error('Failed to fetch balance:', balanceError);
+      }
+    } else {
+      console.log('Balance fetched from DB:', balance);
     }
 
     // Calculate summary

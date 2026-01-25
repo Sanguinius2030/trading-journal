@@ -42,9 +42,11 @@ export function useAuth(): AuthState & AuthActions {
     };
 
     try {
-      // Add 5 second timeout to prevent hanging
+      console.log('Loading settings for user:', userId);
+
+      // Add 15 second timeout to prevent hanging (increased from 5s for slower connections)
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Settings load timeout')), 5000)
+        setTimeout(() => reject(new Error('Settings load timeout after 15s')), 15000)
       );
 
       const queryPromise = supabase
@@ -63,6 +65,11 @@ export function useAuth(): AuthState & AuthActions {
       }
 
       if (data) {
+        console.log('Settings loaded:', {
+          has_account_index: !!data.lighter_account_index,
+          has_auth_token: !!data.lighter_auth_token,
+          starting_capital: data.starting_capital
+        });
         setSettings({
           lighter_account_index: data.lighter_account_index,
           lighter_auth_token: data.lighter_auth_token,
@@ -71,6 +78,7 @@ export function useAuth(): AuthState & AuthActions {
           timezone: data.timezone || 'Europe/Berlin',
         });
       } else {
+        console.log('No settings found for user, using defaults');
         setSettings(defaults);
       }
     } catch (err) {

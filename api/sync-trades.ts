@@ -749,14 +749,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // If authenticated, save to Supabase
     if (userId && supabaseUrl && supabaseServiceKey) {
+      console.log('Saving data to Supabase for user:', userId);
       await savePositionsToSupabase(userId, positions);
 
       // Also fetch and save account balance
+      console.log('Fetching account balance for account:', accountIndex);
       const balance = await fetchAccountBalance(accountIndex, authToken);
       if (balance) {
+        console.log('Saving account balance to Supabase:', balance);
         await saveAccountBalance(userId, balance);
-        console.log('Account balance:', balance);
+      } else {
+        console.error('Balance fetch returned null - not saving to Supabase');
       }
+    } else {
+      console.log('Not saving to Supabase:', {
+        hasUserId: !!userId,
+        hasSupabaseUrl: !!supabaseUrl,
+        hasServiceKey: !!supabaseServiceKey
+      });
     }
 
     // Calculate total PnL
