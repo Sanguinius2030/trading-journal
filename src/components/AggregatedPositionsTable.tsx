@@ -1411,7 +1411,7 @@ export function AggregatedPositionsTable() {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {position.trades.map((trade) => (
+                                  {[...position.trades].reverse().map((trade) => (
                                     <tr key={trade.trade_id} className={trade.side.toLowerCase()}>
                                       <td className="time-cell">{trade.date_time}</td>
                                       <td>
