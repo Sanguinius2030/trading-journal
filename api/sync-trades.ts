@@ -363,6 +363,70 @@ async function getUserSettings(userId: string): Promise<UserSettings | null> {
   return data as UserSettings;
 }
 
+interface AccountBalance {
+  account_equity: number;
+  available_balance: number;
+  unrealized_pnl: number;
+  margin_used: number;
+}
+
+async function fetchAccountBalance(accountIndex: number, authToken: string): Promise<AccountBalance | null> {
+  try {
+    const url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${authToken}`;
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      console.error('Failed to fetch account balance:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const account = Array.isArray(data) ? data[0] : data;
+
+    if (!account) {
+      console.error('No account data returned');
+      return null;
+    }
+
+    // Calculate total unrealized PnL from positions
+    let totalUnrealizedPnl = 0;
+    if (account.positions && account.positions.length > 0) {
+      account.positions.forEach((pos: any) => {
+        totalUnrealizedPnl += parseFloat(pos.unrealized_pnl || '0');
+      });
+    }
+
+    return {
+      account_equity: parseFloat(account.total_asset_value || account.collateral || '0'),
+      available_balance: parseFloat(account.available_balance || '0'),
+      unrealized_pnl: totalUnrealizedPnl,
+      margin_used: parseFloat(account.margin_used || '0'),
+    };
+  } catch (error) {
+    console.error('Error fetching account balance:', error);
+    return null;
+  }
+}
+
+async function saveAccountBalance(userId: string, balance: AccountBalance): Promise<void> {
+  const { error } = await supabase
+    .from('account_balances')
+    .upsert({
+      user_id: userId,
+      account_equity: balance.account_equity,
+      available_balance: balance.available_balance,
+      unrealized_pnl: balance.unrealized_pnl,
+      margin_used: balance.margin_used,
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'user_id' });
+
+  if (error) {
+    console.error('Failed to save account balance:', error);
+  } else {
+    console.log('Saved account balance to Supabase');
+  }
+}
+
 async function savePositionsToSupabase(userId: string, positions: AggregatedPosition[]): Promise<void> {
   // Prepare positions for upsert (remove trades array, it's too large)
   const positionsToSave = positions.map(pos => ({
@@ -470,6 +534,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // If authenticated, save to Supabase
     if (userId && supabaseUrl && supabaseServiceKey) {
       await savePositionsToSupabase(userId, positions);
+
+      // Also fetch and save account balance
+      const balance = await fetchAccountBalance(accountIndex, authToken);
+      if (balance) {
+        await saveAccountBalance(userId, balance);
+        console.log('Account balance:', balance);
+      }
     }
 
     // Calculate total PnL
