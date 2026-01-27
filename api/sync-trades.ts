@@ -159,21 +159,12 @@ async function fetchAllTrades(
     }
 
     batchCount++;
-    const params = new URLSearchParams({
-      auth: authToken,
-      account_index: accountIndex.toString(),
-      limit: BATCH_SIZE.toString(),
-      sort_by: 'timestamp',
-      // The API requires start_time but ignores its value for filtering
-      // (returns trades before start_time too). We pass 0 and do our own
-      // client-side filtering via sinceTimestamp instead.
-      start_time: '0',
-    });
+    // Build URL with template literals — URLSearchParams encodes special chars
+    // in the auth token (e.g. + → %2B) which the Lighter API rejects.
+    let url = `${LIGHTER_API_URL}/api/v1/trades?auth=${authToken}&account_index=${accountIndex}&limit=${BATCH_SIZE}&sort_by=timestamp&start_time=${sinceTimestamp > 0 ? sinceTimestamp : 1}`;
     if (cursor) {
-      params.set('cursor', cursor);
+      url += `&cursor=${cursor}`;
     }
-
-    const url = `${LIGHTER_API_URL}/api/v1/trades?${params}`;
 
     let response;
     let retries = 0;
