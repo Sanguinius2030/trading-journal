@@ -67,16 +67,28 @@ export function ChartsTab() {
     return data;
   }, [sortedPositions]);
 
-  // All-time high points on the equity curve
+  // All-time high points on the equity curve (filtered to significant ones only)
   const athPoints = useMemo(() => {
     if (equityData.length < 2) return [];
     const points: { index: number; value: number; date: Date }[] = [];
-    let peak = equityData[0].value;
+    let lastMarkedPeak = equityData[0].value;
+    let lowestSinceMarked = equityData[0].value;
+    const minDrawdownPct = 0.5; // require 0.5% pullback before marking next ATH
 
     for (let i = 1; i < equityData.length; i++) {
-      if (equityData[i].value > peak) {
-        peak = equityData[i].value;
-        points.push({ index: i, value: peak, date: equityData[i].date });
+      if (equityData[i].value < lowestSinceMarked) {
+        lowestSinceMarked = equityData[i].value;
+      }
+      if (equityData[i].value > lastMarkedPeak) {
+        const drawdown = ((lastMarkedPeak - lowestSinceMarked) / lastMarkedPeak) * 100;
+        if (drawdown >= minDrawdownPct || points.length === 0) {
+          points.push({ index: i, value: equityData[i].value, date: equityData[i].date });
+          lastMarkedPeak = equityData[i].value;
+          lowestSinceMarked = equityData[i].value;
+        } else {
+          // Update peak but don't add marker
+          lastMarkedPeak = equityData[i].value;
+        }
       }
     }
     return points;
@@ -414,13 +426,6 @@ export function ChartsTab() {
                     <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
                     <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                   </linearGradient>
-                  <filter id="athGlow">
-                    <feGaussianBlur stdDeviation="0.4" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
                   <clipPath id="equityClip">
                     <rect
                       x="0"
@@ -442,34 +447,6 @@ export function ChartsTab() {
                     vectorEffect="non-scaling-stroke"
                     style={{ strokeWidth: '2px' }}
                   />
-                  {/* ATH markers — subtle dot + vertical tick */}
-                  {equityData.length >= 2 && (() => {
-                    const minValue = Math.min(...equityData.map(d => d.value));
-                    const maxValue = Math.max(...equityData.map(d => d.value));
-                    const valueRange = maxValue - minValue || 1;
-                    return athPoints.map((ath) => {
-                      const x = (ath.index / (equityData.length - 1)) * chartWidth;
-                      const y = chartHeight - ((ath.value - minValue) / valueRange) * chartHeight;
-                      return (
-                        <g key={ath.index} className="ath-marker">
-                          {/* Vertical tick line from point downward */}
-                          <line
-                            x1={x} y1={y}
-                            x2={x} y2={y + 2.5}
-                            stroke="#f59e0b"
-                            strokeWidth="0.15"
-                            strokeOpacity="0.35"
-                            vectorEffect="non-scaling-stroke"
-                            style={{ strokeWidth: '1px' }}
-                          />
-                          {/* Outer glow ring */}
-                          <circle cx={x} cy={y} r="0.6" fill="#f59e0b" fillOpacity="0.15" filter="url(#athGlow)" />
-                          {/* Core dot */}
-                          <circle cx={x} cy={y} r="0.3" fill="#f59e0b" stroke="#fff" strokeWidth="0.08" vectorEffect="non-scaling-stroke" style={{ strokeWidth: '1px' }} />
-                        </g>
-                      );
-                    });
-                  })()}
                 </g>
               </svg>
               <div className="chart-hover-areas">
@@ -477,6 +454,20 @@ export function ChartsTab() {
                   <div key={i} className="hover-area" style={{ left: `${getEquityHoverX(i)}%`, width: `${100 / equityData.length}%`, marginLeft: `${-50 / equityData.length}%` }} onMouseEnter={() => setHoveredEquityPoint(i)} />
                 ))}
               </div>
+              {/* ATH markers as HTML overlays — dot on the line, line extends upward */}
+              {equityData.length >= 2 && athPoints.map(ath => {
+                const xPct = (ath.index / (equityData.length - 1)) * 100;
+                const minValue = equityMin;
+                const maxValue = equityMax;
+                const valueRange = maxValue - minValue || 1;
+                const yPct = ((ath.value - minValue) / valueRange) * 100;
+                return (
+                  <div key={ath.index} className="ath-flag" style={{ left: `${xPct}%`, bottom: `calc(${yPct}% - 2px)` }}>
+                    <div className="ath-flag-dot" />
+                    <div className="ath-flag-line" />
+                  </div>
+                );
+              })}
               {hoveredEquityPoint !== null && equityData[hoveredEquityPoint] && (
                 <>
                   <div className="hover-line" style={{ left: `${getEquityHoverX(hoveredEquityPoint)}%` }} />
@@ -1098,16 +1089,36 @@ export function ChartsTab() {
 
         .tooltip-ath::before {
           content: '';
-          width: 6px;
-          height: 6px;
+          width: 5px;
+          height: 5px;
           border-radius: 50%;
           background: #f59e0b;
           box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
           flex-shrink: 0;
         }
 
-        .ath-marker {
-          opacity: 0.85;
+        .ath-flag {
+          position: absolute;
+          transform: translate(-50%, 0);
+          pointer-events: none;
+          z-index: 1;
+          display: flex;
+          flex-direction: column-reverse;
+          align-items: center;
+        }
+
+        .ath-flag-dot {
+          width: 5px;
+          height: 5px;
+          border-radius: 50%;
+          background: #f59e0b;
+          box-shadow: 0 0 6px rgba(245, 158, 11, 0.45);
+        }
+
+        .ath-flag-line {
+          width: 1px;
+          height: 18px;
+          background: linear-gradient(to top, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0));
         }
 
         .tooltip-detail {
