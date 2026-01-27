@@ -340,9 +340,11 @@ export function AggregatedPositionsTable() {
       const dateKey = `${day}/${month}/${year}`;
 
       const dayPositions = groups.get(dateKey) || [];
-      const dayPnL = dayPositions
-        .filter(p => p.is_closed && p.pnl !== null)
-        .reduce((sum, p) => sum + p.pnl!, 0);
+      const dayPnL = dayPositions.reduce((sum, p) => {
+        if (p.is_closed && p.pnl !== null) return sum + p.pnl;
+        if (!p.is_closed && p.realized_pnl) return sum + p.realized_pnl;
+        return sum;
+      }, 0);
 
       dailyPnLMap.set(dateKey, dayPnL);
       portfolioValue += dayPnL;
@@ -377,7 +379,15 @@ export function AggregatedPositionsTable() {
 
       // If previous day exists in our data, use its ending value; otherwise use starting capital
       const prevPortfolioValue = portfolioValueMap.get(prevDateKey) ?? STARTING_CAPITAL;
-      const dayPnLPercent = prevPortfolioValue !== 0 ? (dayPnL / prevPortfolioValue) * 100 : 0;
+
+      // Check if this is today
+      const isToday = currentDate.getTime() === today.getTime();
+
+      // For today, include unrealized PnL in percentage calculation
+      const effectiveDayPnL = isToday && balanceData
+        ? dayPnL + (balanceData.unrealized_pnl || 0)
+        : dayPnL;
+      const dayPnLPercent = prevPortfolioValue !== 0 ? (effectiveDayPnL / prevPortfolioValue) * 100 : 0;
 
       const displayDate = currentDate.toLocaleDateString('en-US', {
         weekday: 'long',
@@ -385,9 +395,6 @@ export function AggregatedPositionsTable() {
         month: 'long',
         day: 'numeric'
       });
-
-      // Check if this is today
-      const isToday = currentDate.getTime() === today.getTime();
 
       allDays.push({
         date: dateKey,
@@ -450,9 +457,11 @@ export function AggregatedPositionsTable() {
       });
 
       // Recalculate day PnL based on filtered positions
-      const filteredDayPnL = filteredPositions
-        .filter(p => p.is_closed && p.pnl !== null)
-        .reduce((sum, p) => sum + p.pnl!, 0);
+      const filteredDayPnL = filteredPositions.reduce((sum, p) => {
+        if (p.is_closed && p.pnl !== null) return sum + p.pnl;
+        if (!p.is_closed && p.realized_pnl) return sum + p.realized_pnl;
+        return sum;
+      }, 0);
 
       return {
         ...dayGroup,

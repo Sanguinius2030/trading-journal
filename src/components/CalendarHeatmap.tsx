@@ -7,6 +7,7 @@ interface Position {
   entry_time: number;
   entry_date: string;
   pnl: number | null;
+  realized_pnl?: number;
   is_closed: boolean;
 }
 
@@ -42,10 +43,16 @@ export function CalendarHeatmap() {
     const pnlByDate = new Map<string, { pnl: number; count: number }>();
 
     positions.forEach(position => {
-      if (!position.is_closed || position.pnl === null) return;
+      let positionPnl: number | null = null;
+      if (position.is_closed && position.pnl !== null) {
+        positionPnl = position.pnl;
+      } else if (!position.is_closed && position.realized_pnl) {
+        positionPnl = position.realized_pnl;
+      }
+      if (positionPnl === null) return;
       const datePart = position.entry_date.split(' ')[0];
       const current = pnlByDate.get(datePart) || { pnl: 0, count: 0 };
-      pnlByDate.set(datePart, { pnl: current.pnl + position.pnl, count: current.count + 1 });
+      pnlByDate.set(datePart, { pnl: current.pnl + positionPnl, count: current.count + 1 });
     });
 
     // Generate all days from start date to today
