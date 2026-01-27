@@ -21,8 +21,10 @@ interface AggregatedPosition {
   exit_time: number | null;
   entry_date: string;
   exit_date: string | null;
-  trades: Trade[];
-  max_position_size: number;
+  trades?: Trade[];
+  trade_count?: number;
+  max_position_size?: number;
+  total_size?: number;
   avg_entry_price: number;
   avg_exit_price: number | null;
   total_entry_value: number;

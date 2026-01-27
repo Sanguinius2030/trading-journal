@@ -26,14 +26,15 @@ interface AggregatedPosition {
   exit_date: string | null;
   trades?: Trade[];
   trade_count?: number;
-  max_position_size: number;
+  max_position_size?: number;
+  total_size?: number;
   avg_entry_price: number;
   avg_exit_price: number | null;
   total_entry_value: number;
   total_exit_value: number;
   total_fees: number;
   pnl: number | null;
-  realized_pnl: number;  // For open positions: realized P&L from partial closes
+  realized_pnl?: number;  // For open positions: realized P&L from partial closes
   position_type: 'LONG' | 'SHORT';
   is_closed: boolean;
 }
@@ -1195,7 +1196,7 @@ export function AggregatedPositionsTable() {
                               <span className={`type ${position.position_type.toLowerCase()}`}>
                                 {position.position_type}
                               </span>
-                              <span className="size">{position.max_position_size.toFixed(4)} {position.market_symbol}</span>
+                              <span className="size">{(position.max_position_size ?? position.total_size ?? 0).toFixed(4)} {position.market_symbol}</span>
                             </div>
                             <div className="position-dates">
                               <span>Entry: {position.entry_date}</span>
