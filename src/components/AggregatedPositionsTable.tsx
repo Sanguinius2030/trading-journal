@@ -24,7 +24,8 @@ interface AggregatedPosition {
   exit_time: number | null;
   entry_date: string;
   exit_date: string | null;
-  trades: Trade[];
+  trades?: Trade[];
+  trade_count?: number;
   max_position_size: number;
   avg_entry_price: number;
   avg_exit_price: number | null;
@@ -1240,7 +1241,7 @@ export function AggregatedPositionsTable() {
                             })()}
                             <div className="metric">
                               <span className="label">Trades:</span>
-                              <span className="value">{position.trades.length}</span>
+                              <span className="value">{position.trades?.length || position.trade_count || 0}</span>
                             </div>
                           </div>
                           <div className="expand-icon">{isExpanded ? '▼' : '▶'}</div>
@@ -1422,7 +1423,8 @@ export function AggregatedPositionsTable() {
                             </div>
 
                             <div className="trades-section">
-                              <h4>Trade Breakdown ({position.trades.length} trades)</h4>
+                              <h4>Trade Breakdown ({position.trades?.length || position.trade_count || 0} trades)</h4>
+                              {position.trades && position.trades.length > 0 ? (
                               <table className="trades-breakdown">
                                 <thead>
                                   <tr>
@@ -1455,6 +1457,11 @@ export function AggregatedPositionsTable() {
                                   ))}
                                 </tbody>
                               </table>
+                              ) : (
+                                <p style={{ color: '#6b7280', fontStyle: 'italic', margin: '0.5rem 0' }}>
+                                  Trade details not available for synced positions.
+                                </p>
+                              )}
                             </div>
                           </div>
                         )}
