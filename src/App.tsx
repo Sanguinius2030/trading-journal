@@ -72,17 +72,29 @@ function AppContent() {
       localStorage.setItem('aggregated-positions', JSON.stringify(data));
 
       const tradesInfo = data.summary.total_trades_fetched ? ` from ${data.summary.total_trades_fetched} trades` : '';
-      setSyncStatus({
-        type: 'success',
-        message: `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)${tradesInfo}`
-      });
+      const isPartial = data.summary.fetch_complete === false;
 
-      // Increment refresh key to trigger component re-mount and data re-fetch
-      setTimeout(() => {
-        setRefreshKey(prev => prev + 1);
-        // Clear success message after components refresh
-        setTimeout(() => setSyncStatus(null), 2000);
-      }, 800);
+      if (isPartial && data.summary.total_positions === 0) {
+        // Timeout with no usable data - suggest seed script
+        setSyncStatus({
+          type: 'error',
+          message: data.summary.message || 'Sync timed out. Run the seed script locally to upload data.'
+        });
+      } else {
+        setSyncStatus({
+          type: isPartial ? 'error' : 'success',
+          message: isPartial
+            ? `Partial sync: ${data.summary.total_positions} positions${tradesInfo} (timed out - run seed script for full data)`
+            : `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)${tradesInfo}`
+        });
+
+        // Increment refresh key to trigger component re-mount and data re-fetch
+        setTimeout(() => {
+          setRefreshKey(prev => prev + 1);
+          // Clear success message after components refresh
+          setTimeout(() => setSyncStatus(null), 3000);
+        }, 800);
+      }
     } catch (error) {
       console.error('Sync error:', error);
       setSyncStatus({

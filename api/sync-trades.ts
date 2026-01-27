@@ -132,18 +132,32 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
   return MARKET_SYMBOLS;
 }
 
-async function fetchAllTrades(accountIndex: number, authToken: string): Promise<RawTrade[]> {
+async function fetchAllTrades(
+  accountIndex: number,
+  authToken: string,
+  options?: { timeLimitMs?: number; startTime?: number }
+): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number }> {
   const allTrades: RawTrade[] = [];
-  // Request large batch - API will return its actual max (may be less)
-  // We rely on next_cursor for pagination, NOT on response size matching request
+  // Request large batch - API returns its actual max (may be less)
+  // We rely on next_cursor for pagination, NOT on response size
   const BATCH_SIZE = 1000;
   const MAX_TRADES = 25000;
+  const TIME_LIMIT = options?.timeLimitMs || 50000; // 50s default (leave 10s buffer for Vercel)
+  const fetchStart = options?.startTime || Date.now();
   let cursor: string | undefined = undefined;
   let batchCount = 0;
+  let complete = false;
 
-  console.log(`Fetching trades for account ${accountIndex} (requested batch: ${BATCH_SIZE}, max: ${MAX_TRADES})...`);
+  console.log(`Fetching trades for account ${accountIndex} (batch: ${BATCH_SIZE}, max: ${MAX_TRADES}, timeLimit: ${TIME_LIMIT}ms)...`);
 
   while (allTrades.length < MAX_TRADES) {
+    // Time guard: stop before Vercel timeout
+    const elapsed = Date.now() - fetchStart;
+    if (elapsed > TIME_LIMIT) {
+      console.log(`Time limit reached after ${elapsed}ms, ${batchCount} batches, ${allTrades.length} trades`);
+      break;
+    }
+
     batchCount++;
     const params = new URLSearchParams({
       auth: authToken,
@@ -195,18 +209,22 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
     const data = await response.json();
 
     if (!data.trades || data.trades.length === 0) {
-      console.log(`Batch ${batchCount}: empty trades response, done fetching`);
+      console.log(`Batch ${batchCount}: empty response, all trades fetched`);
+      complete = true;
       break;
     }
 
     allTrades.push(...data.trades);
-    console.log(`Batch ${batchCount}: got ${data.trades.length} trades (total: ${allTrades.length}), has_next: ${!!data.next_cursor}`);
+
+    if (batchCount % 10 === 0) {
+      console.log(`Batch ${batchCount}: ${data.trades.length} trades (total: ${allTrades.length}), elapsed: ${Date.now() - fetchStart}ms`);
+    }
 
     // Only use cursor to determine if there are more pages
-    // Do NOT use data.trades.length < BATCH_SIZE - API may cap response size
     if (data.next_cursor) {
       cursor = data.next_cursor;
     } else {
+      complete = true;
       break;
     }
 
@@ -214,10 +232,14 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
     await new Promise(resolve => setTimeout(resolve, 50));
   }
 
-  console.log(`Trade fetch complete: ${allTrades.length} trades in ${batchCount} batches`);
+  if (allTrades.length >= MAX_TRADES) {
+    complete = true;
+  }
+
+  console.log(`Trade fetch: ${allTrades.length} trades in ${batchCount} batches, complete: ${complete}, elapsed: ${Date.now() - fetchStart}ms`);
   allTrades.sort((a, b) => a.timestamp - b.timestamp);
 
-  return allTrades;
+  return { trades: allTrades, complete, batchCount };
 }
 
 async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
@@ -749,47 +771,73 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
+    const syncStart = Date.now();
+
+    // Always fetch and update balance first (single API call, fast)
+    const balance = await fetchAccountBalance(accountIndex, authToken);
+    if (balance && userId && supabaseUrl && supabaseServiceKey) {
+      await saveAccountBalance(userId, balance);
+      console.log('Balance updated');
+    }
+
     // Fetch market symbols
     const marketSymbols = await fetchMarketSymbols();
     console.log(`Loaded ${Object.keys(marketSymbols).length} market symbols`);
 
-    // Fetch all trades
-    const trades = await fetchAllTrades(accountIndex, authToken);
-    console.log(`Fetched ${trades.length} total trades`);
+    // Fetch trades with time guard (stops before Vercel 60s timeout)
+    const tradeResult = await fetchAllTrades(accountIndex, authToken, {
+      timeLimitMs: 45000, // 45s for trades, leaves 15s for aggregation + save
+      startTime: syncStart,
+    });
+    const trades = tradeResult.trades;
+    console.log(`Fetched ${trades.length} trades (complete: ${tradeResult.complete})`);
 
-    // Note: The /trades endpoint already includes liquidations as regular trades.
-    // We fetch liquidation data for informational purposes but don't convert them
-    // to synthetic trades as that would cause double-counting.
-    const liquidations = await fetchLiquidations(accountIndex, authToken);
-    console.log(`Fetched ${liquidations.length} liquidations (already included in trade data)`);
+    // Skip liquidation fetch if trade fetch wasn't complete (save time)
+    let liquidationCount = 0;
+    if (tradeResult.complete) {
+      const liquidations = await fetchLiquidations(accountIndex, authToken);
+      liquidationCount = liquidations.length;
+      console.log(`Fetched ${liquidationCount} liquidations`);
+    }
 
-    // Aggregate into positions (trades already include liquidation events)
+    // If we got 0 trades and fetch was incomplete, we hit a timeout on the very first batch
+    // or the API returned nothing. Don't overwrite existing data.
+    if (trades.length === 0 && !tradeResult.complete) {
+      return res.status(200).json({
+        positions: [],
+        summary: {
+          total_pnl: 0,
+          total_positions: 0,
+          closed_positions: 0,
+          open_positions: 0,
+          total_trades_fetched: 0,
+          fetch_complete: false,
+          message: 'Trade fetch timed out. Use the seed script to upload local data: npx tsx scripts/upload-to-supabase.ts',
+          synced_at: new Date().toISOString()
+        }
+      });
+    }
+
+    // Aggregate into positions
     const allPositions = aggregatePositions(trades, marketSymbols, accountIndex);
     console.log(`Aggregated ${allPositions.length} positions from ${trades.length} trades`);
 
     // Filter to positions starting from Dec 19th, 2025 and exclude unknown markets
     const startDate = new Date('2025-12-19T00:00:00Z').getTime();
-    const beforeFilter = allPositions.length;
-    const afterDateFilter = allPositions.filter(p => p.entry_time >= startDate).length;
-    const afterMarketFilter = allPositions.filter(p => !p.market_symbol.startsWith('Market ')).length;
 
     const positions = allPositions.filter(p =>
       p.entry_time >= startDate &&
       !p.market_symbol.startsWith('Market ')
     );
 
-    console.log(`Positions: ${beforeFilter} total, ${positions.length} after filters`);
+    console.log(`Positions after filters: ${positions.length} (from ${allPositions.length} total)`);
 
-    // Save to Supabase
-    if (userId && supabaseUrl && supabaseServiceKey) {
+    // Save to Supabase (only if we got a complete fetch, otherwise don't overwrite)
+    if (tradeResult.complete && userId && supabaseUrl && supabaseServiceKey) {
       await savePositionsToSupabase(userId, positions);
-
-      const balance = await fetchAccountBalance(accountIndex, authToken);
-      if (balance) {
-        await saveAccountBalance(userId, balance);
-      } else {
-        console.error('Balance fetch returned null');
-      }
+      console.log('Positions saved to Supabase');
+    } else if (!tradeResult.complete) {
+      console.log('Skipping Supabase save - trade fetch was incomplete');
     }
 
     // Calculate total PnL
@@ -808,12 +856,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         closed_positions: positions.filter(p => p.is_closed).length,
         open_positions: positions.filter(p => !p.is_closed).length,
         total_trades_fetched: trades.length,
-        total_liquidations_fetched: liquidations.length,
+        total_liquidations_fetched: liquidationCount,
+        fetch_complete: tradeResult.complete,
+        message: tradeResult.complete
+          ? undefined
+          : `Partial sync: fetched ${trades.length} trades in ${tradeResult.batchCount} batches before timeout. Use seed script for full data.`,
         synced_at: new Date().toISOString()
       }
     };
 
-    console.log('Sync complete:', result.summary);
+    console.log(`Sync done in ${Date.now() - syncStart}ms:`, result.summary);
 
     return res.status(200).json(result);
   } catch (error) {
