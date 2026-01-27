@@ -134,13 +134,16 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
 
 async function fetchAllTrades(accountIndex: number, authToken: string): Promise<RawTrade[]> {
   const allTrades: RawTrade[] = [];
-  const BATCH_SIZE = 500;
+  // Lighter API max is 100 per request - using 100 to match local script
+  const BATCH_SIZE = 100;
   const MAX_TRADES = 25000;
   let cursor: string | undefined = undefined;
+  let batchCount = 0;
 
-  console.log(`Fetching trades for account ${accountIndex}...`);
+  console.log(`Fetching trades for account ${accountIndex} (batch size: ${BATCH_SIZE}, max: ${MAX_TRADES})...`);
 
   while (allTrades.length < MAX_TRADES) {
+    batchCount++;
     const params = new URLSearchParams({
       auth: authToken,
       account_index: accountIndex.toString(),
@@ -159,39 +162,52 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
 
     while (retries < maxRetries) {
       try {
-        response = await fetch(url);
+        response = await fetch(url, {
+          headers: {
+            'Authorization': authToken,
+            'Accept': 'application/json',
+          }
+        });
         if (response.status === 429) {
           retries++;
           const waitTime = Math.pow(2, retries) * 1000;
-          console.log(`Rate limited. Waiting ${waitTime/1000}s...`);
+          console.log(`Rate limited on batch ${batchCount}. Waiting ${waitTime/1000}s...`);
           await new Promise(resolve => setTimeout(resolve, waitTime));
         } else {
           break;
         }
       } catch (err) {
         retries++;
+        console.error(`Fetch error on batch ${batchCount}, retry ${retries}:`, err instanceof Error ? err.message : err);
         if (retries >= maxRetries) throw err;
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
     if (!response || !response.ok) {
-      console.error('Failed to fetch trades:', response?.status);
+      const status = response?.status;
+      const text = response ? await response.text().catch(() => 'could not read body') : 'no response';
+      console.error(`Failed to fetch trades batch ${batchCount}: status=${status}, body=${text.substring(0, 200)}`);
       break;
     }
 
     const data = await response.json();
 
     if (!data.trades || data.trades.length === 0) {
+      console.log(`Batch ${batchCount}: empty trades response, done fetching`);
       break;
     }
 
     allTrades.push(...data.trades);
-    console.log(`Fetched ${allTrades.length} trades so far...`);
+
+    if (batchCount % 20 === 0 || data.trades.length < BATCH_SIZE) {
+      console.log(`Batch ${batchCount}: fetched ${data.trades.length} trades (total: ${allTrades.length})`);
+    }
 
     if (data.next_cursor) {
       cursor = data.next_cursor;
     } else {
+      console.log(`No next_cursor after batch ${batchCount}, done fetching`);
       break;
     }
 
@@ -199,10 +215,11 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
       break;
     }
 
-    // Small delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Small delay to avoid rate limiting (kept minimal for Vercel 60s timeout)
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
 
+  console.log(`Trade fetch complete: ${allTrades.length} trades in ${batchCount} batches`);
   allTrades.sort((a, b) => a.timestamp - b.timestamp);
 
   return allTrades;
@@ -210,7 +227,7 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
 
 async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
   const allLiquidations: RawLiquidation[] = [];
-  const BATCH_SIZE = 500;
+  const BATCH_SIZE = 100;
   const MAX_LIQUIDATIONS = 5000;
   let cursor: string | undefined = undefined;
 
@@ -234,7 +251,12 @@ async function fetchLiquidations(accountIndex: number, authToken: string): Promi
 
     while (retries < maxRetries) {
       try {
-        response = await fetch(url);
+        response = await fetch(url, {
+          headers: {
+            'Authorization': authToken,
+            'Accept': 'application/json',
+          }
+        });
         if (response.status === 429) {
           retries++;
           const waitTime = Math.pow(2, retries) * 1000;
@@ -274,7 +296,7 @@ async function fetchLiquidations(accountIndex: number, authToken: string): Promi
       break;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await new Promise(resolve => setTimeout(resolve, 50));
   }
 
   console.log(`Total liquidations fetched: ${allLiquidations.length}`);
@@ -537,9 +559,13 @@ interface AccountBalance {
 
 async function fetchAccountBalance(accountIndex: number, authToken: string): Promise<AccountBalance | null> {
   try {
-    // Always include auth token - account data may require it
     const url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${encodeURIComponent(authToken)}`;
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        'Authorization': authToken,
+        'Accept': 'application/json',
+      }
+    });
 
     if (!response.ok) {
       console.error('Failed to fetch account balance:', response.status);
@@ -683,7 +709,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Rate limiting: max 1 sync per 2 minutes per user
+    // Rate limiting: max 1 sync per 90 seconds per user
     if (supabaseUrl && supabaseServiceKey) {
       const { data: lastSync } = await supabase
         .from('positions')
@@ -695,11 +721,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (lastSync?.updated_at) {
         const lastSyncTime = new Date(lastSync.updated_at).getTime();
-        const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
-        if (lastSyncTime > twoMinutesAgo) {
+        const cooldownMs = 90 * 1000;
+        const cooldownAgo = Date.now() - cooldownMs;
+        if (lastSyncTime > cooldownAgo) {
           return res.status(429).json({
             error: 'Rate limited. Please wait before syncing again.',
-            retry_after: Math.ceil((lastSyncTime - twoMinutesAgo) / 1000)
+            retry_after: Math.ceil((lastSyncTime - cooldownAgo) / 1000)
           });
         }
       }
@@ -788,6 +815,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         total_positions: positions.length,
         closed_positions: positions.filter(p => p.is_closed).length,
         open_positions: positions.filter(p => !p.is_closed).length,
+        total_trades_fetched: trades.length,
+        total_liquidations_fetched: liquidations.length,
         synced_at: new Date().toISOString()
       }
     };

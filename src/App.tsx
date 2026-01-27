@@ -71,9 +71,10 @@ function AppContent() {
       // Store the synced data in localStorage for persistence
       localStorage.setItem('aggregated-positions', JSON.stringify(data));
 
+      const tradesInfo = data.summary.total_trades_fetched ? ` from ${data.summary.total_trades_fetched} trades` : '';
       setSyncStatus({
         type: 'success',
-        message: `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)`
+        message: `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)${tradesInfo}`
       });
 
       // Increment refresh key to trigger component re-mount and data re-fetch
