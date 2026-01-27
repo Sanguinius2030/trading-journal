@@ -134,13 +134,14 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
 
 async function fetchAllTrades(accountIndex: number, authToken: string): Promise<RawTrade[]> {
   const allTrades: RawTrade[] = [];
-  // Lighter API max is 100 per request - using 100 to match local script
-  const BATCH_SIZE = 100;
+  // Request large batch - API will return its actual max (may be less)
+  // We rely on next_cursor for pagination, NOT on response size matching request
+  const BATCH_SIZE = 1000;
   const MAX_TRADES = 25000;
   let cursor: string | undefined = undefined;
   let batchCount = 0;
 
-  console.log(`Fetching trades for account ${accountIndex} (batch size: ${BATCH_SIZE}, max: ${MAX_TRADES})...`);
+  console.log(`Fetching trades for account ${accountIndex} (requested batch: ${BATCH_SIZE}, max: ${MAX_TRADES})...`);
 
   while (allTrades.length < MAX_TRADES) {
     batchCount++;
@@ -199,23 +200,17 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
     }
 
     allTrades.push(...data.trades);
+    console.log(`Batch ${batchCount}: got ${data.trades.length} trades (total: ${allTrades.length}), has_next: ${!!data.next_cursor}`);
 
-    if (batchCount % 20 === 0 || data.trades.length < BATCH_SIZE) {
-      console.log(`Batch ${batchCount}: fetched ${data.trades.length} trades (total: ${allTrades.length})`);
-    }
-
+    // Only use cursor to determine if there are more pages
+    // Do NOT use data.trades.length < BATCH_SIZE - API may cap response size
     if (data.next_cursor) {
       cursor = data.next_cursor;
     } else {
-      console.log(`No next_cursor after batch ${batchCount}, done fetching`);
       break;
     }
 
-    if (data.trades.length < BATCH_SIZE) {
-      break;
-    }
-
-    // Small delay to avoid rate limiting (kept minimal for Vercel 60s timeout)
+    // Small delay to avoid rate limiting
     await new Promise(resolve => setTimeout(resolve, 50));
   }
 
@@ -227,7 +222,7 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
 
 async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
   const allLiquidations: RawLiquidation[] = [];
-  const BATCH_SIZE = 100;
+  const BATCH_SIZE = 1000;
   const MAX_LIQUIDATIONS = 5000;
   let cursor: string | undefined = undefined;
 
@@ -286,13 +281,10 @@ async function fetchLiquidations(accountIndex: number, authToken: string): Promi
     allLiquidations.push(...data.liquidations);
     console.log(`Fetched ${allLiquidations.length} liquidations so far...`);
 
+    // Only use cursor for pagination - don't check response size vs BATCH_SIZE
     if (data.next_cursor) {
       cursor = data.next_cursor;
     } else {
-      break;
-    }
-
-    if (data.liquidations.length < BATCH_SIZE) {
       break;
     }
 
