@@ -117,18 +117,21 @@ function formatDateTime(timestamp: number): string {
 
 async function fetchMarketSymbols(): Promise<Record<number, string>> {
   try {
-    const response = await fetch(`${LIGHTER_API_URL}/api/v1/order_book_details`);
+    const response = await fetch(`${LIGHTER_API_URL.trim()}/api/v1/order_book_details`);
     if (response.ok) {
       const data = await response.json();
       const markets: Record<number, string> = {};
       (data.order_book_details || []).forEach((m: any) => {
         markets[m.market_id] = m.symbol;
       });
+      console.log(`Fetched ${Object.keys(markets).length} market symbols from API`);
       return { ...MARKET_SYMBOLS, ...markets };
     }
+    console.error('Market symbols API returned:', response.status);
   } catch (error) {
     console.error('Could not fetch market symbols:', error);
   }
+  console.log('Using fallback market symbols (only 4 markets)');
   return MARKET_SYMBOLS;
 }
 
@@ -920,15 +923,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const allPositions = aggregatePositions(trades, marketSymbols, accountIndex);
     console.log(`Aggregated ${allPositions.length} positions from ${trades.length} trades`);
 
-    // Filter to positions starting from Dec 19th, 2025 and exclude unknown markets
+    // Filter to positions starting from Dec 19th, 2025
     const startDate = new Date('2025-12-19T00:00:00Z').getTime();
 
-    const newPositions = allPositions.filter(p =>
-      p.entry_time >= startDate &&
-      !p.market_symbol.startsWith('Market ')
-    );
+    const newPositions = allPositions.filter(p => p.entry_time >= startDate);
 
-    console.log(`New positions after filters: ${newPositions.length} (from ${allPositions.length} total)`);
+    // Log details of all aggregated positions for debugging
+    allPositions.forEach(p => {
+      console.log(`  Position: ${p.market_symbol} ${p.position_type} ${p.is_closed ? 'CLOSED' : 'OPEN'} entry=${new Date(p.entry_time).toISOString()} trades=${p.trade_count}`);
+    });
+    console.log(`New positions after date filter: ${newPositions.length} (from ${allPositions.length} total)`);
 
     // Save new/updated positions to Supabase (upsert - won't delete existing)
     if (tradeResult.complete && userId && supabaseUrl && supabaseServiceKey) {
