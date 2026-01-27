@@ -164,10 +164,11 @@ async function fetchAllTrades(
       account_index: accountIndex.toString(),
       limit: BATCH_SIZE.toString(),
       sort_by: 'timestamp',
+      // The API requires start_time but ignores its value for filtering
+      // (returns trades before start_time too). We pass 0 and do our own
+      // client-side filtering via sinceTimestamp instead.
+      start_time: '0',
     });
-    // NOTE: We do NOT use the API's start_time parameter — testing showed
-    // the Lighter API ignores it entirely. Instead, we stop pagination when
-    // we reach trades older than sinceTimestamp (API returns newest-first).
     if (cursor) {
       params.set('cursor', cursor);
     }
