@@ -2149,3 +2149,551 @@ body {
 .cancel-external-btn:hover {
   background: rgba(220, 38, 38, 0.15);
 }
+
+/* ==================== MOBILE RESPONSIVE ==================== */
+
+/* Collapsible sidebar panel */
+.collapsible-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 0.75rem 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.collapsible-panel-header .panel-toggle {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+}
+
+.collapsible-panel-header .panel-toggle.expanded {
+  transform: rotate(180deg);
+}
+
+.collapsible-panel-content {
+  overflow: hidden;
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+}
+
+.collapsible-panel-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+.collapsible-panel-content.expanded {
+  max-height: 2000px;
+  opacity: 1;
+}
+
+/* Mobile position cards — scoped under .mob-positions to avoid conflicts */
+.mob-positions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+}
+
+.mob-pos {
+  background: white;
+  border-radius: 12px;
+  padding: 0.875rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mob-pos.profit {
+  border-left: 4px solid #10b981;
+}
+
+.mob-pos.loss {
+  border-left: 4px solid #dc2626;
+}
+
+.mob-pos.open-pos {
+  border-left: 4px solid #3b82f6;
+}
+
+.mob-pos-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mob-pos-symbol {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1e293b;
+  flex: 1;
+}
+
+.mob-pos-pnl {
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.mob-pos-pnl.positive {
+  color: #10b981;
+}
+
+.mob-pos-pnl.negative {
+  color: #dc2626;
+}
+
+.mob-pos-pnl.open-position {
+  color: #3b82f6;
+}
+
+.mob-pos-date {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.25rem;
+}
+
+.mob-pos-details {
+  margin-top: 0.625rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+}
+
+.mob-pos-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem 0;
+  color: #64748b;
+}
+
+.mob-pos-row span:last-child {
+  color: #1e293b;
+  font-weight: 500;
+  font-family: monospace;
+}
+
+.mob-pos-expanded {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mob-pos-fills {
+  font-size: 0.75rem;
+}
+
+.mob-pos-fills h4 {
+  color: #64748b;
+  font-size: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.mob-pos-fill {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.375rem 0;
+  border-bottom: 1px solid #f0f3f7;
+}
+
+.mob-pos-fill:last-child {
+  border-bottom: none;
+}
+
+.mob-fill-side {
+  font-weight: 600;
+  font-size: 0.7rem;
+  padding: 0.125rem 0.375rem;
+  border-radius: 3px;
+}
+
+.mob-fill-side.buy {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+}
+
+.mob-fill-side.sell {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.15);
+}
+
+.mob-fill-info {
+  color: #64748b;
+  text-align: right;
+  font-family: monospace;
+  font-size: 0.7rem;
+}
+
+.mob-pos-journal {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.mob-pos-journal .annotation-tags {
+  margin-bottom: 0.5rem;
+}
+
+.mob-pos-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.mob-pos-actions button {
+  flex: 1;
+  text-align: center;
+  padding: 0.5rem;
+  min-height: 44px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.mob-pos-actions button:active {
+  background: #e5e7eb;
+}
+
+/* Mobile breakpoint */
+@media (max-width: 768px) {
+  /* Header */
+  .app-header {
+    padding: 1rem;
+    margin: 0.5rem;
+    border-radius: 12px;
+  }
+
+  .logo h1 {
+    font-size: 1.25rem;
+  }
+
+  .logo svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logo {
+    gap: 0.5rem;
+  }
+
+  .subtitle,
+  .user-email {
+    display: none;
+  }
+
+  .sync-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .sync-button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .logout-button {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+  }
+
+  .header-actions {
+    gap: 0.5rem;
+  }
+
+  .sync-status {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Tab navigation — horizontal scroll */
+  .tab-navigation {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0 0.5rem;
+    margin-top: 0.5rem;
+    gap: 0.375rem;
+  }
+
+  .tab-navigation::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-radius: 8px;
+  }
+
+  .tab-button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Dashboard layout — stack vertically */
+  .app-layout {
+    flex-direction: column;
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .kpi-sidebar,
+  .calendar-heatmap {
+    width: 100% !important;
+    position: static !important;
+    max-height: none;
+    order: unset;
+  }
+
+  .kpi-sidebar {
+    padding: 0.875rem;
+    border-radius: 12px;
+  }
+
+  .main-column {
+    gap: 0.75rem;
+  }
+
+  /* Positions table container */
+  .positions-table-container {
+    padding: 0.75rem;
+    border-radius: 12px;
+  }
+
+  .positions-table-container h2 {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* All tab layouts — reduce padding */
+  .stats-layout,
+  .charts-layout,
+  .projection-layout,
+  .calendar-layout,
+  .tax-layout,
+  .settings-layout {
+    padding: 0.5rem;
+  }
+
+  /* Chart sections */
+  .chart-container,
+  .trades-timeline,
+  .kpi-metrics,
+  .growth-projection,
+  .pnl-dashboard {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .chart-container:hover,
+  .trades-timeline:hover,
+  .kpi-metrics:hover,
+  .pnl-dashboard:hover {
+    transform: none;
+  }
+
+  .chart-container h2,
+  .trades-timeline h2,
+  .kpi-metrics h2,
+  .pnl-dashboard h2 {
+    font-size: 1.125rem;
+    margin-bottom: 1rem;
+  }
+
+  /* Footer */
+  .app-footer {
+    margin: 0.5rem;
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+  }
+
+  .footer-note {
+    font-size: 0.65rem;
+  }
+
+  /* Disable hover transforms on mobile (no hover on touch) */
+  .trade-card:hover,
+  .scenario:hover,
+  .exchange-item:hover,
+  .metric-card:hover {
+    transform: none;
+  }
+
+  /* Charts — fluid sizing */
+  .chart-y-labels {
+    min-width: 45px;
+  }
+
+  .scatter-plot {
+    margin-left: 40px;
+  }
+
+  .scatter-y-axis {
+    width: 40px;
+  }
+
+  .market-info {
+    width: 80px;
+  }
+
+  .market-pnl {
+    width: 60px;
+  }
+
+  /* Projection scenarios */
+  .projection-scenarios {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Forms */
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Settings */
+  .settings-layout {
+    max-width: 100%;
+  }
+
+  /* Aggregated Positions - mobile adjustments */
+  .aggregated-positions-container {
+    padding: 0.75rem !important;
+  }
+
+  .summary-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .day-controls {
+    flex-wrap: wrap !important;
+    gap: 0.375rem !important;
+  }
+
+  .control-btn {
+    padding: 0.375rem 0.625rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .filters-section {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    padding: 0.75rem !important;
+  }
+
+  .filter-group {
+    min-width: unset !important;
+  }
+
+  .week-header {
+    padding: 0.875rem 1rem !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .week-info {
+    flex-wrap: wrap;
+    gap: 0.5rem !important;
+  }
+
+  .week-date {
+    font-size: 0.9rem !important;
+  }
+
+  .week-stats {
+    font-size: 0.75rem !important;
+  }
+
+  .week-pnl {
+    font-size: 0.95rem !important;
+  }
+
+  .day-header {
+    padding: 0.75rem 1rem !important;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .day-info {
+    gap: 0.5rem !important;
+  }
+
+  .day-date {
+    font-size: 0.9rem !important;
+  }
+
+  .day-pnl {
+    font-size: 0.85rem !important;
+  }
+
+  /* Journal editors on mobile */
+  .editor-row,
+  .editor-row.three-col {
+    grid-template-columns: 1fr !important;
+  }
+
+  .daily-journal-editor .editor-row,
+  .weekly-journal-editor .editor-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .weekly-content {
+    grid-template-columns: 1fr !important;
+  }
+
+  .position-details {
+    padding: 0.75rem !important;
+  }
+
+  /* Trade breakdown table scrolls horizontally on mobile */
+  .trades-section {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .trades-breakdown {
+    min-width: 600px;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 480px) {
+  .app-header {
+    padding: 0.75rem;
+    margin: 0.375rem;
+  }
+
+  .logo h1 {
+    font-size: 1.1rem;
+  }
+
+  .tab-button {
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+  }
+
+  .projection-scenarios {
+    grid-template-columns: 1fr;
+  }
+
+  .mob-pos-pnl {
+    font-size: 0.9rem;
+  }
+}

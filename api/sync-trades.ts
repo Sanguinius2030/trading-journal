@@ -132,7 +132,7 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
   } catch (error) {
     console.error('Could not fetch market symbols:', error);
   }
-  console.log('Using fallback market symbols (only 4 markets)');
+  console.log(`Using fallback market symbols (${Object.keys(MARKET_SYMBOLS).length} markets)`);
   return MARKET_SYMBOLS;
 }
 

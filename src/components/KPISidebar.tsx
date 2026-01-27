@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { TrendingUp, TrendingDown, Target, Activity, Flame, BarChart3, Wallet, Settings, X, Check } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, Activity, Flame, BarChart3, Wallet, Settings, X, Check, ChevronDown } from 'lucide-react';
 import { usePositions } from '../hooks/usePositions';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface Trade {
   trade_id: number;
@@ -151,6 +152,8 @@ function calculateKPIs(positions: AggregatedPosition[]): KPIData {
 
 export function KPISidebar() {
   const { positions: rawPositions, loading, balance } = usePositions();
+  const isMobile = useIsMobile();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Cast positions to the local type
   const positions = rawPositions as unknown as AggregatedPosition[];
@@ -261,12 +264,26 @@ export function KPISidebar() {
 
   return (
     <div className="kpi-sidebar">
+      {isMobile && (
+        <div className="collapsible-panel-header" onClick={() => setIsCollapsed(!isCollapsed)}>
+          <h3 className="kpi-sidebar-title" style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+            <Wallet size={18} />
+            Portfolio & KPIs
+          </h3>
+          <button className={`panel-toggle ${isCollapsed ? '' : 'expanded'}`}>
+            <ChevronDown size={18} />
+          </button>
+        </div>
+      )}
+      <div className={isMobile ? `collapsible-panel-content ${isCollapsed ? 'collapsed' : 'expanded'}` : ''}>
       {/* Portfolio Section */}
       <div className="kpi-section">
+        {!isMobile && (
         <h3 className="kpi-sidebar-title">
           <Wallet size={18} />
           Portfolio
         </h3>
+        )}
 
         <div className="kpi-cards">
           {/* Total Portfolio Value */}
@@ -518,6 +535,7 @@ export function KPISidebar() {
         <div className="kpi-footer">
           <span>{kpis.totalTrades} closed trades</span>
         </div>
+      </div>
       </div>
     </div>
   );

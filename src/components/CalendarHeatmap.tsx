@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
-import { Calendar } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Calendar, ChevronDown } from 'lucide-react';
 import { usePositions } from '../hooks/usePositions';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface Position {
   entry_time: number;
@@ -22,6 +23,8 @@ interface DayData {
 
 export function CalendarHeatmap() {
   const { positions: rawPositions, balance } = usePositions();
+  const isMobile = useIsMobile();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   // Cast positions to the local type
   const positions = rawPositions as unknown as Position[];
@@ -182,11 +185,24 @@ export function CalendarHeatmap() {
 
   return (
     <div className="calendar-heatmap">
-      <div className="heatmap-header">
-        <Calendar size={18} />
-        <span>Daily P&L</span>
-      </div>
+      {isMobile ? (
+        <div className="collapsible-panel-header" onClick={() => setIsCollapsed(!isCollapsed)}>
+          <div className="heatmap-header" style={{ marginBottom: 0, paddingBottom: 0, borderBottom: 'none' }}>
+            <Calendar size={18} />
+            <span>Daily P&L</span>
+          </div>
+          <button className={`panel-toggle ${isCollapsed ? '' : 'expanded'}`}>
+            <ChevronDown size={18} />
+          </button>
+        </div>
+      ) : (
+        <div className="heatmap-header">
+          <Calendar size={18} />
+          <span>Daily P&L</span>
+        </div>
+      )}
 
+      <div className={isMobile ? `collapsible-panel-content ${isCollapsed ? 'collapsed' : 'expanded'}` : ''}>
       <div className="heatmap-summary">
         <div className={`avg-daily ${stats.avgPnlPerDay >= 0 ? 'positive' : 'negative'}`}>
           <span className="avg-label">Avg P&L / Day</span>
@@ -229,6 +245,7 @@ export function CalendarHeatmap() {
             </div>
           </div>
         ))}
+      </div>
       </div>
 
       <style>{`

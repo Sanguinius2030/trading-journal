@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { usePositions } from '../hooks/usePositions';
 import { useAuthContext } from './Auth/AuthProvider';
 import { supabase } from '../lib/supabase';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface Trade {
   trade_id: number;
@@ -118,6 +119,7 @@ const FEES_STORAGE_KEY = 'trading-journal-fees-expenses';
 export function AggregatedPositionsTable() {
   const { user } = useAuthContext();
   const { positions: rawPositions, loading, balance } = usePositions();
+  const isMobile = useIsMobile();
 
   // Cast positions to the local type
   const positions = rawPositions as unknown as AggregatedPosition[];
@@ -1182,6 +1184,206 @@ export function AggregatedPositionsTable() {
                     )}
                   </div>
 
+                  {isMobile ? (
+                    <div className="mob-positions">
+                      {dayGroup.positions.map((position) => {
+                        const annotation = annotations.get(position.position_id);
+                        const isExpanded = expandedPositionId === position.position_id;
+                        const isEditing = editingPositionId === position.position_id;
+                        const realizedPnl = position.is_closed ? position.pnl : (position.realized_pnl || 0);
+                        const hasRealizedPnl = realizedPnl !== null && realizedPnl !== 0;
+                        const balancePosition = !position.is_closed
+                          ? balanceData?.positions?.find(bp => bp.symbol === position.market_symbol)
+                          : undefined;
+                        const unrealizedPnl = balancePosition ? parseFloat(balancePosition.unrealized_pnl) : null;
+                        const pnlClass = !position.is_closed ? 'open-position' : (hasRealizedPnl && realizedPnl >= 0 ? 'positive' : 'negative');
+                        const cardClass = !position.is_closed ? 'open-pos' : (hasRealizedPnl && realizedPnl >= 0 ? 'profit' : 'loss');
+
+                        return (
+                          <div key={position.position_id} className={`mob-pos ${cardClass}`} onClick={() => togglePositionExpanded(position.position_id)}>
+                            <div className="mob-pos-header">
+                              <span className={`type ${position.position_type.toLowerCase()}`}>
+                                {position.position_type}
+                              </span>
+                              <span className="mob-pos-symbol">{position.market_symbol}</span>
+                              <span className={`mob-pos-pnl ${pnlClass}`}>
+                                {hasRealizedPnl ? `$${Math.round(realizedPnl!).toLocaleString()}` : '—'}
+                              </span>
+                            </div>
+                            <div className="mob-pos-date">
+                              {position.entry_date}{position.exit_date ? ` → ${position.exit_date}` : ' (Open)'}
+                            </div>
+                            <div className="mob-pos-details">
+                              <div className="mob-pos-row">
+                                <span>Size</span>
+                                <span>{(position.max_position_size ?? position.total_size ?? 0).toFixed(4)}</span>
+                              </div>
+                              <div className="mob-pos-row">
+                                <span>Entry</span>
+                                <span>${position.avg_entry_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                              <div className="mob-pos-row">
+                                <span>Exit</span>
+                                <span>{position.avg_exit_price ? `$${position.avg_exit_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</span>
+                              </div>
+                              {unrealizedPnl !== null && unrealizedPnl !== 0 && (
+                                <div className="mob-pos-row">
+                                  <span>uPnL</span>
+                                  <span style={{ color: unrealizedPnl >= 0 ? '#10b981' : '#dc2626', fontWeight: 600 }}>
+                                    ${Math.round(unrealizedPnl).toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
+                              <div className="mob-pos-row">
+                                <span>Trades</span>
+                                <span>{position.trades?.length || position.trade_count || 0}</span>
+                              </div>
+                            </div>
+
+                            {isExpanded && (
+                              <div className="mob-pos-expanded" onClick={(e) => e.stopPropagation()}>
+                                {/* Journal section */}
+                                <div className="mob-pos-journal">
+                                  {isEditing ? (
+                                    <div className="journal-editor" data-position-id={position.position_id}>
+                                      <div className="editor-row three-col">
+                                        <div className="editor-field">
+                                          <label>Category</label>
+                                          <select className="category-select" defaultValue={annotation?.category || ''}>
+                                            <option value="">Select...</option>
+                                            {categories.map(cat => (
+                                              <option key={cat.value} value={cat.value}>{cat.label}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                        <div className="editor-field">
+                                          <label>Timeframe</label>
+                                          <select className="timeframe-select" defaultValue={annotation?.timeframe || ''}>
+                                            <option value="">Select...</option>
+                                            {timeframes.map(tf => (
+                                              <option key={tf.value} value={tf.value}>{tf.label}</option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                        <div className="editor-field">
+                                          <label>Setup/Pattern</label>
+                                          <input type="text" className="subcategory-input" defaultValue={annotation?.subcategory || ''} placeholder="e.g., Monday Range..." />
+                                        </div>
+                                      </div>
+                                      <div className="editor-row">
+                                        <div className="editor-field">
+                                          <label>What went well?</label>
+                                          <textarea className="did-well-input" defaultValue={annotation?.did_well || ''} placeholder="Good entries, patience..." rows={2} />
+                                        </div>
+                                        <div className="editor-field">
+                                          <label>Possible improvements</label>
+                                          <textarea className="could-improve-input" defaultValue={annotation?.could_improve || ''} placeholder="Sizing, entry timing..." rows={2} />
+                                        </div>
+                                      </div>
+                                      <div className="editor-field">
+                                        <label>Emotions</label>
+                                        <div className="emotions-chips">
+                                          {emotionOptions.map(emotion => {
+                                            const currentEmotions = (annotation?.emotions || '').split(',').map(e => e.trim()).filter(Boolean);
+                                            const isSelected = currentEmotions.includes(emotion);
+                                            return (
+                                              <button key={emotion} type="button" className={`emotion-chip ${isSelected ? 'selected' : ''}`}
+                                                onClick={(e) => {
+                                                  const editor = e.currentTarget.closest('.journal-editor');
+                                                  const hiddenInput = editor?.querySelector('.emotions-hidden') as HTMLInputElement;
+                                                  if (hiddenInput) {
+                                                    const current = hiddenInput.value.split(',').map(s => s.trim()).filter(Boolean);
+                                                    if (current.includes(emotion)) {
+                                                      hiddenInput.value = current.filter(e => e !== emotion).join(', ');
+                                                    } else {
+                                                      hiddenInput.value = [...current, emotion].join(', ');
+                                                    }
+                                                    e.currentTarget.classList.toggle('selected');
+                                                  }
+                                                }}
+                                              >
+                                                {emotion}
+                                              </button>
+                                            );
+                                          })}
+                                          <input type="hidden" className="emotions-hidden" defaultValue={annotation?.emotions || ''} />
+                                        </div>
+                                      </div>
+                                      <div className="journal-actions">
+                                        <button className="save-btn" onClick={() => {
+                                          const editor = document.querySelector(`.journal-editor[data-position-id="${position.position_id}"]`);
+                                          if (editor) {
+                                            handleSaveAnnotation(position.position_id, {
+                                              category: (editor.querySelector('.category-select') as HTMLSelectElement)?.value || '',
+                                              timeframe: (editor.querySelector('.timeframe-select') as HTMLSelectElement)?.value || '',
+                                              subcategory: (editor.querySelector('.subcategory-input') as HTMLInputElement)?.value || '',
+                                              did_well: (editor.querySelector('.did-well-input') as HTMLTextAreaElement)?.value || '',
+                                              could_improve: (editor.querySelector('.could-improve-input') as HTMLTextAreaElement)?.value || '',
+                                              emotions: (editor.querySelector('.emotions-hidden') as HTMLInputElement)?.value || ''
+                                            });
+                                          }
+                                        }}>Save</button>
+                                        <button className="cancel-btn" onClick={() => setEditingPositionId(null)}>Cancel</button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <>
+                                      <div className="annotation-tags">
+                                        {annotation?.timeframe && (
+                                          <span className={`timeframe-badge ${annotation.timeframe}`}>
+                                            {timeframes.find(t => t.value === annotation.timeframe)?.label || annotation.timeframe}
+                                          </span>
+                                        )}
+                                        {annotation?.category && (
+                                          <span className={`category-badge ${annotation.category}`}>
+                                            {categories.find(c => c.value === annotation.category)?.label || annotation.category}
+                                          </span>
+                                        )}
+                                        {annotation?.subcategory && <span className="subcategory-badge">{annotation.subcategory}</span>}
+                                        {annotation?.emotions && <span className="emotions-badge">{annotation.emotions}</span>}
+                                      </div>
+                                      {annotation?.did_well || annotation?.could_improve ? (
+                                        <div className="journal-notes">
+                                          {annotation?.did_well && (
+                                            <div className="note-section positive">
+                                              <span className="note-label">Did well:</span>
+                                              <span className="note-text">{annotation.did_well}</span>
+                                            </div>
+                                          )}
+                                          {annotation?.could_improve && (
+                                            <div className="note-section negative">
+                                              <span className="note-label">Improve:</span>
+                                              <span className="note-text">{annotation.could_improve}</span>
+                                            </div>
+                                          )}
+                                        </div>
+                                      ) : null}
+                                      <div className="mob-pos-actions">
+                                        <button onClick={() => setEditingPositionId(position.position_id)}>Edit Journal</button>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+
+                                {/* Trade fills */}
+                                {position.trades && position.trades.length > 0 && (
+                                  <div className="mob-pos-fills">
+                                    <h4>Trade Fills ({position.trades.length})</h4>
+                                    {[...position.trades].reverse().map((trade) => (
+                                      <div key={trade.trade_id} className="mob-pos-fill">
+                                        <span className={`mob-fill-side ${trade.side.toLowerCase()}`}>{trade.side}</span>
+                                        <span className="mob-fill-info">{trade.size.toFixed(4)} @ ${trade.price.toFixed(2)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
                   <div className="positions-list">
                     {dayGroup.positions.map((position) => {
                     const annotation = annotations.get(position.position_id);
@@ -1470,6 +1672,7 @@ export function AggregatedPositionsTable() {
                     );
                         })}
                     </div>
+                  )}
                   </>
                 )}
               </div>
