@@ -1128,14 +1128,14 @@ export function ChartsTab() {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #ffffff;
-          box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+          background: #6b7280;
+          box-shadow: 0 0 5px rgba(107, 114, 128, 0.4);
         }
 
         .ath-flag-line {
           width: 1px;
           height: 18px;
-          background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+          background: linear-gradient(to top, rgba(107, 114, 128, 0.45), rgba(107, 114, 128, 0));
         }
 
         .tooltip-detail {
