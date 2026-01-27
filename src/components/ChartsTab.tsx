@@ -16,6 +16,7 @@ interface AggregatedPosition {
 }
 
 const STARTING_CAPITAL = 10000;
+const FEES_STORAGE_KEY = 'trading-journal-fees-expenses';
 
 export function ChartsTab() {
   const { positions: rawPositions, loading } = usePositions();
@@ -36,6 +37,21 @@ export function ChartsTab() {
   const [dayAnimated, setDayAnimated] = useState(false);
   const equityPathRef = useRef<SVGPathElement>(null);
 
+  // Read fees/costs from localStorage (same source as KPI sidebar)
+  const [feesExpenses, setFeesExpenses] = useState<number>(() => {
+    const stored = localStorage.getItem(FEES_STORAGE_KEY);
+    return stored ? parseFloat(stored) : 0;
+  });
+
+  useEffect(() => {
+    const handleFeesChange = () => {
+      const stored = localStorage.getItem(FEES_STORAGE_KEY);
+      setFeesExpenses(stored ? parseFloat(stored) : 0);
+    };
+    window.addEventListener('fees-expenses-changed', handleFeesChange);
+    return () => window.removeEventListener('fees-expenses-changed', handleFeesChange);
+  }, []);
+
   // Sort positions by exit time for chronological charts
   const sortedPositions = useMemo(() => {
     return positions
@@ -43,10 +59,11 @@ export function ChartsTab() {
       .sort((a, b) => (a.exit_time || 0) - (b.exit_time || 0));
   }, [positions]);
 
-  // Equity curve data (portfolio value over time)
+  // Equity curve data (portfolio value over time, with fees spread across trades)
   const equityData = useMemo(() => {
     let portfolioValue = STARTING_CAPITAL;
     const data: { date: Date; value: number; pnl: number; tradeNum: number }[] = [];
+    const feePerTrade = sortedPositions.length > 0 ? feesExpenses / sortedPositions.length : 0;
 
     if (sortedPositions.length > 0) {
       const firstDate = new Date(sortedPositions[0].exit_time!);
@@ -55,17 +72,18 @@ export function ChartsTab() {
     }
 
     sortedPositions.forEach((p, i) => {
-      portfolioValue += p.pnl || 0;
+      const netPnl = (p.pnl || 0) - feePerTrade;
+      portfolioValue += netPnl;
       data.push({
         date: new Date(p.exit_time!),
         value: portfolioValue,
-        pnl: p.pnl || 0,
+        pnl: netPnl,
         tradeNum: i + 1
       });
     });
 
     return data;
-  }, [sortedPositions]);
+  }, [sortedPositions, feesExpenses]);
 
   // All-time high points on the equity curve (filtered to significant ones only)
   const athPoints = useMemo(() => {
@@ -1080,7 +1098,7 @@ export function ChartsTab() {
           font-weight: 600;
           text-transform: uppercase;
           letter-spacing: 0.06em;
-          color: #f59e0b;
+          color: var(--success);
           margin-top: 0.3rem;
           display: flex;
           align-items: center;
@@ -1092,8 +1110,7 @@ export function ChartsTab() {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #f59e0b;
-          box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+          background: var(--success);
           flex-shrink: 0;
         }
 
@@ -1111,14 +1128,14 @@ export function ChartsTab() {
           width: 5px;
           height: 5px;
           border-radius: 50%;
-          background: #f59e0b;
-          box-shadow: 0 0 6px rgba(245, 158, 11, 0.45);
+          background: #ffffff;
+          box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
         }
 
         .ath-flag-line {
           width: 1px;
           height: 18px;
-          background: linear-gradient(to top, rgba(245, 158, 11, 0.4), rgba(245, 158, 11, 0));
+          background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
         }
 
         .tooltip-detail {
