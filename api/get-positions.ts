@@ -93,9 +93,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const openPositions = positions?.filter(p => !p.is_closed) || [];
     const totalPnL = closedPositions.reduce((sum, p) => sum + (p.pnl || 0), 0);
 
+    // Parse positions JSON if stored as string
+    let balanceData = balance || null;
+    if (balanceData?.positions && typeof balanceData.positions === 'string') {
+      try {
+        balanceData = { ...balanceData, positions: JSON.parse(balanceData.positions) };
+      } catch {
+        console.error('Failed to parse balance positions JSON');
+      }
+    }
+
     const result = {
       positions: positions || [],
-      balance: balance || null,
+      balance: balanceData,
       summary: {
         total_pnl: totalPnL,
         total_positions: positions?.length || 0,

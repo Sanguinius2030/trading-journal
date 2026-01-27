@@ -94,12 +94,13 @@ interface UserSettings {
   starting_capital: number;
 }
 
-// Market symbols - hardcoded for speed (can be fetched dynamically if needed)
+// Market symbols - comprehensive fallback in case the API fetch fails
 const MARKET_SYMBOLS: Record<number, string> = {
-  0: 'ETH',
-  1: 'BTC',
-  2: 'SOL',
-  77: 'XMR',
+  0: 'ETH', 1: 'BTC', 2: 'SOL', 3: 'DOGE', 7: 'XRP', 9: 'AVAX',
+  16: 'SUI', 21: 'FARTCOIN', 24: 'HYPE', 25: 'BNB', 29: 'ENA',
+  32: 'SEI', 39: 'ADA', 45: 'PUMP', 47: 'PENGU', 48: 'PAXG',
+  49: 'EIGEN', 58: 'BCH', 71: 'XPL', 77: 'XMR', 83: 'ASTER',
+  90: 'ZEC', 96: 'EURUSD', 120: 'LIT', 126: 'RIVER', 128: 'SPY',
 };
 
 function formatDateTime(timestamp: number): string {
@@ -586,11 +587,20 @@ async function getUserSettings(userId: string): Promise<UserSettings | null> {
   return data as UserSettings;
 }
 
+interface BalancePosition {
+  market_id: number;
+  symbol: string;
+  position: string;
+  unrealized_pnl: string;
+  position_value: string;
+}
+
 interface AccountBalance {
   account_equity: number;
   available_balance: number;
   unrealized_pnl: number;
   margin_used: number;
+  positions?: BalancePosition[];
 }
 
 async function fetchAccountBalance(accountIndex: number, authToken: string): Promise<AccountBalance | null> {
@@ -639,11 +649,29 @@ async function fetchAccountBalance(accountIndex: number, authToken: string): Pro
       });
     }
 
-    const balance = {
+    // Extract per-position data for uPnL display
+    const positions: BalancePosition[] = [];
+    if (account.positions && Array.isArray(account.positions)) {
+      account.positions.forEach((pos: any) => {
+        const size = parseFloat(pos.position || '0');
+        if (Math.abs(size) > 0.0001) {
+          positions.push({
+            market_id: pos.market_id,
+            symbol: pos.symbol || `Market ${pos.market_id}`,
+            position: pos.position,
+            unrealized_pnl: pos.unrealized_pnl || '0',
+            position_value: pos.position_value || '0',
+          });
+        }
+      });
+    }
+
+    const balance: AccountBalance = {
       account_equity: parseFloat(account.total_asset_value || account.collateral || '0'),
       available_balance: parseFloat(account.available_balance || account.collateral || '0'),
       unrealized_pnl: totalUnrealizedPnl,
       margin_used: parseFloat(account.margin_used || '0'),
+      positions: positions.length > 0 ? positions : undefined,
     };
 
     return balance;
@@ -654,21 +682,42 @@ async function fetchAccountBalance(accountIndex: number, authToken: string): Pro
 }
 
 async function saveAccountBalance(userId: string, balance: AccountBalance): Promise<void> {
+  // Try saving with positions JSON first (requires JSONB column in account_balances)
+  const balanceData: Record<string, any> = {
+    user_id: userId,
+    account_equity: balance.account_equity,
+    available_balance: balance.available_balance,
+    unrealized_pnl: balance.unrealized_pnl,
+    margin_used: balance.margin_used,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (balance.positions) {
+    balanceData.positions = JSON.stringify(balance.positions);
+  }
+
   const { error } = await supabase
     .from('account_balances')
-    .upsert({
-      user_id: userId,
-      account_equity: balance.account_equity,
-      available_balance: balance.available_balance,
-      unrealized_pnl: balance.unrealized_pnl,
-      margin_used: balance.margin_used,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'user_id' });
+    .upsert(balanceData, { onConflict: 'user_id' });
 
   if (error) {
-    console.error('Failed to save account balance:', error);
+    // If the positions column doesn't exist, retry without it
+    if (error.message?.includes('positions') || error.code === '42703') {
+      console.log('Retrying balance save without positions (column may not exist)');
+      delete balanceData.positions;
+      const { error: retryError } = await supabase
+        .from('account_balances')
+        .upsert(balanceData, { onConflict: 'user_id' });
+      if (retryError) {
+        console.error('Failed to save account balance:', retryError);
+      } else {
+        console.log('Saved account balance to Supabase (without positions)');
+      }
+    } else {
+      console.error('Failed to save account balance:', error);
+    }
   } else {
-    console.log('Saved account balance to Supabase');
+    console.log('Saved account balance to Supabase (with positions)');
   }
 }
 
@@ -889,6 +938,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       return res.status(200).json({
         positions: existingPositions,
+        balance: balance ? {
+          account_equity: balance.account_equity,
+          available_balance: balance.available_balance,
+          unrealized_pnl: balance.unrealized_pnl,
+          margin_used: balance.margin_used,
+          updated_at: new Date().toISOString(),
+          positions: balance.positions,
+        } : null,
         summary: {
           total_pnl: totalPnL,
           total_positions: existingPositions.length,
@@ -954,6 +1011,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const result = {
       positions: allStoredPositions,
+      balance: balance ? {
+        account_equity: balance.account_equity,
+        available_balance: balance.available_balance,
+        unrealized_pnl: balance.unrealized_pnl,
+        margin_used: balance.margin_used,
+        updated_at: new Date().toISOString(),
+        positions: balance.positions,
+      } : null,
       summary: {
         total_pnl: totalPnL,
         total_positions: allStoredPositions.length,
