@@ -1,10 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { createClient } from '@supabase/supabase-js';
 import { usePositions } from '../hooks/usePositions';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { useAuthContext } from './Auth/AuthProvider';
+import { supabase } from '../lib/supabase';
 
 interface Trade {
   trade_id: number;
@@ -117,6 +114,7 @@ const STARTING_CAPITAL = 10000;
 const FEES_STORAGE_KEY = 'trading-journal-fees-expenses';
 
 export function AggregatedPositionsTable() {
+  const { user } = useAuthContext();
   const { positions: rawPositions, loading, balance } = usePositions();
 
   // Cast positions to the local type
@@ -205,10 +203,17 @@ export function AggregatedPositionsTable() {
   // Load annotations from Supabase
   useEffect(() => {
     const loadAnnotations = async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('position_annotations')
-        .select('*')
-        .eq('account_index', 132275);
+        .select('*');
+
+      if (user) {
+        query.eq('user_id', user.id);
+      } else {
+        query.eq('account_index', 132275);
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         const annotationsMap = new Map();
@@ -222,15 +227,22 @@ export function AggregatedPositionsTable() {
     };
 
     loadAnnotations();
-  }, []);
+  }, [user]);
 
   // Load daily journals from Supabase
   useEffect(() => {
     const loadDailyJournals = async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('daily_journals')
-        .select('*')
-        .eq('account_index', 132275);
+        .select('*');
+
+      if (user) {
+        query.eq('user_id', user.id);
+      } else {
+        query.eq('account_index', 132275);
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         const journalsMap = new Map();
@@ -244,15 +256,22 @@ export function AggregatedPositionsTable() {
     };
 
     loadDailyJournals();
-  }, []);
+  }, [user]);
 
   // Load weekly journals from Supabase
   useEffect(() => {
     const loadWeeklyJournals = async () => {
-      const { data, error } = await supabase
+      const query = supabase
         .from('weekly_journals')
-        .select('*')
-        .eq('account_index', 132275);
+        .select('*');
+
+      if (user) {
+        query.eq('user_id', user.id);
+      } else {
+        query.eq('account_index', 132275);
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         const journalsMap = new Map();
@@ -266,7 +285,7 @@ export function AggregatedPositionsTable() {
     };
 
     loadWeeklyJournals();
-  }, []);
+  }, [user]);
 
   // Group positions by day and sort chronologically (including empty days)
   const dayGroups = useMemo(() => {
@@ -636,10 +655,11 @@ export function AggregatedPositionsTable() {
         updated_at: new Date().toISOString()
       };
 
+      const upsertData = user ? { ...annotation, user_id: user.id } : annotation;
       const { error } = await supabase
         .from('position_annotations')
-        .upsert(annotation, {
-          onConflict: 'position_id,account_index'
+        .upsert(upsertData, {
+          onConflict: user ? 'user_id,position_id' : 'position_id,account_index'
         });
 
       if (error) throw error;
@@ -665,10 +685,11 @@ export function AggregatedPositionsTable() {
         updated_at: new Date().toISOString()
       };
 
+      const upsertData = user ? { ...journal, user_id: user.id } : journal;
       const { error } = await supabase
         .from('daily_journals')
-        .upsert(journal, {
-          onConflict: 'date,account_index'
+        .upsert(upsertData, {
+          onConflict: user ? 'user_id,date' : 'date,account_index'
         });
 
       if (error) throw error;
@@ -695,10 +716,11 @@ export function AggregatedPositionsTable() {
         updated_at: new Date().toISOString()
       };
 
+      const upsertData = user ? { ...journal, user_id: user.id } : journal;
       const { error } = await supabase
         .from('weekly_journals')
-        .upsert(journal, {
-          onConflict: 'week_start,account_index'
+        .upsert(upsertData, {
+          onConflict: user ? 'user_id,week_start' : 'week_start,account_index'
         });
 
       if (error) throw error;
@@ -1202,9 +1224,10 @@ export function AggregatedPositionsTable() {
                               );
                             })()}
                             {(() => {
-                              const balancePosition = balanceData?.positions?.find(
-                                bp => bp.symbol === position.market_symbol
-                              );
+                              // Only show uPnL for open positions - closed positions have fully realized P&L
+                              const balancePosition = !position.is_closed
+                                ? balanceData?.positions?.find(bp => bp.symbol === position.market_symbol)
+                                : undefined;
                               const unrealizedPnl = balancePosition ? parseFloat(balancePosition.unrealized_pnl) : null;
                               return (
                                 <div className={`metric upnl ${unrealizedPnl !== null && unrealizedPnl !== 0 ? (unrealizedPnl >= 0 ? 'profit' : 'loss') : ''}`}>

@@ -29,7 +29,16 @@ export function LoginPage() {
       return;
     }
 
-    if (password.length < 6) {
+    if (mode === 'signup') {
+      if (password.length < 10) {
+        setError('Password must be at least 10 characters');
+        return;
+      }
+      if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+        setError('Password must include uppercase, lowercase, and a number');
+        return;
+      }
+    } else if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }

@@ -26,9 +26,18 @@ async function getUserFromToken(authHeader: string | undefined): Promise<string 
   }
 }
 
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://trading-journal-2026.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 

@@ -4,35 +4,57 @@ const LIGHTER_API_BASE_URL = process.env.VITE_LIGHTER_API_URL || 'https://mainne
 const LIGHTER_EXPLORER_URL = 'https://explorer.elliot.ai';
 const LIGHTER_API_KEY = process.env.VITE_LIGHTER_API_KEY || '';
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://trading-journal-2026.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
 
-  // Handle preflight
+// Whitelist of allowed API endpoints to prevent path traversal
+const ALLOWED_ENDPOINTS = [
+  'markets',
+  'order_book_details',
+  'trades',
+  'account',
+  'liquidations',
+];
+
+function isAllowedEndpoint(endpoint: string): boolean {
+  // Allow exact matches from whitelist
+  if (ALLOWED_ENDPOINTS.includes(endpoint)) return true;
+  // Allow accounts/{number}/positions pattern for explorer API
+  if (/^accounts\/\d+\/positions$/.test(endpoint)) return true;
+  return false;
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // CORS with origin whitelist
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-Lighter-Auth');
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // Only allow GET requests
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    // Log environment variables (first few chars only for security)
-    console.log('Environment check:', {
-      hasApiKey: !!LIGHTER_API_KEY,
-      apiKeyLength: LIGHTER_API_KEY?.length || 0,
-      apiKeyPrefix: LIGHTER_API_KEY?.substring(0, 8) || 'missing',
-      baseUrl: LIGHTER_API_BASE_URL,
-    });
-
     const { endpoint, ...params } = req.query;
 
     if (!endpoint || typeof endpoint !== 'string') {
       return res.status(400).json({ error: 'Missing endpoint parameter' });
+    }
+
+    // Validate endpoint against whitelist
+    if (!isAllowedEndpoint(endpoint)) {
+      return res.status(400).json({ error: 'Invalid endpoint' });
     }
 
     // Get auth token from custom header if provided
@@ -49,38 +71,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Use explorer URL for positions endpoint
     let url: string;
     if (endpoint.startsWith('accounts/') && endpoint.includes('/positions')) {
-      // Explorer API for positions: /api/accounts/{account_index}/positions
-      // Try both URL formats
       url = `${LIGHTER_EXPLORER_URL}/api/${endpoint}`;
-      console.log('Using explorer URL for positions:', url);
-    } else if (endpoint === 'markets') {
-      // Markets endpoint
-      url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
-      console.log('Using base URL for markets:', url);
     } else {
       url = `${LIGHTER_API_BASE_URL}/api/v1/${endpoint}${queryString ? `?${queryString}` : ''}`;
     }
 
-    console.log('Proxying request:', {
-      endpoint,
-      params,
-      authFromHeader: authToken,
-      authFromQuery: req.query.auth,
-      queryString,
-      fullUrl: url,
-    });
-
-    // Note: accountsByL1Address is a public endpoint that doesn't require API key
-    // Only add API key header if we have one AND it's needed for authenticated endpoints
     const headers: Record<string, string> = {
       'Accept': 'application/json',
       'User-Agent': 'TradingJournal/1.0',
     };
 
-    // Add API key from environment if available
     if (LIGHTER_API_KEY) {
       headers['x-api-key'] = LIGHTER_API_KEY;
-      console.log('Using API key from environment');
     }
 
     // Explorer API may need different headers
@@ -94,16 +96,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers,
     });
 
-    console.log('Lighter API response:', {
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-    });
-
     if (!response.ok) {
-      // Try to get error details from response body
       const errorText = await response.text();
-      console.error('Lighter API error details:', errorText);
+      console.error('Lighter API error:', response.status, endpoint);
 
       return res.status(response.status).json({
         error: `Lighter API error: ${response.status} ${response.statusText}`,
@@ -112,10 +107,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const data = await response.json();
-    console.log('Lighter API success, data keys:', Object.keys(data));
     return res.status(200).json(data);
   } catch (error) {
-    console.error('Proxy error:', error);
+    console.error('Proxy error:', error instanceof Error ? error.message : 'Unknown error');
     return res.status(500).json({
       error: error instanceof Error ? error.message : 'Internal server error',
     });

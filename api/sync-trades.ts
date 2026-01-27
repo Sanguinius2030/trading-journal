@@ -134,8 +134,8 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
 
 async function fetchAllTrades(accountIndex: number, authToken: string): Promise<RawTrade[]> {
   const allTrades: RawTrade[] = [];
-  const BATCH_SIZE = 100;
-  const MAX_TRADES = 10000;
+  const BATCH_SIZE = 500;
+  const MAX_TRADES = 25000;
   let cursor: string | undefined = undefined;
 
   console.log(`Fetching trades for account ${accountIndex}...`);
@@ -199,7 +199,8 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
       break;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // Small delay to avoid rate limiting
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   allTrades.sort((a, b) => a.timestamp - b.timestamp);
@@ -209,8 +210,8 @@ async function fetchAllTrades(accountIndex: number, authToken: string): Promise<
 
 async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
   const allLiquidations: RawLiquidation[] = [];
-  const BATCH_SIZE = 100;
-  const MAX_LIQUIDATIONS = 1000;
+  const BATCH_SIZE = 500;
+  const MAX_LIQUIDATIONS = 5000;
   let cursor: string | undefined = undefined;
 
   console.log(`Fetching liquidations for account ${accountIndex}...`);
@@ -273,7 +274,7 @@ async function fetchLiquidations(accountIndex: number, authToken: string): Promi
       break;
     }
 
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
 
   console.log(`Total liquidations fetched: ${allLiquidations.length}`);
@@ -536,28 +537,32 @@ interface AccountBalance {
 
 async function fetchAccountBalance(accountIndex: number, authToken: string): Promise<AccountBalance | null> {
   try {
-    // Account endpoint - try without auth first (public data), then with auth
-    let url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}`;
-    console.log('Fetching account balance for index:', accountIndex);
-
-    let response = await fetch(url);
-
-    // If unauthorized, try with auth token
-    if (response.status === 401 || response.status === 403) {
-      console.log('Account endpoint requires auth, retrying with token...');
-      url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${encodeURIComponent(authToken)}`;
-      response = await fetch(url);
-    }
+    // Always include auth token - account data may require it
+    const url = `${LIGHTER_API_URL}/api/v1/account?by=index&value=${accountIndex}&auth=${encodeURIComponent(authToken)}`;
+    const response = await fetch(url);
 
     if (!response.ok) {
-      console.error('Failed to fetch account balance:', response.status, await response.text().catch(() => ''));
+      console.error('Failed to fetch account balance:', response.status);
       return null;
     }
 
     const data = await response.json();
-    console.log('Account API response:', JSON.stringify(data).slice(0, 500));
 
-    const account = Array.isArray(data) ? data[0] : data;
+    // Handle various API response formats:
+    // Could be: array, { accounts: [...] }, { account: {...} }, or bare object
+    let account: any;
+    if (Array.isArray(data)) {
+      account = data[0];
+    } else if (data.accounts && Array.isArray(data.accounts)) {
+      account = data.accounts[0];
+    } else if (data.account) {
+      account = data.account;
+    } else {
+      account = data;
+    }
+
+    // Log the response structure for debugging (no sensitive data)
+    console.log('Account API response keys:', Object.keys(data), 'account keys:', account ? Object.keys(account).slice(0, 10) : 'null');
 
     if (!account) {
       console.error('No account data returned');
@@ -572,14 +577,6 @@ async function fetchAccountBalance(accountIndex: number, authToken: string): Pro
       });
     }
 
-    // Log the fields we're parsing to debug
-    console.log('Parsing balance fields:', {
-      total_asset_value: account.total_asset_value,
-      collateral: account.collateral,
-      available_balance: account.available_balance,
-      margin_used: account.margin_used
-    });
-
     const balance = {
       account_equity: parseFloat(account.total_asset_value || account.collateral || '0'),
       available_balance: parseFloat(account.available_balance || account.collateral || '0'),
@@ -587,7 +584,6 @@ async function fetchAccountBalance(accountIndex: number, authToken: string): Pro
       margin_used: parseFloat(account.margin_used || '0'),
     };
 
-    console.log('Parsed balance:', balance);
     return balance;
   } catch (error) {
     console.error('Error fetching account balance:', error);
@@ -653,11 +649,24 @@ async function savePositionsToSupabase(userId: string, positions: AggregatedPosi
   console.log(`Saved ${positionsToSave.length} positions to Supabase`);
 }
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
+// Allowed origins for CORS
+const ALLOWED_ORIGINS = [
+  'https://trading-journal-2026.vercel.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
+function setCorsHeaders(req: VercelRequest, res: VercelResponse) {
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+}
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
+  setCorsHeaders(req, res);
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -668,23 +677,42 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Require authentication
+    const userId = await getUserFromToken(req.headers.authorization);
+    if (!userId) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    // Rate limiting: max 1 sync per 2 minutes per user
+    if (supabaseUrl && supabaseServiceKey) {
+      const { data: lastSync } = await supabase
+        .from('positions')
+        .select('updated_at')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (lastSync?.updated_at) {
+        const lastSyncTime = new Date(lastSync.updated_at).getTime();
+        const twoMinutesAgo = Date.now() - 2 * 60 * 1000;
+        if (lastSyncTime > twoMinutesAgo) {
+          return res.status(429).json({
+            error: 'Rate limited. Please wait before syncing again.',
+            retry_after: Math.ceil((lastSyncTime - twoMinutesAgo) / 1000)
+          });
+        }
+      }
+    }
+
     console.log('Starting trade sync...');
 
-    // Try to get authenticated user
-    const userId = await getUserFromToken(req.headers.authorization);
     let accountIndex = FALLBACK_ACCOUNT_INDEX;
     let authToken = FALLBACK_AUTH_TOKEN;
 
-    // If authenticated, get user's Lighter credentials
-    if (userId && supabaseUrl && supabaseServiceKey) {
-      console.log('User authenticated:', userId);
+    // Get user's Lighter credentials
+    if (supabaseUrl && supabaseServiceKey) {
       const settings = await getUserSettings(userId);
-      console.log('User settings:', settings ? {
-        has_account_index: !!settings.lighter_account_index,
-        account_index: settings.lighter_account_index,
-        has_auth_token: !!settings.lighter_auth_token,
-        auth_token_length: settings.lighter_auth_token?.length || 0
-      } : 'null');
 
       if (settings?.lighter_account_index && settings?.lighter_auth_token) {
         accountIndex = settings.lighter_account_index;
@@ -692,13 +720,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.log('Using user credentials for account:', accountIndex);
       } else {
         console.log('User has no Lighter credentials, using fallback');
-        console.log('Fallback account index:', FALLBACK_ACCOUNT_INDEX);
-        console.log('Fallback auth token available:', !!FALLBACK_AUTH_TOKEN, 'length:', FALLBACK_AUTH_TOKEN?.length || 0);
       }
-    } else {
-      console.log('No auth or Supabase not configured, using fallback credentials');
-      console.log('Fallback account index:', FALLBACK_ACCOUNT_INDEX);
-      console.log('Fallback auth token available:', !!FALLBACK_AUTH_TOKEN, 'length:', FALLBACK_AUTH_TOKEN?.length || 0);
     }
 
     // Validate we have credentials
@@ -737,36 +759,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       !p.market_symbol.startsWith('Market ')
     );
 
-    console.log(`Filtering: total=${beforeFilter}, after date filter=${afterDateFilter}, after market filter=${afterMarketFilter}, final=${positions.length}`);
-    console.log(`Date filter: positions after ${new Date(startDate).toISOString()}`);
+    console.log(`Positions: ${beforeFilter} total, ${positions.length} after filters`);
 
-    // Log first and last position dates for debugging
-    if (allPositions.length > 0) {
-      const sortedByEntry = [...allPositions].sort((a, b) => a.entry_time - b.entry_time);
-      console.log(`Earliest position: ${new Date(sortedByEntry[0].entry_time).toISOString()}`);
-      console.log(`Latest position: ${new Date(sortedByEntry[sortedByEntry.length - 1].entry_time).toISOString()}`);
-    }
-
-    // If authenticated, save to Supabase
+    // Save to Supabase
     if (userId && supabaseUrl && supabaseServiceKey) {
-      console.log('Saving data to Supabase for user:', userId);
       await savePositionsToSupabase(userId, positions);
 
-      // Also fetch and save account balance
-      console.log('Fetching account balance for account:', accountIndex);
       const balance = await fetchAccountBalance(accountIndex, authToken);
       if (balance) {
-        console.log('Saving account balance to Supabase:', balance);
         await saveAccountBalance(userId, balance);
       } else {
-        console.error('Balance fetch returned null - not saving to Supabase');
+        console.error('Balance fetch returned null');
       }
-    } else {
-      console.log('Not saving to Supabase:', {
-        hasUserId: !!userId,
-        hasSupabaseUrl: !!supabaseUrl,
-        hasServiceKey: !!supabaseServiceKey
-      });
     }
 
     // Calculate total PnL
