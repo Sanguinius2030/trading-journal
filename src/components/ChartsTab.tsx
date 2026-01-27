@@ -67,6 +67,24 @@ export function ChartsTab() {
     return data;
   }, [sortedPositions]);
 
+  // All-time high points on the equity curve
+  const athPoints = useMemo(() => {
+    if (equityData.length < 2) return [];
+    const points: { index: number; value: number; date: Date }[] = [];
+    let peak = equityData[0].value;
+
+    for (let i = 1; i < equityData.length; i++) {
+      if (equityData[i].value > peak) {
+        peak = equityData[i].value;
+        points.push({ index: i, value: peak, date: equityData[i].date });
+      }
+    }
+    return points;
+  }, [equityData]);
+
+  // Set for quick ATH index lookup (used in tooltip)
+  const athIndexSet = useMemo(() => new Set(athPoints.map(p => p.index)), [athPoints]);
+
   // Drawdown data
   const drawdownData = useMemo(() => {
     let portfolioValue = STARTING_CAPITAL;
@@ -396,6 +414,13 @@ export function ChartsTab() {
                     <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
                     <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
                   </linearGradient>
+                  <filter id="athGlow">
+                    <feGaussianBlur stdDeviation="0.4" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
                   <clipPath id="equityClip">
                     <rect
                       x="0"
@@ -417,6 +442,34 @@ export function ChartsTab() {
                     vectorEffect="non-scaling-stroke"
                     style={{ strokeWidth: '2px' }}
                   />
+                  {/* ATH markers — subtle dot + vertical tick */}
+                  {equityData.length >= 2 && (() => {
+                    const minValue = Math.min(...equityData.map(d => d.value));
+                    const maxValue = Math.max(...equityData.map(d => d.value));
+                    const valueRange = maxValue - minValue || 1;
+                    return athPoints.map((ath) => {
+                      const x = (ath.index / (equityData.length - 1)) * chartWidth;
+                      const y = chartHeight - ((ath.value - minValue) / valueRange) * chartHeight;
+                      return (
+                        <g key={ath.index} className="ath-marker">
+                          {/* Vertical tick line from point downward */}
+                          <line
+                            x1={x} y1={y}
+                            x2={x} y2={y + 2.5}
+                            stroke="#f59e0b"
+                            strokeWidth="0.15"
+                            strokeOpacity="0.35"
+                            vectorEffect="non-scaling-stroke"
+                            style={{ strokeWidth: '1px' }}
+                          />
+                          {/* Outer glow ring */}
+                          <circle cx={x} cy={y} r="0.6" fill="#f59e0b" fillOpacity="0.15" filter="url(#athGlow)" />
+                          {/* Core dot */}
+                          <circle cx={x} cy={y} r="0.3" fill="#f59e0b" stroke="#fff" strokeWidth="0.08" vectorEffect="non-scaling-stroke" style={{ strokeWidth: '1px' }} />
+                        </g>
+                      );
+                    });
+                  })()}
                 </g>
               </svg>
               <div className="chart-hover-areas">
@@ -434,6 +487,9 @@ export function ChartsTab() {
                       <div className={`tooltip-change ${equityData[hoveredEquityPoint].pnl >= 0 ? 'positive' : 'negative'}`}>
                         Trade #{equityData[hoveredEquityPoint].tradeNum}: {formatCurrency(equityData[hoveredEquityPoint].pnl)}
                       </div>
+                    )}
+                    {athIndexSet.has(hoveredEquityPoint) && (
+                      <div className="tooltip-ath">New ATH</div>
                     )}
                   </div>
                 </>
@@ -1027,6 +1083,32 @@ export function ChartsTab() {
 
         .tooltip-change.positive { color: var(--success); }
         .tooltip-change.negative { color: var(--danger); }
+
+        .tooltip-ath {
+          font-size: 0.6rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+          color: #f59e0b;
+          margin-top: 0.3rem;
+          display: flex;
+          align-items: center;
+          gap: 0.3rem;
+        }
+
+        .tooltip-ath::before {
+          content: '';
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #f59e0b;
+          box-shadow: 0 0 4px rgba(245, 158, 11, 0.5);
+          flex-shrink: 0;
+        }
+
+        .ath-marker {
+          opacity: 0.85;
+        }
 
         .tooltip-detail {
           font-size: 0.7rem;
