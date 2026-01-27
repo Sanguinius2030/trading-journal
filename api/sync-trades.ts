@@ -159,11 +159,19 @@ async function fetchAllTrades(
     }
 
     batchCount++;
-    // Build URL with template literals — URLSearchParams encodes special chars
-    // in the auth token (e.g. + → %2B) which the Lighter API rejects.
-    let url = `${LIGHTER_API_URL}/api/v1/trades?auth=${authToken}&account_index=${accountIndex}&limit=${BATCH_SIZE}&sort_by=timestamp&start_time=${sinceTimestamp > 0 ? sinceTimestamp : 1}`;
+    // Trim auth token and API URL to avoid whitespace issues from env vars
+    const cleanAuth = authToken.trim();
+    const cleanApiUrl = LIGHTER_API_URL.trim();
+    let url = `${cleanApiUrl}/api/v1/trades?auth=${cleanAuth}&account_index=${accountIndex}&limit=${BATCH_SIZE}&sort_by=timestamp&start_time=${sinceTimestamp > 0 ? sinceTimestamp : 1}`;
     if (cursor) {
       url += `&cursor=${cursor}`;
+    }
+
+    // Log masked URL for debugging
+    if (batchCount === 1) {
+      const maskedUrl = url.replace(/auth=[^&]+/, `auth=${cleanAuth.substring(0, 6)}...${cleanAuth.substring(cleanAuth.length - 4)}`);
+      console.log(`First batch URL: ${maskedUrl}`);
+      console.log(`Auth token length: ${cleanAuth.length}, API URL: ${cleanApiUrl}`);
     }
 
     let response;
@@ -174,7 +182,6 @@ async function fetchAllTrades(
       try {
         response = await fetch(url, {
           headers: {
-            'Authorization': authToken,
             'Accept': 'application/json',
           }
         });
@@ -197,8 +204,9 @@ async function fetchAllTrades(
     if (!response || !response.ok) {
       const status = response?.status;
       const text = response ? await response.text().catch(() => 'could not read body') : 'no response';
-      fetchError = `API error ${status}: ${text.substring(0, 100)}`;
-      console.error(`Failed to fetch trades batch ${batchCount}: status=${status}, body=${text.substring(0, 200)}`);
+      // Include diagnostic info in the error
+      fetchError = `API ${status} (auth_len=${cleanAuth.length}, acct=${accountIndex}, limit=${BATCH_SIZE}): ${text.substring(0, 150)}`;
+      console.error(`Failed batch ${batchCount}: status=${status}, url_base=${cleanApiUrl}, body=${text.substring(0, 300)}`);
       break;
     }
 
