@@ -138,7 +138,7 @@ async function fetchAllTrades(
   options?: { timeLimitMs?: number; sinceTimestamp?: number }
 ): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number; error?: string }> {
   const allTrades: RawTrade[] = [];
-  const BATCH_SIZE = 1000;
+  const BATCH_SIZE = 100; // Lighter API rejects limit > 100
   const MAX_TRADES = 25000;
   const TIME_LIMIT = options?.timeLimitMs || 50000; // 50s default (leave 10s buffer for Vercel)
   const fetchStart = Date.now();
