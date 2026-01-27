@@ -138,8 +138,6 @@ async function fetchAllTrades(
   options?: { timeLimitMs?: number; startTime?: number; sinceTimestamp?: number }
 ): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number }> {
   const allTrades: RawTrade[] = [];
-  // Request large batch - API returns its actual max (may be less)
-  // We rely on next_cursor for pagination, NOT on response size
   const BATCH_SIZE = 1000;
   const MAX_TRADES = 25000;
   const TIME_LIMIT = options?.timeLimitMs || 50000; // 50s default (leave 10s buffer for Vercel)
@@ -149,7 +147,7 @@ async function fetchAllTrades(
   let batchCount = 0;
   let complete = false;
 
-  console.log(`Fetching trades for account ${accountIndex} (batch: ${BATCH_SIZE}, max: ${MAX_TRADES}, timeLimit: ${TIME_LIMIT}ms, since: ${sinceTimestamp ? new Date(sinceTimestamp).toISOString() : 'all'})...`);
+  console.log(`Fetching trades for account ${accountIndex} (since: ${sinceTimestamp ? new Date(sinceTimestamp).toISOString() : 'all'})...`);
 
   while (allTrades.length < MAX_TRADES) {
     // Time guard: stop before Vercel timeout
@@ -166,10 +164,9 @@ async function fetchAllTrades(
       limit: BATCH_SIZE.toString(),
       sort_by: 'timestamp',
     });
-    // Incremental sync: only fetch trades after the given timestamp
-    if (sinceTimestamp > 0) {
-      params.set('start_time', sinceTimestamp.toString());
-    }
+    // NOTE: We do NOT use the API's start_time parameter — testing showed
+    // the Lighter API ignores it entirely. Instead, we stop pagination when
+    // we reach trades older than sinceTimestamp (API returns newest-first).
     if (cursor) {
       params.set('cursor', cursor);
     }
@@ -219,10 +216,25 @@ async function fetchAllTrades(
       break;
     }
 
-    allTrades.push(...data.trades);
+    // For incremental sync: API returns trades newest-first.
+    // Filter to only trades newer than sinceTimestamp, and stop pagination
+    // once we hit known (older) trades.
+    if (sinceTimestamp > 0) {
+      const newTrades = data.trades.filter((t: RawTrade) => t.timestamp > sinceTimestamp);
+      const oldTradesFound = data.trades.length - newTrades.length;
+      allTrades.push(...newTrades);
 
-    if (batchCount % 10 === 0) {
-      console.log(`Batch ${batchCount}: ${data.trades.length} trades (total: ${allTrades.length}), elapsed: ${Date.now() - fetchStart}ms`);
+      if (oldTradesFound > 0) {
+        console.log(`Batch ${batchCount}: reached known trades. Kept ${newTrades.length}/${data.trades.length} from this batch.`);
+        complete = true;
+        break;
+      }
+      console.log(`Batch ${batchCount}: ${newTrades.length} new trades (total: ${allTrades.length})`);
+    } else {
+      allTrades.push(...data.trades);
+      if (batchCount % 10 === 0) {
+        console.log(`Batch ${batchCount}: ${data.trades.length} trades (total: ${allTrades.length}), elapsed: ${Date.now() - fetchStart}ms`);
+      }
     }
 
     // Only use cursor to determine if there are more pages
@@ -708,8 +720,10 @@ async function getSyncStartTime(userId: string): Promise<number> {
 
   if (openPositions && openPositions.length > 0) {
     // Re-fetch from the earliest open position's entry time
-    console.log(`Found open position, syncing from entry_time: ${new Date(openPositions[0].entry_time).toISOString()}`);
-    return openPositions[0].entry_time;
+    // Subtract 1ms so the > filter in fetchAllTrades includes trades at this exact timestamp
+    const entryTime = openPositions[0].entry_time;
+    console.log(`Found open position, syncing from entry_time: ${new Date(entryTime).toISOString()}`);
+    return entryTime - 1;
   }
 
   // No open positions - fetch only new trades since the latest known position
