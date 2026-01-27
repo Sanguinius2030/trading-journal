@@ -135,17 +135,18 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
 async function fetchAllTrades(
   accountIndex: number,
   authToken: string,
-  options?: { timeLimitMs?: number; startTime?: number; sinceTimestamp?: number }
-): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number }> {
+  options?: { timeLimitMs?: number; sinceTimestamp?: number }
+): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number; error?: string }> {
   const allTrades: RawTrade[] = [];
   const BATCH_SIZE = 1000;
   const MAX_TRADES = 25000;
   const TIME_LIMIT = options?.timeLimitMs || 50000; // 50s default (leave 10s buffer for Vercel)
-  const fetchStart = options?.startTime || Date.now();
+  const fetchStart = Date.now();
   const sinceTimestamp = options?.sinceTimestamp || 0;
   let cursor: string | undefined = undefined;
   let batchCount = 0;
   let complete = false;
+  let fetchError: string | undefined;
 
   console.log(`Fetching trades for account ${accountIndex} (since: ${sinceTimestamp ? new Date(sinceTimestamp).toISOString() : 'all'})...`);
 
@@ -204,6 +205,7 @@ async function fetchAllTrades(
     if (!response || !response.ok) {
       const status = response?.status;
       const text = response ? await response.text().catch(() => 'could not read body') : 'no response';
+      fetchError = `API error ${status}: ${text.substring(0, 100)}`;
       console.error(`Failed to fetch trades batch ${batchCount}: status=${status}, body=${text.substring(0, 200)}`);
       break;
     }
@@ -253,10 +255,10 @@ async function fetchAllTrades(
     complete = true;
   }
 
-  console.log(`Trade fetch: ${allTrades.length} trades in ${batchCount} batches, complete: ${complete}, elapsed: ${Date.now() - fetchStart}ms`);
+  console.log(`Trade fetch: ${allTrades.length} trades in ${batchCount} batches, complete: ${complete}, error: ${fetchError || 'none'}, elapsed: ${Date.now() - fetchStart}ms`);
   allTrades.sort((a, b) => a.timestamp - b.timestamp);
 
-  return { trades: allTrades, complete, batchCount };
+  return { trades: allTrades, complete, batchCount, error: fetchError };
 }
 
 async function fetchLiquidations(accountIndex: number, authToken: string): Promise<RawLiquidation[]> {
@@ -865,9 +867,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.log(`Loaded ${Object.keys(marketSymbols).length} market symbols`);
 
     // Fetch trades (incremental: only new trades since last sync, fast!)
+    // Don't pass startTime — let fetchAllTrades start its own timer so the
+    // 45s budget isn't consumed by balance/settings/market symbol fetches above.
     const tradeResult = await fetchAllTrades(accountIndex, authToken, {
       timeLimitMs: 45000,
-      startTime: syncStart,
       sinceTimestamp,
     });
     const trades = tradeResult.trades;
@@ -959,7 +962,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           ? (newPositions.length > 0
             ? `Synced ${newPositions.length} new position${newPositions.length === 1 ? '' : 's'}.`
             : undefined)
-          : `Partial sync: fetched ${trades.length} trades in ${tradeResult.batchCount} batches before timeout.`,
+          : tradeResult.error
+            ? `Sync failed: ${tradeResult.error}`
+            : `Partial sync: fetched ${trades.length} trades in ${tradeResult.batchCount} batches before timeout.`,
         synced_at: new Date().toISOString()
       }
     };
