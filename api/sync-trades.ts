@@ -135,7 +135,7 @@ async function fetchMarketSymbols(): Promise<Record<number, string>> {
 async function fetchAllTrades(
   accountIndex: number,
   authToken: string,
-  options?: { timeLimitMs?: number; startTime?: number }
+  options?: { timeLimitMs?: number; startTime?: number; sinceTimestamp?: number }
 ): Promise<{ trades: RawTrade[]; complete: boolean; batchCount: number }> {
   const allTrades: RawTrade[] = [];
   // Request large batch - API returns its actual max (may be less)
@@ -144,11 +144,12 @@ async function fetchAllTrades(
   const MAX_TRADES = 25000;
   const TIME_LIMIT = options?.timeLimitMs || 50000; // 50s default (leave 10s buffer for Vercel)
   const fetchStart = options?.startTime || Date.now();
+  const sinceTimestamp = options?.sinceTimestamp || 0;
   let cursor: string | undefined = undefined;
   let batchCount = 0;
   let complete = false;
 
-  console.log(`Fetching trades for account ${accountIndex} (batch: ${BATCH_SIZE}, max: ${MAX_TRADES}, timeLimit: ${TIME_LIMIT}ms)...`);
+  console.log(`Fetching trades for account ${accountIndex} (batch: ${BATCH_SIZE}, max: ${MAX_TRADES}, timeLimit: ${TIME_LIMIT}ms, since: ${sinceTimestamp ? new Date(sinceTimestamp).toISOString() : 'all'})...`);
 
   while (allTrades.length < MAX_TRADES) {
     // Time guard: stop before Vercel timeout
@@ -165,6 +166,10 @@ async function fetchAllTrades(
       limit: BATCH_SIZE.toString(),
       sort_by: 'timestamp',
     });
+    // Incremental sync: only fetch trades after the given timestamp
+    if (sinceTimestamp > 0) {
+      params.set('start_time', sinceTimestamp.toString());
+    }
     if (cursor) {
       params.set('cursor', cursor);
     }
@@ -689,6 +694,59 @@ async function savePositionsToSupabase(userId: string, positions: AggregatedPosi
   console.log(`Saved ${positionsToSave.length} positions to Supabase`);
 }
 
+// Get the timestamp to start fetching trades from (for incremental sync)
+// Returns 0 if no existing data (full sync needed)
+async function getSyncStartTime(userId: string): Promise<number> {
+  // Check for open positions - we need to re-fetch their trades to properly re-aggregate
+  const { data: openPositions } = await supabase
+    .from('positions')
+    .select('entry_time')
+    .eq('user_id', userId)
+    .eq('is_closed', false)
+    .order('entry_time', { ascending: true })
+    .limit(1);
+
+  if (openPositions && openPositions.length > 0) {
+    // Re-fetch from the earliest open position's entry time
+    console.log(`Found open position, syncing from entry_time: ${new Date(openPositions[0].entry_time).toISOString()}`);
+    return openPositions[0].entry_time;
+  }
+
+  // No open positions - fetch only new trades since the latest known position
+  const { data: latestClosed } = await supabase
+    .from('positions')
+    .select('exit_time')
+    .eq('user_id', userId)
+    .eq('is_closed', true)
+    .order('exit_time', { ascending: false })
+    .limit(1);
+
+  if (latestClosed && latestClosed.length > 0 && latestClosed[0].exit_time) {
+    console.log(`Incremental sync from last exit_time: ${new Date(latestClosed[0].exit_time).toISOString()}`);
+    return latestClosed[0].exit_time;
+  }
+
+  // No existing data - full sync needed
+  console.log('No existing positions found, full sync needed');
+  return 0;
+}
+
+// Fetch all positions from Supabase for the response (after incremental save)
+async function getAllPositionsFromSupabase(userId: string): Promise<any[]> {
+  const { data, error } = await supabase
+    .from('positions')
+    .select('*')
+    .eq('user_id', userId)
+    .order('entry_time', { ascending: false });
+
+  if (error) {
+    console.error('Failed to fetch positions from Supabase:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 // Allowed origins for CORS
 const ALLOWED_ORIGINS = [
   'https://trading-journal-2026.vercel.app',
@@ -723,7 +781,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Rate limiting: max 1 sync per 90 seconds per user
+    // Rate limiting: max 1 sync per 30 seconds per user (incremental syncs are fast)
     if (supabaseUrl && supabaseServiceKey) {
       const { data: lastSync } = await supabase
         .from('positions')
@@ -735,7 +793,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (lastSync?.updated_at) {
         const lastSyncTime = new Date(lastSync.updated_at).getTime();
-        const cooldownMs = 90 * 1000;
+        const cooldownMs = 30 * 1000;
         const cooldownAgo = Date.now() - cooldownMs;
         if (lastSyncTime > cooldownAgo) {
           return res.status(429).json({
@@ -780,29 +838,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.log('Balance updated');
     }
 
+    // Determine incremental sync start time from existing data
+    let sinceTimestamp = 0;
+    if (supabaseUrl && supabaseServiceKey) {
+      sinceTimestamp = await getSyncStartTime(userId);
+    }
+    const isIncremental = sinceTimestamp > 0;
+    console.log(`Sync mode: ${isIncremental ? 'incremental' : 'full'}`);
+
     // Fetch market symbols
     const marketSymbols = await fetchMarketSymbols();
     console.log(`Loaded ${Object.keys(marketSymbols).length} market symbols`);
 
-    // Fetch trades with time guard (stops before Vercel 60s timeout)
+    // Fetch trades (incremental: only new trades since last sync, fast!)
     const tradeResult = await fetchAllTrades(accountIndex, authToken, {
-      timeLimitMs: 45000, // 45s for trades, leaves 15s for aggregation + save
+      timeLimitMs: 45000,
       startTime: syncStart,
+      sinceTimestamp,
     });
     const trades = tradeResult.trades;
-    console.log(`Fetched ${trades.length} trades (complete: ${tradeResult.complete})`);
+    console.log(`Fetched ${trades.length} trades (complete: ${tradeResult.complete}, incremental: ${isIncremental})`);
 
-    // Skip liquidation fetch if trade fetch wasn't complete (save time)
-    let liquidationCount = 0;
-    if (tradeResult.complete) {
-      const liquidations = await fetchLiquidations(accountIndex, authToken);
-      liquidationCount = liquidations.length;
-      console.log(`Fetched ${liquidationCount} liquidations`);
+    // If incremental sync returned 0 new trades, just return existing data
+    if (isIncremental && trades.length === 0 && tradeResult.complete) {
+      console.log('No new trades found - returning existing data from Supabase');
+      const existingPositions = await getAllPositionsFromSupabase(userId);
+      const totalPnL = existingPositions
+        .filter(p => p.is_closed && p.pnl != null)
+        .reduce((sum: number, p: any) => sum + parseFloat(p.pnl), 0);
+
+      return res.status(200).json({
+        positions: existingPositions,
+        summary: {
+          total_pnl: totalPnL,
+          total_positions: existingPositions.length,
+          closed_positions: existingPositions.filter((p: any) => p.is_closed).length,
+          open_positions: existingPositions.filter((p: any) => !p.is_closed).length,
+          total_trades_fetched: 0,
+          fetch_complete: true,
+          message: 'Already up to date - no new trades found.',
+          synced_at: new Date().toISOString()
+        }
+      });
     }
 
-    // If we got 0 trades and fetch was incomplete, we hit a timeout on the very first batch
-    // or the API returned nothing. Don't overwrite existing data.
-    if (trades.length === 0 && !tradeResult.complete) {
+    // For full sync that timed out with 0 trades, don't overwrite existing data
+    if (!isIncremental && trades.length === 0 && !tradeResult.complete) {
       return res.status(200).json({
         positions: [],
         summary: {
@@ -818,49 +899,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Aggregate into positions
+    // Aggregate new trades into positions
     const allPositions = aggregatePositions(trades, marketSymbols, accountIndex);
     console.log(`Aggregated ${allPositions.length} positions from ${trades.length} trades`);
 
     // Filter to positions starting from Dec 19th, 2025 and exclude unknown markets
     const startDate = new Date('2025-12-19T00:00:00Z').getTime();
 
-    const positions = allPositions.filter(p =>
+    const newPositions = allPositions.filter(p =>
       p.entry_time >= startDate &&
       !p.market_symbol.startsWith('Market ')
     );
 
-    console.log(`Positions after filters: ${positions.length} (from ${allPositions.length} total)`);
+    console.log(`New positions after filters: ${newPositions.length} (from ${allPositions.length} total)`);
 
-    // Save to Supabase (only if we got a complete fetch, otherwise don't overwrite)
+    // Save new/updated positions to Supabase (upsert - won't delete existing)
     if (tradeResult.complete && userId && supabaseUrl && supabaseServiceKey) {
-      await savePositionsToSupabase(userId, positions);
-      console.log('Positions saved to Supabase');
+      if (newPositions.length > 0) {
+        await savePositionsToSupabase(userId, newPositions);
+        console.log(`Saved ${newPositions.length} new/updated positions to Supabase`);
+      }
     } else if (!tradeResult.complete) {
       console.log('Skipping Supabase save - trade fetch was incomplete');
     }
 
-    // Calculate total PnL
-    const totalPnL = positions
-      .filter(p => p.is_closed && p.pnl !== null)
-      .reduce((sum, p) => sum + p.pnl!, 0);
+    // Fetch ALL positions from Supabase for the response (existing + newly added)
+    const allStoredPositions = await getAllPositionsFromSupabase(userId);
+
+    // Calculate total PnL from all positions
+    const totalPnL = allStoredPositions
+      .filter((p: any) => p.is_closed && p.pnl != null)
+      .reduce((sum: number, p: any) => sum + parseFloat(p.pnl), 0);
 
     const result = {
-      positions: positions.map(p => ({
-        ...p,
-        trades: undefined // Remove trades array from response to reduce size
-      })),
+      positions: allStoredPositions,
       summary: {
         total_pnl: totalPnL,
-        total_positions: positions.length,
-        closed_positions: positions.filter(p => p.is_closed).length,
-        open_positions: positions.filter(p => !p.is_closed).length,
+        total_positions: allStoredPositions.length,
+        closed_positions: allStoredPositions.filter((p: any) => p.is_closed).length,
+        open_positions: allStoredPositions.filter((p: any) => !p.is_closed).length,
         total_trades_fetched: trades.length,
-        total_liquidations_fetched: liquidationCount,
+        new_positions: newPositions.length,
         fetch_complete: tradeResult.complete,
         message: tradeResult.complete
-          ? undefined
-          : `Partial sync: fetched ${trades.length} trades in ${tradeResult.batchCount} batches before timeout. Use seed script for full data.`,
+          ? (newPositions.length > 0
+            ? `Synced ${newPositions.length} new position${newPositions.length === 1 ? '' : 's'}.`
+            : undefined)
+          : `Partial sync: fetched ${trades.length} trades in ${tradeResult.batchCount} batches before timeout.`,
         synced_at: new Date().toISOString()
       }
     };

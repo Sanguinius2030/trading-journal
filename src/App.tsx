@@ -63,6 +63,11 @@ function AppContent() {
         if (response.status === 404) {
           throw new Error('Run "npx tsx scripts/fetch-all-trades.ts && npx tsx scripts/aggregate-positions.ts" to refresh data locally');
         }
+        if (response.status === 429) {
+          const errData = await response.json().catch(() => ({}));
+          const retryAfter = errData.retry_after || 30;
+          throw new Error(`Please wait ${retryAfter}s before syncing again.`);
+        }
         throw new Error(`Sync failed: ${response.status}`);
       }
 
@@ -71,8 +76,8 @@ function AppContent() {
       // Store the synced data in localStorage for persistence
       localStorage.setItem('aggregated-positions', JSON.stringify(data));
 
-      const tradesInfo = data.summary.total_trades_fetched ? ` from ${data.summary.total_trades_fetched} trades` : '';
       const isPartial = data.summary.fetch_complete === false;
+      const newCount = data.summary.new_positions || 0;
 
       if (isPartial && data.summary.total_positions === 0) {
         // Timeout with no usable data - suggest seed script
@@ -81,11 +86,14 @@ function AppContent() {
           message: data.summary.message || 'Sync timed out. Run the seed script locally to upload data.'
         });
       } else {
+        const message = data.summary.message
+          || (newCount > 0
+            ? `Synced ${newCount} new position${newCount === 1 ? '' : 's'} (${data.summary.total_positions} total)`
+            : `Up to date - ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)`);
+
         setSyncStatus({
           type: isPartial ? 'error' : 'success',
-          message: isPartial
-            ? `Partial sync: ${data.summary.total_positions} positions${tradesInfo} (timed out - run seed script for full data)`
-            : `Synced ${data.summary.total_positions} positions (${data.summary.closed_positions} closed, ${data.summary.open_positions} open)${tradesInfo}`
+          message,
         });
 
         // Increment refresh key to trigger component re-mount and data re-fetch
