@@ -4,7 +4,7 @@
  */
 
 import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { ApiClient, OrderApi } from '@oraichain/lighter-ts-sdk';
+import { ApiClient, OrderApi, AccountApi } from '@oraichain/lighter-ts-sdk';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -55,15 +55,27 @@ interface Liquidation {
   executed_at: number;
 }
 
+interface FundingPayment {
+  funding_id: number;
+  market_id: number;
+  timestamp: number;
+  change: string;  // USD amount: positive = received, negative = paid
+  position_size: string;
+  rate: string;
+  position_side: 'long' | 'short';
+}
+
 interface StoredData {
   trades: Trade[];
   liquidations?: Liquidation[];
+  funding?: FundingPayment[];
   metadata: {
     total_count: number;
     fetched_at: string;
     account_index: number;
     newest_trade_id?: number;
     newest_liquidation_id?: number;
+    newest_funding_id?: number;
   };
 }
 
@@ -146,6 +158,102 @@ async function fetchLiquidations(accountIndex: number, authToken: string, newest
   return allLiquidations;
 }
 
+async function fetchFunding(
+  accountApi: AccountApi,
+  accountIndex: number,
+  authToken: string,
+  newestExistingId: number = 0
+): Promise<FundingPayment[]> {
+  const allFunding: FundingPayment[] = [];
+  const BATCH_SIZE = 100;
+  const MAX_ITERATIONS = 100;
+
+  console.log('\n--- Fetching Funding Payments ---');
+  if (newestExistingId > 0) {
+    console.log(`Looking for funding payments newer than ID ${newestExistingId}...`);
+  }
+
+  // Get all market IDs we need to fetch funding for
+  // We'll fetch for markets 0 (ETH), 1 (BTC), and any others
+  const marketIds = [0, 1, 77]; // ETH, BTC, XMR - add more as needed
+
+  for (const marketId of marketIds) {
+    let cursor: string | undefined = undefined;
+    let iteration = 0;
+    let marketFundingCount = 0;
+
+    while (iteration < MAX_ITERATIONS) {
+      iteration++;
+
+      try {
+        const response = await accountApi.positionFunding(
+          authToken,
+          accountIndex,
+          marketId,
+          BATCH_SIZE,
+          'all',
+          cursor
+        );
+
+        const payments = response.position_fundings || [];
+
+        if (payments.length === 0) {
+          break;
+        }
+
+        if (iteration === 1) {
+          console.log(`  Market ${marketId}: fetching...`);
+        }
+
+        // Filter out ones we already have
+        const newPayments = payments.filter(
+          (p: any) => p.funding_id > newestExistingId
+        );
+
+        // Map to our interface (already matches API response)
+        const mappedPayments: FundingPayment[] = newPayments.map((p: any) => ({
+          funding_id: p.funding_id,
+          market_id: p.market_id,
+          timestamp: p.timestamp,
+          change: p.change,
+          position_size: p.position_size,
+          rate: p.rate,
+          position_side: p.position_side
+        }));
+
+        allFunding.push(...mappedPayments);
+        marketFundingCount += mappedPayments.length;
+
+        // If we got fewer new ones than the batch, we've caught up
+        if (newPayments.length < payments.length) {
+          break;
+        }
+
+        cursor = response.next_cursor;
+        if (!cursor) {
+          break;
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 300));
+      } catch (error: any) {
+        if (error.status === 404 || error.message?.includes('not found')) {
+          // No funding for this market, skip
+          break;
+        }
+        console.error(`  Error fetching funding for market ${marketId}:`, error.message || error);
+        break;
+      }
+    }
+
+    if (marketFundingCount > 0) {
+      console.log(`  Market ${marketId}: ${marketFundingCount} funding payments`);
+    }
+  }
+
+  console.log(`  Total new funding payments: ${allFunding.length}`);
+  return allFunding;
+}
+
 async function main() {
   const dataDir = path.join(__dirname, '..', 'data');
   const dataFile = path.join(dataDir, 'sdk-trades.json');
@@ -153,14 +261,17 @@ async function main() {
   // Load existing trades if available
   let existingTrades: Trade[] = [];
   let existingLiquidations: Liquidation[] = [];
+  let existingFunding: FundingPayment[] = [];
   let newestExistingTradeId = 0;
   let newestExistingLiquidationId = 0;
+  let newestExistingFundingId = 0;
 
   if (existsSync(dataFile)) {
     try {
       const existingData: StoredData = JSON.parse(readFileSync(dataFile, 'utf-8'));
       existingTrades = existingData.trades || [];
       existingLiquidations = existingData.liquidations || [];
+      existingFunding = existingData.funding || [];
 
       // Find the newest IDs we already have
       if (existingTrades.length > 0) {
@@ -169,15 +280,20 @@ async function main() {
       if (existingLiquidations.length > 0) {
         newestExistingLiquidationId = Math.max(...existingLiquidations.map(l => l.id));
       }
+      if (existingFunding.length > 0) {
+        newestExistingFundingId = Math.max(...existingFunding.map(f => f.funding_id));
+      }
 
       console.log('='.repeat(80));
       console.log('INCREMENTAL TRADE SYNC');
       console.log('='.repeat(80));
       console.log(`Found ${existingTrades.length} existing trades`);
       console.log(`Found ${existingLiquidations.length} existing liquidations`);
+      console.log(`Found ${existingFunding.length} existing funding payments`);
       console.log(`Newest existing trade ID: ${newestExistingTradeId}`);
       console.log(`Newest existing liquidation ID: ${newestExistingLiquidationId}`);
-      console.log(`Looking for new trades and liquidations...\n`);
+      console.log(`Newest existing funding ID: ${newestExistingFundingId}`);
+      console.log(`Looking for new data...\n`);
     } catch (err) {
       console.log('Could not parse existing data, will fetch all');
     }
@@ -189,8 +305,9 @@ async function main() {
 
   console.log(`Account Index: ${ACCOUNT_INDEX}\n`);
 
-  const apiClient = new ApiClient(LIGHTER_API_URL);
+  const apiClient = new ApiClient(LIGHTER_API_URL as any);
   const orderApi = new OrderApi(apiClient);
+  const accountApi = new AccountApi(apiClient);
 
   const newTrades: Trade[] = [];
   const BATCH_SIZE = 100;
@@ -330,10 +447,23 @@ async function main() {
 
     console.log(`\nTotal liquidations after merge: ${uniqueLiquidations.length}`);
 
-    // Save all trades and liquidations
+    // Fetch funding payments
+    const newFunding = await fetchFunding(accountApi, ACCOUNT_INDEX, AUTH_TOKEN, newestExistingFundingId);
+
+    // Merge funding
+    const allFunding = [...existingFunding, ...newFunding];
+    const uniqueFunding = Array.from(
+      new Map(allFunding.map(f => [f.funding_id, f])).values()
+    );
+    uniqueFunding.sort((a, b) => a.timestamp - b.timestamp);
+
+    console.log(`Total funding payments after merge: ${uniqueFunding.length}`);
+
+    // Save all trades, liquidations, and funding
     const outputData: StoredData = {
       trades: uniqueTrades,
       liquidations: uniqueLiquidations,
+      funding: uniqueFunding,
       metadata: {
         total_count: uniqueTrades.length,
         fetched_at: new Date().toISOString(),
@@ -343,6 +473,9 @@ async function main() {
           : 0,
         newest_liquidation_id: uniqueLiquidations.length > 0
           ? Math.max(...uniqueLiquidations.map(l => l.id))
+          : 0,
+        newest_funding_id: uniqueFunding.length > 0
+          ? Math.max(...uniqueFunding.map(f => f.funding_id))
           : 0
       }
     };
@@ -353,8 +486,8 @@ async function main() {
       'utf-8'
     );
 
-    console.log(`\n✅ Saved ${uniqueTrades.length} trades and ${uniqueLiquidations.length} liquidations to data/sdk-trades.json`);
-    if (newTrades.length === 0 && newLiquidations.length === 0) {
+    console.log(`\n✅ Saved ${uniqueTrades.length} trades, ${uniqueLiquidations.length} liquidations, and ${uniqueFunding.length} funding payments to data/sdk-trades.json`);
+    if (newTrades.length === 0 && newLiquidations.length === 0 && newFunding.length === 0) {
       console.log('   (No new data found - already up to date)');
     }
 

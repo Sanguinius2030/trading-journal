@@ -48,6 +48,16 @@ interface RawLiquidation {
   executed_at: number;
 }
 
+interface FundingPayment {
+  funding_id: number;
+  market_id: number;
+  timestamp: number;
+  change: string;  // USD amount: positive = received, negative = paid
+  position_size: string;
+  rate: string;
+  position_side: 'long' | 'short';
+}
+
 interface AggregatedPosition {
   position_id: string;
   market_id: number;
@@ -74,6 +84,7 @@ interface AggregatedPosition {
   total_entry_value: number;
   total_exit_value: number;
   total_fees: number;  // Total trading fees paid
+  total_funding: number;  // Funding payments (positive = received, negative = paid)
   pnl: number | null;
   realized_pnl: number;  // For open positions: realized P&L from partial closes
   position_type: 'LONG' | 'SHORT';
@@ -287,6 +298,7 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
           total_entry_value: tradeValue,
           total_exit_value: 0,
           total_fees: totalFees,
+          total_funding: 0,
           pnl: null,
           realized_pnl: 0,
           position_type: positionAfter > 0 ? 'LONG' : 'SHORT',
@@ -385,6 +397,53 @@ function aggregatePositions(trades: RawTrade[]): AggregatedPosition[] {
   return positions;
 }
 
+/**
+ * Calculate funding for each position based on funding payments within position's time range
+ */
+function applyFundingToPositions(positions: AggregatedPosition[], funding: FundingPayment[]): void {
+  // Group funding by market_id for efficient lookup
+  const fundingByMarket = new Map<number, FundingPayment[]>();
+  funding.forEach(f => {
+    if (!fundingByMarket.has(f.market_id)) {
+      fundingByMarket.set(f.market_id, []);
+    }
+    fundingByMarket.get(f.market_id)!.push(f);
+  });
+
+  // Sort funding by timestamp within each market
+  fundingByMarket.forEach(marketFunding => {
+    marketFunding.sort((a, b) => a.timestamp - b.timestamp);
+  });
+
+  // For each position, find funding payments within its time range
+  positions.forEach(pos => {
+    const marketFunding = fundingByMarket.get(pos.market_id) || [];
+    const entryTime = pos.entry_time;
+    // For open positions, use current time; for closed, use exit time
+    // Funding timestamps are in seconds, position timestamps are in milliseconds
+    const exitTime = pos.exit_time || Date.now();
+
+    let totalFunding = 0;
+    marketFunding.forEach(f => {
+      // Convert funding timestamp from seconds to milliseconds
+      const fundingTimeMs = f.timestamp * 1000;
+      if (fundingTimeMs >= entryTime && fundingTimeMs <= exitTime) {
+        totalFunding += parseFloat(f.change);
+      }
+    });
+
+    pos.total_funding = totalFunding;
+
+    // Update PnL to include funding (funding received adds to profit, paid subtracts)
+    if (pos.is_closed && pos.pnl !== null) {
+      pos.pnl = pos.pnl + totalFunding;
+      pos.realized_pnl = pos.realized_pnl + totalFunding;
+    } else if (!pos.is_closed) {
+      pos.realized_pnl = pos.realized_pnl + totalFunding;
+    }
+  });
+}
+
 async function main() {
   try {
     // Load market symbols first
@@ -395,9 +454,11 @@ async function main() {
     const jsonData = JSON.parse(fs.readFileSync(tradesPath, 'utf-8'));
     const tradesData: RawTrade[] = jsonData.trades || jsonData;
     const liquidationsData: RawLiquidation[] = jsonData.liquidations || [];
+    const fundingData: FundingPayment[] = jsonData.funding || [];
 
     console.log(`\nLoaded ${tradesData.length} raw trades`);
     console.log(`Loaded ${liquidationsData.length} liquidations`);
+    console.log(`Loaded ${fundingData.length} funding payments`);
 
     // Build a set of trade IDs that correspond to liquidations
     // by matching liquidation data (time, price, size) to trades
@@ -444,6 +505,11 @@ async function main() {
     // Aggregate ALL trades into positions first
     const allPositions = aggregatePositions(allTrades);
 
+    // Apply funding to positions (calculates funding within each position's time range)
+    applyFundingToPositions(allPositions, fundingData);
+    const totalFundingApplied = allPositions.reduce((sum, p) => sum + p.total_funding, 0);
+    console.log(`Applied funding to positions (total: $${totalFundingApplied.toFixed(2)})`);
+
     // Then filter to only include positions that STARTED on or after December 19th, 2025
     // Also filter out unknown/test markets (market_symbol starting with "Market ")
     const startDate = new Date('2025-12-19T00:00:00Z').getTime();
@@ -463,7 +529,11 @@ async function main() {
       .filter(p => p.is_closed && p.pnl !== null)
       .reduce((sum, p) => sum + p.pnl!, 0);
 
+    const totalFunding = positions
+      .reduce((sum, p) => sum + p.total_funding, 0);
+
     console.log(`\nTotal PnL from closed positions: $${totalPnL.toFixed(2)}`);
+    console.log(`Total funding received/paid: $${totalFunding.toFixed(2)}`);
 
     // Show summary of each position
     console.log('\n=== Position Summary ===\n');
@@ -478,10 +548,16 @@ async function main() {
         console.log(`  Entry Value: $${pos.total_entry_value.toFixed(2)}`);
         console.log(`  Exit Value: $${pos.total_exit_value.toFixed(2)}`);
         console.log(`  Fees: $${pos.total_fees.toFixed(2)}`);
+        if (pos.total_funding !== 0) {
+          console.log(`  Funding: $${pos.total_funding.toFixed(2)}`);
+        }
         console.log(`  PnL: $${pos.pnl?.toFixed(2)} (${pos.pnl! > 0 ? '✓' : '✗'})`);
       } else {
         console.log(`  Status: OPEN`);
         console.log(`  Fees paid: $${pos.total_fees.toFixed(2)}`);
+        if (pos.total_funding !== 0) {
+          console.log(`  Funding: $${pos.total_funding.toFixed(2)}`);
+        }
       }
       console.log(`  Trades: ${pos.trades.length}`);
       console.log('');
@@ -489,7 +565,7 @@ async function main() {
 
     // Save to file
     const outputPath = path.join(__dirname, '..', 'data', 'aggregated-positions.json');
-    const outputData = JSON.stringify({ positions, summary: { total_pnl: totalPnL } }, null, 2);
+    const outputData = JSON.stringify({ positions, summary: { total_pnl: totalPnL, total_funding: totalFunding } }, null, 2);
     fs.writeFileSync(outputPath, outputData);
     console.log(`\n✓ Saved aggregated positions to: ${outputPath}`);
 
