@@ -34,6 +34,7 @@ interface AggregatedPosition {
   total_entry_value: number;
   total_exit_value: number;
   total_fees: number;
+  total_funding?: number;  // Funding payments (positive = received, negative = paid)
   pnl: number | null;
   realized_pnl?: number;  // For open positions: realized P&L from partial closes
   position_type: 'LONG' | 'SHORT';
@@ -1243,6 +1244,14 @@ export function AggregatedPositionsTable() {
                                   </span>
                                 </div>
                               )}
+                              {position.total_funding !== undefined && position.total_funding !== 0 && (
+                                <div className="mob-pos-row">
+                                  <span>Funding</span>
+                                  <span style={{ color: position.total_funding >= 0 ? '#10b981' : '#dc2626', fontWeight: 600 }}>
+                                    ${Math.round(position.total_funding).toLocaleString()}
+                                  </span>
+                                </div>
+                              )}
                               <div className="mob-pos-row">
                                 <span>Trades</span>
                                 <span>{position.trades?.length || position.trade_count || 0}</span>
@@ -1447,6 +1456,18 @@ export function AggregatedPositionsTable() {
                                   <span className="label">uPnL:</span>
                                   <span className="value">
                                     {unrealizedPnl !== null && unrealizedPnl !== 0 ? `$${Math.round(unrealizedPnl).toLocaleString()}` : '—'}
+                                  </span>
+                                </div>
+                              );
+                            })()}
+                            {(() => {
+                              const funding = position.total_funding || 0;
+                              const hasFunding = funding !== 0;
+                              return (
+                                <div className={`metric funding ${hasFunding ? (funding >= 0 ? 'profit' : 'loss') : ''}`}>
+                                  <span className="label">Funding:</span>
+                                  <span className="value">
+                                    {hasFunding ? `$${Math.round(funding).toLocaleString()}` : '—'}
                                   </span>
                                 </div>
                               );
@@ -2053,6 +2074,10 @@ export function AggregatedPositionsTable() {
           min-width: 85px;
         }
 
+        .metric.funding {
+          min-width: 85px;
+        }
+
         .metric .label {
           font-size: 0.75rem;
           color: #999;
@@ -2066,12 +2091,14 @@ export function AggregatedPositionsTable() {
         }
 
         .metric.pnl.profit .value,
-        .metric.upnl.profit .value {
+        .metric.upnl.profit .value,
+        .metric.funding.profit .value {
           color: #10b981;
         }
 
         .metric.pnl.loss .value,
-        .metric.upnl.loss .value {
+        .metric.upnl.loss .value,
+        .metric.funding.loss .value {
           color: #dc2626;
         }
 
