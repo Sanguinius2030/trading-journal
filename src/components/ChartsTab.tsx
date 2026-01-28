@@ -115,13 +115,15 @@ export function ChartsTab() {
   // Set for quick ATH index lookup (used in tooltip)
   const athIndexSet = useMemo(() => new Set(athPoints.map(p => p.index)), [athPoints]);
 
-  // Drawdown data
+  // Drawdown data (using same fee-adjusted PnL as equity curve for consistency)
   const drawdownData = useMemo(() => {
     let portfolioValue = STARTING_CAPITAL;
     let peak = STARTING_CAPITAL;
+    const feePerTrade = sortedPositions.length > 0 ? feesExpenses / sortedPositions.length : 0;
 
     return sortedPositions.map((p, i) => {
-      portfolioValue += p.pnl || 0;
+      const netPnl = (p.pnl || 0) - feePerTrade;
+      portfolioValue += netPnl;
       if (portfolioValue > peak) peak = portfolioValue;
       const drawdown = peak - portfolioValue;
       const drawdownPct = (drawdown / peak) * 100;
@@ -135,7 +137,7 @@ export function ChartsTab() {
         tradeNum: i + 1
       };
     });
-  }, [sortedPositions]);
+  }, [sortedPositions, feesExpenses]);
 
   // Rolling Win Rate (10-trade window)
   const rollingWinRate = useMemo(() => {
