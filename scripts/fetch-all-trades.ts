@@ -162,6 +162,7 @@ async function fetchFunding(
   accountApi: AccountApi,
   accountIndex: number,
   authToken: string,
+  marketIds: number[],
   newestExistingId: number = 0
 ): Promise<FundingPayment[]> {
   const allFunding: FundingPayment[] = [];
@@ -169,13 +170,10 @@ async function fetchFunding(
   const MAX_ITERATIONS = 100;
 
   console.log('\n--- Fetching Funding Payments ---');
+  console.log(`  Checking ${marketIds.length} markets for funding...`);
   if (newestExistingId > 0) {
-    console.log(`Looking for funding payments newer than ID ${newestExistingId}...`);
+    console.log(`  Looking for funding payments newer than ID ${newestExistingId}...`);
   }
-
-  // Get all market IDs we need to fetch funding for
-  // We'll fetch for markets 0 (ETH), 1 (BTC), and any others
-  const marketIds = [0, 1, 77]; // ETH, BTC, XMR - add more as needed
 
   for (const marketId of marketIds) {
     let cursor: string | undefined = undefined;
@@ -447,8 +445,11 @@ async function main() {
 
     console.log(`\nTotal liquidations after merge: ${uniqueLiquidations.length}`);
 
-    // Fetch funding payments
-    const newFunding = await fetchFunding(accountApi, ACCOUNT_INDEX, AUTH_TOKEN, newestExistingFundingId);
+    // Extract unique market IDs from all trades for funding fetch
+    const tradedMarketIds = Array.from(new Set(uniqueTrades.map(t => t.market_id))).sort((a, b) => a - b);
+
+    // Fetch funding payments for all markets we've traded on
+    const newFunding = await fetchFunding(accountApi, ACCOUNT_INDEX, AUTH_TOKEN, tradedMarketIds, newestExistingFundingId);
 
     // Merge funding
     const allFunding = [...existingFunding, ...newFunding];

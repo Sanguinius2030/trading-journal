@@ -197526,23 +197526,59 @@
           "fee": 0,
           "position_before": 6.544,
           "position_after": 6.561
+        },
+        {
+          "trade_id": 845258302,
+          "timestamp": 1769604666878,
+          "date_time": "28/01/2026 13:51:06",
+          "side": "SELL",
+          "size": 0.4,
+          "price": 52.087,
+          "usd_amount": 20.8348,
+          "fee": 0,
+          "position_before": 6.561,
+          "position_after": 6.161
+        },
+        {
+          "trade_id": 845258700,
+          "timestamp": 1769604674587,
+          "date_time": "28/01/2026 13:51:14",
+          "side": "BUY",
+          "size": 0.4,
+          "price": 52.152,
+          "usd_amount": 20.8608,
+          "fee": 0,
+          "position_before": 6.161,
+          "position_after": 6.561
+        },
+        {
+          "trade_id": 845258850,
+          "timestamp": 1769604679779,
+          "date_time": "28/01/2026 13:51:19",
+          "side": "BUY",
+          "size": 0.4,
+          "price": 52.206,
+          "usd_amount": 20.8824,
+          "fee": 0,
+          "position_before": 6.561,
+          "position_after": 6.961
         }
       ],
-      "max_position_size": 6.561,
-      "avg_entry_price": 52.83739170858091,
+      "max_position_size": 6.961,
+      "avg_entry_price": 52.76583711452239,
       "avg_exit_price": null,
       "total_entry_value": 265.485,
       "total_exit_value": 0,
       "total_fees": 0,
-      "total_funding": 0,
+      "total_funding": 0.183396,
       "pnl": null,
-      "realized_pnl": 0,
+      "realized_pnl": -0.08813884580895792,
       "position_type": "LONG",
       "is_closed": false
     }
   ],
   "summary": {
     "total_pnl": 682.8666430999563,
-    "total_funding": 9.185846
+    "total_funding": 9.369242
   }
 }
