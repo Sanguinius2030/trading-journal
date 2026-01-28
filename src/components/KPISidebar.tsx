@@ -185,11 +185,6 @@ export function KPISidebar() {
 
   const kpis = useMemo(() => calculateKPIs(positions), [positions]);
 
-  // Calculate total funding received/paid
-  const totalFunding = useMemo(() => {
-    return positions.reduce((sum, p) => sum + (p.total_funding || 0), 0);
-  }, [positions]);
-
   // Calculate portfolio metrics
   const portfolioMetrics = useMemo(() => {
     // Use margin_balance as it represents total account equity (balance + unrealized PnL already included)
@@ -405,7 +400,7 @@ export function KPISidebar() {
         </h3>
 
         <div className="kpi-cards">
-          {/* Total P&L (net of fees, including unrealized) */}
+          {/* Total P&L (net of fees, including unrealized and funding) */}
           {(() => {
             const netPnL = kpis.totalPnL + portfolioMetrics.unrealizedPnl - feesExpenses;
             return (
@@ -418,19 +413,11 @@ export function KPISidebar() {
                   <span className={`kpi-value ${netPnL >= 0 ? 'positive' : 'negative'}`}>
                     {formatCurrency(netPnL)}
                   </span>
-                  <span className="kpi-detail">
-                    {totalFunding !== 0 && (
-                      <span className={totalFunding >= 0 ? 'positive' : 'negative'}>
-                        {totalFunding >= 0 ? '+' : ''}${Math.round(totalFunding)} funding
-                      </span>
-                    )}
-                    {totalFunding !== 0 && feesExpenses > 0 && ' · '}
-                    {feesExpenses > 0 && (
-                      <span>-${formatWholeNumber(feesExpenses)} fees</span>
-                    )}
-                  </span>
+                  {feesExpenses > 0 && (
+                    <span className="kpi-detail">after ${formatWholeNumber(feesExpenses)} fees</span>
+                  )}
                 </div>
-                <div className="kpi-tooltip">Total profit/loss from all trades, including unrealized gains, funding payments, minus fees and expenses.</div>
+                <div className="kpi-tooltip">Total profit/loss including unrealized gains and funding payments, minus fees.</div>
               </div>
             );
           })()}
