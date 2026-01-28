@@ -490140,6 +490140,59 @@
       "maker_entry_quote_before": "1461.976140",
       "maker_initial_margin_fraction_before": 3333,
       "transaction_time": 1769604679810368
+    },
+    {
+      "trade_id": 845271768,
+      "tx_hash": "e8b04c466648aec38a37dbafb32457b021aec98cacabf4302ce766daf6f4edf4c36f98fefd85cdfd",
+      "type": "trade",
+      "market_id": 126,
+      "size": "3.481",
+      "price": "51.415",
+      "usd_amount": "178.975615",
+      "ask_id": 35747322058541960,
+      "bid_id": 36028797010186436,
+      "ask_client_id": 0,
+      "bid_client_id": 0,
+      "ask_account_id": 132275,
+      "bid_account_id": 281474976710654,
+      "is_maker_ask": false,
+      "block_height": 159567427,
+      "timestamp": 1769605005689,
+      "taker_position_size_before": "6.961",
+      "taker_entry_quote_before": "367.274370",
+      "taker_initial_margin_fraction_before": 3333,
+      "maker_fee": 20,
+      "maker_position_size_before": "-45.748",
+      "maker_entry_quote_before": "2390.767190",
+      "maker_initial_margin_fraction_before": 3333,
+      "transaction_time": 1769605005709765
+    },
+    {
+      "trade_id": 845272236,
+      "tx_hash": "197390b0b97e1bf75a232fbbb160728f597acd21045ab30da01e7729bf71d47f71602b45d403a2be",
+      "type": "trade",
+      "market_id": 126,
+      "size": "3.480",
+      "price": "51.151",
+      "usd_amount": "178.005480",
+      "ask_id": 35747322058542892,
+      "bid_id": 36028797010185376,
+      "ask_client_id": 0,
+      "bid_client_id": 0,
+      "ask_account_id": 132275,
+      "bid_account_id": 281474976710654,
+      "is_maker_ask": false,
+      "block_height": 159567540,
+      "timestamp": 1769605019282,
+      "taker_position_size_before": "3.480",
+      "taker_entry_quote_before": "183.610804",
+      "taker_initial_margin_fraction_before": 3333,
+      "taker_position_sign_changed": true,
+      "maker_fee": 20,
+      "maker_position_size_before": "3.365",
+      "maker_entry_quote_before": "172.072640",
+      "maker_initial_margin_fraction_before": 3333,
+      "transaction_time": 1769605019368334
     }
   ],
   "liquidations": [
@@ -495785,6 +495838,87 @@
   ],
   "funding": [
     {
+      "funding_id": 257148,
+      "market_id": 29,
+      "timestamp": 1758657600,
+      "change": "-0.011818",
+      "position_size": "1636.9",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258061,
+      "market_id": 29,
+      "timestamp": 1758697200,
+      "change": "0.014881",
+      "position_size": "1538.9",
+      "rate": "-0.000016",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258144,
+      "market_id": 29,
+      "timestamp": 1758700800,
+      "change": "0.013935",
+      "position_size": "1538.9",
+      "rate": "-0.000015",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258227,
+      "market_id": 29,
+      "timestamp": 1758704400,
+      "change": "0.053242",
+      "position_size": "1538.9",
+      "rate": "-0.000058",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258310,
+      "market_id": 29,
+      "timestamp": 1758708000,
+      "change": "0.072636",
+      "position_size": "1538.9",
+      "rate": "-0.000078",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258393,
+      "market_id": 29,
+      "timestamp": 1758711600,
+      "change": "0.055700",
+      "position_size": "1538.9",
+      "rate": "-0.000060",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258476,
+      "market_id": 29,
+      "timestamp": 1758715200,
+      "change": "0.057033",
+      "position_size": "1538.9",
+      "rate": "-0.000061",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258559,
+      "market_id": 29,
+      "timestamp": 1758718800,
+      "change": "0.050438",
+      "position_size": "1538.9",
+      "rate": "-0.000054",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 258642,
+      "market_id": 29,
+      "timestamp": 1758722400,
+      "change": "0.042643",
+      "position_size": "1538.9",
+      "rate": "-0.000046",
+      "position_side": "long"
+    },
+    {
       "funding_id": 259036,
       "market_id": 1,
       "timestamp": 1758740400,
@@ -495893,6 +496027,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 259994,
+      "market_id": 24,
+      "timestamp": 1758780000,
+      "change": "-0.039197",
+      "position_size": "11.55",
+      "rate": "0.000079",
+      "position_side": "long"
+    },
+    {
       "funding_id": 260056,
       "market_id": 1,
       "timestamp": 1758783600,
@@ -495902,6 +496045,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 260079,
+      "market_id": 24,
+      "timestamp": 1758783600,
+      "change": "-0.008831",
+      "position_size": "17.41",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 260141,
       "market_id": 1,
       "timestamp": 1758787200,
@@ -495909,6 +496061,15 @@
       "position_size": "0.03783",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 260164,
+      "market_id": 24,
+      "timestamp": 1758787200,
+      "change": "-0.035962",
+      "position_size": "17.41",
+      "rate": "0.000049",
+      "position_side": "long"
     },
     {
       "funding_id": 260226,
@@ -495947,11 +496108,137 @@
       "position_side": "short"
     },
     {
+      "funding_id": 260589,
+      "market_id": 24,
+      "timestamp": 1758805200,
+      "change": "-0.084098",
+      "position_size": "49.62",
+      "rate": "0.000041",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 260674,
+      "market_id": 24,
+      "timestamp": 1758808800,
+      "change": "-0.072528",
+      "position_size": "23.78",
+      "rate": "0.000073",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 260759,
+      "market_id": 24,
+      "timestamp": 1758812400,
+      "change": "-0.005937",
+      "position_size": "11.92",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 260844,
+      "market_id": 24,
+      "timestamp": 1758816000,
+      "change": "-0.024109",
+      "position_size": "24.10",
+      "rate": "0.000024",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 260929,
+      "market_id": 24,
+      "timestamp": 1758819600,
+      "change": "-0.076338",
+      "position_size": "36.11",
+      "rate": "0.000051",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 261014,
+      "market_id": 24,
+      "timestamp": 1758823200,
+      "change": "-0.037005",
+      "position_size": "73.55",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 263031,
       "market_id": 1,
       "timestamp": 1758909600,
       "change": "0.065968",
       "position_size": "0.05002",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 263124,
+      "market_id": 9,
+      "timestamp": 1758913200,
+      "change": "-0.023949",
+      "position_size": "102.76",
+      "rate": "-0.000008",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 263209,
+      "market_id": 9,
+      "timestamp": 1758916800,
+      "change": "0.000000",
+      "position_size": "69.02",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 263294,
+      "market_id": 9,
+      "timestamp": 1758920400,
+      "change": "0.012039",
+      "position_size": "34.93",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 263379,
+      "market_id": 9,
+      "timestamp": 1758924000,
+      "change": "0.004015",
+      "position_size": "17.47",
+      "rate": "0.000008",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 264523,
+      "market_id": 49,
+      "timestamp": 1758970800,
+      "change": "-0.006036",
+      "position_size": "291.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 264608,
+      "market_id": 49,
+      "timestamp": 1758974400,
+      "change": "-0.006016",
+      "position_size": "291.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 264693,
+      "market_id": 49,
+      "timestamp": 1758978000,
+      "change": "-0.006033",
+      "position_size": "291.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 266782,
+      "market_id": 9,
+      "timestamp": 1759068000,
+      "change": "0.012062",
+      "position_size": "34.77",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -496026,6 +496313,384 @@
       "position_size": "1.6309",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 269057,
+      "market_id": 49,
+      "timestamp": 1759161600,
+      "change": "-0.028228",
+      "position_size": "1379.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 271666,
+      "market_id": 49,
+      "timestamp": 1759269600,
+      "change": "0.026692",
+      "position_size": "1316.5",
+      "rate": "-0.000014",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 271753,
+      "market_id": 49,
+      "timestamp": 1759273200,
+      "change": "0.020746",
+      "position_size": "1316.5",
+      "rate": "-0.000011",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 271840,
+      "market_id": 49,
+      "timestamp": 1759276800,
+      "change": "0.049604",
+      "position_size": "1316.5",
+      "rate": "-0.000026",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 271927,
+      "market_id": 49,
+      "timestamp": 1759280400,
+      "change": "-0.005658",
+      "position_size": "1316.5",
+      "rate": "0.000003",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 272014,
+      "market_id": 49,
+      "timestamp": 1759284000,
+      "change": "-0.022710",
+      "position_size": "1316.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 272101,
+      "market_id": 49,
+      "timestamp": 1759287600,
+      "change": "-0.022335",
+      "position_size": "1316.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273145,
+      "market_id": 49,
+      "timestamp": 1759330800,
+      "change": "0.073554",
+      "position_size": "1061.2",
+      "rate": "-0.000048",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273232,
+      "market_id": 49,
+      "timestamp": 1759334400,
+      "change": "0.066065",
+      "position_size": "1061.2",
+      "rate": "-0.000042",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273319,
+      "market_id": 49,
+      "timestamp": 1759338000,
+      "change": "-0.007903",
+      "position_size": "1061.2",
+      "rate": "0.000005",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273406,
+      "market_id": 49,
+      "timestamp": 1759341600,
+      "change": "0.033186",
+      "position_size": "1061.2",
+      "rate": "-0.000021",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273493,
+      "market_id": 49,
+      "timestamp": 1759345200,
+      "change": "-0.001574",
+      "position_size": "1061.2",
+      "rate": "0.000001",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273580,
+      "market_id": 49,
+      "timestamp": 1759348800,
+      "change": "0.004686",
+      "position_size": "1061.2",
+      "rate": "-0.000003",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273667,
+      "market_id": 49,
+      "timestamp": 1759352400,
+      "change": "0.018813",
+      "position_size": "1061.2",
+      "rate": "-0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273754,
+      "market_id": 49,
+      "timestamp": 1759356000,
+      "change": "0.024843",
+      "position_size": "1061.2",
+      "rate": "-0.000016",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273841,
+      "market_id": 49,
+      "timestamp": 1759359600,
+      "change": "-0.019122",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 273928,
+      "market_id": 49,
+      "timestamp": 1759363200,
+      "change": "-0.019327",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274015,
+      "market_id": 49,
+      "timestamp": 1759366800,
+      "change": "-0.019618",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274102,
+      "market_id": 49,
+      "timestamp": 1759370400,
+      "change": "-0.020061",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274189,
+      "market_id": 49,
+      "timestamp": 1759374000,
+      "change": "-0.020506",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274276,
+      "market_id": 49,
+      "timestamp": 1759377600,
+      "change": "-0.021081",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274363,
+      "market_id": 49,
+      "timestamp": 1759381200,
+      "change": "-0.021267",
+      "position_size": "1061.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274450,
+      "market_id": 49,
+      "timestamp": 1759384800,
+      "change": "-0.010578",
+      "position_size": "520.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274537,
+      "market_id": 49,
+      "timestamp": 1759388400,
+      "change": "-0.010509",
+      "position_size": "520.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274624,
+      "market_id": 49,
+      "timestamp": 1759392000,
+      "change": "-0.010322",
+      "position_size": "520.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274711,
+      "market_id": 49,
+      "timestamp": 1759395600,
+      "change": "-0.005300",
+      "position_size": "270.4",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274798,
+      "market_id": 49,
+      "timestamp": 1759399200,
+      "change": "-0.005303",
+      "position_size": "270.4",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274885,
+      "market_id": 49,
+      "timestamp": 1759402800,
+      "change": "-0.004854",
+      "position_size": "244.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 274972,
+      "market_id": 49,
+      "timestamp": 1759406400,
+      "change": "-0.004921",
+      "position_size": "244.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 275059,
+      "market_id": 49,
+      "timestamp": 1759410000,
+      "change": "-0.004904",
+      "position_size": "244.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 275146,
+      "market_id": 49,
+      "timestamp": 1759413600,
+      "change": "-0.004984",
+      "position_size": "244.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 276633,
+      "market_id": 29,
+      "timestamp": 1759474800,
+      "change": "0.036993",
+      "position_size": "1635.1",
+      "rate": "-0.000037",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 276722,
+      "market_id": 29,
+      "timestamp": 1759478400,
+      "change": "0.071674",
+      "position_size": "1635.1",
+      "rate": "-0.000072",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 276811,
+      "market_id": 29,
+      "timestamp": 1759482000,
+      "change": "0.127491",
+      "position_size": "2461.5",
+      "rate": "-0.000085",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 276900,
+      "market_id": 29,
+      "timestamp": 1759485600,
+      "change": "0.075530",
+      "position_size": "2461.5",
+      "rate": "-0.000050",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 276989,
+      "market_id": 29,
+      "timestamp": 1759489200,
+      "change": "-0.018118",
+      "position_size": "2461.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277079,
+      "market_id": 29,
+      "timestamp": 1759492800,
+      "change": "-0.018037",
+      "position_size": "2461.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277169,
+      "market_id": 29,
+      "timestamp": 1759496400,
+      "change": "-0.018061",
+      "position_size": "2461.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277259,
+      "market_id": 29,
+      "timestamp": 1759500000,
+      "change": "-0.018079",
+      "position_size": "2461.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277349,
+      "market_id": 29,
+      "timestamp": 1759503600,
+      "change": "-0.021007",
+      "position_size": "2865.4",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277439,
+      "market_id": 29,
+      "timestamp": 1759507200,
+      "change": "-0.021488",
+      "position_size": "2865.4",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 277529,
+      "market_id": 29,
+      "timestamp": 1759510800,
+      "change": "-0.017646",
+      "position_size": "2362.1",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 277952,
@@ -496784,11 +497449,29 @@
       "position_side": "long"
     },
     {
+      "funding_id": 292302,
+      "market_id": 83,
+      "timestamp": 1760097600,
+      "change": "-0.002404",
+      "position_size": "121.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 292312,
       "market_id": 1,
       "timestamp": 1760101200,
       "change": "-0.240985",
       "position_size": "0.16515",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 292393,
+      "market_id": 83,
+      "timestamp": 1760101200,
+      "change": "-0.005918",
+      "position_size": "304.8",
       "rate": "0.000012",
       "position_side": "long"
     },
@@ -496799,6 +497482,24 @@
       "change": "-0.119507",
       "position_size": "0.08184",
       "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 292404,
+      "market_id": 2,
+      "timestamp": 1760104800,
+      "change": "-0.018042",
+      "position_size": "6.728",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 292484,
+      "market_id": 83,
+      "timestamp": 1760104800,
+      "change": "-0.027044",
+      "position_size": "305.0",
+      "rate": "0.000055",
       "position_side": "long"
     },
     {
@@ -497531,6 +498232,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 305810,
+      "market_id": 32,
+      "timestamp": 1760637600,
+      "change": "0.027431",
+      "position_size": "10971.5",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 305870,
       "market_id": 0,
       "timestamp": 1760641200,
@@ -497555,6 +498265,15 @@
       "change": "0.023240",
       "position_size": "0.5029",
       "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 306083,
+      "market_id": 32,
+      "timestamp": 1760648400,
+      "change": "-0.080423",
+      "position_size": "26328.5",
+      "rate": "-0.000015",
       "position_side": "short"
     },
     {
@@ -497639,11 +498358,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 306902,
+      "market_id": 32,
+      "timestamp": 1760680800,
+      "change": "0.005633",
+      "position_size": "5558.7",
+      "rate": "0.000005",
+      "position_side": "short"
+    },
+    {
       "funding_id": 306962,
       "market_id": 0,
       "timestamp": 1760684400,
       "change": "0.023050",
       "position_size": "0.5029",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 306993,
+      "market_id": 32,
+      "timestamp": 1760684400,
+      "change": "0.012978",
+      "position_size": "5558.7",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -497657,12 +498394,363 @@
       "position_side": "short"
     },
     {
+      "funding_id": 307084,
+      "market_id": 32,
+      "timestamp": 1760688000,
+      "change": "0.005921",
+      "position_size": "2612.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 307144,
       "market_id": 0,
       "timestamp": 1760691600,
       "change": "0.012089",
       "position_size": "0.2716",
       "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 311792,
+      "market_id": 7,
+      "timestamp": 1760875200,
+      "change": "-0.001306",
+      "position_size": "550",
+      "rate": "-0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 311883,
+      "market_id": 7,
+      "timestamp": 1760878800,
+      "change": "0.006521",
+      "position_size": "550",
+      "rate": "0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 311974,
+      "market_id": 7,
+      "timestamp": 1760882400,
+      "change": "0.007931",
+      "position_size": "550",
+      "rate": "0.000006",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312065,
+      "market_id": 7,
+      "timestamp": 1760886000,
+      "change": "0.012164",
+      "position_size": "720",
+      "rate": "0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312156,
+      "market_id": 7,
+      "timestamp": 1760889600,
+      "change": "0.012105",
+      "position_size": "720",
+      "rate": "0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312247,
+      "market_id": 7,
+      "timestamp": 1760893200,
+      "change": "-0.008641",
+      "position_size": "720",
+      "rate": "-0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312338,
+      "market_id": 7,
+      "timestamp": 1760896800,
+      "change": "-0.024166",
+      "position_size": "720",
+      "rate": "-0.000014",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312429,
+      "market_id": 7,
+      "timestamp": 1760900400,
+      "change": "-0.036435",
+      "position_size": "720",
+      "rate": "-0.000021",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312520,
+      "market_id": 7,
+      "timestamp": 1760904000,
+      "change": "-0.036290",
+      "position_size": "720",
+      "rate": "-0.000021",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312611,
+      "market_id": 7,
+      "timestamp": 1760907600,
+      "change": "-0.043327",
+      "position_size": "720",
+      "rate": "-0.000025",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312702,
+      "market_id": 7,
+      "timestamp": 1760911200,
+      "change": "-0.024165",
+      "position_size": "720",
+      "rate": "-0.000014",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312793,
+      "market_id": 7,
+      "timestamp": 1760914800,
+      "change": "-0.031144",
+      "position_size": "720",
+      "rate": "-0.000018",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312884,
+      "market_id": 7,
+      "timestamp": 1760918400,
+      "change": "-0.037881",
+      "position_size": "720",
+      "rate": "-0.000022",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 312975,
+      "market_id": 7,
+      "timestamp": 1760922000,
+      "change": "-0.013714",
+      "position_size": "720",
+      "rate": "-0.000008",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313066,
+      "market_id": 7,
+      "timestamp": 1760925600,
+      "change": "-0.008543",
+      "position_size": "720",
+      "rate": "-0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313157,
+      "market_id": 7,
+      "timestamp": 1760929200,
+      "change": "-0.006874",
+      "position_size": "720",
+      "rate": "-0.000004",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313248,
+      "market_id": 7,
+      "timestamp": 1760932800,
+      "change": "0.028383",
+      "position_size": "1060",
+      "rate": "0.000011",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313339,
+      "market_id": 7,
+      "timestamp": 1760936400,
+      "change": "0.036116",
+      "position_size": "1230",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313430,
+      "market_id": 7,
+      "timestamp": 1760940000,
+      "change": "0.036268",
+      "position_size": "1230",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313521,
+      "market_id": 7,
+      "timestamp": 1760943600,
+      "change": "0.038765",
+      "position_size": "1570",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313612,
+      "market_id": 7,
+      "timestamp": 1760947200,
+      "change": "0.031036",
+      "position_size": "1570",
+      "rate": "0.000008",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313703,
+      "market_id": 7,
+      "timestamp": 1760950800,
+      "change": "0.046586",
+      "position_size": "1570",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313794,
+      "market_id": 7,
+      "timestamp": 1760954400,
+      "change": "-0.046613",
+      "position_size": "1570",
+      "rate": "-0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313885,
+      "market_id": 7,
+      "timestamp": 1760958000,
+      "change": "-0.050347",
+      "position_size": "1570",
+      "rate": "-0.000013",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 313976,
+      "market_id": 7,
+      "timestamp": 1760961600,
+      "change": "-0.027014",
+      "position_size": "1570",
+      "rate": "-0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314067,
+      "market_id": 7,
+      "timestamp": 1760965200,
+      "change": "-0.038522",
+      "position_size": "1570",
+      "rate": "-0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314158,
+      "market_id": 7,
+      "timestamp": 1760968800,
+      "change": "0.034772",
+      "position_size": "1570",
+      "rate": "0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314249,
+      "market_id": 7,
+      "timestamp": 1760972400,
+      "change": "0.046552",
+      "position_size": "1570",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314435,
+      "market_id": 7,
+      "timestamp": 1760979600,
+      "change": "0.013558",
+      "position_size": "616",
+      "rate": "0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314528,
+      "market_id": 7,
+      "timestamp": 1760983200,
+      "change": "0.018186",
+      "position_size": "616",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 314621,
+      "market_id": 7,
+      "timestamp": 1760986800,
+      "change": "0.018298",
+      "position_size": "616",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 315923,
+      "market_id": 7,
+      "timestamp": 1761037200,
+      "change": "-0.042813",
+      "position_size": "934",
+      "rate": "-0.000019",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 315932,
+      "market_id": 16,
+      "timestamp": 1761037200,
+      "change": "-0.019778",
+      "position_size": "468.6",
+      "rate": "-0.000017",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 316016,
+      "market_id": 7,
+      "timestamp": 1761040800,
+      "change": "-0.022504",
+      "position_size": "934",
+      "rate": "-0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 316025,
+      "market_id": 16,
+      "timestamp": 1761040800,
+      "change": "-0.064683",
+      "position_size": "840.5",
+      "rate": "-0.000031",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 316290,
+      "market_id": 2,
+      "timestamp": 1761051600,
+      "change": "-0.002794",
+      "position_size": "14.985",
+      "rate": "-0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 316304,
+      "market_id": 16,
+      "timestamp": 1761051600,
+      "change": "-0.063281",
+      "position_size": "1051.6",
+      "rate": "-0.000024",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 316383,
+      "market_id": 2,
+      "timestamp": 1761055200,
+      "change": "-0.094332",
+      "position_size": "14.985",
+      "rate": "-0.000034",
       "position_side": "short"
     },
     {
@@ -498104,6 +499192,285 @@
       "change": "-0.082194",
       "position_size": "0.7951",
       "rate": "-0.000027",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 322931,
+      "market_id": 2,
+      "timestamp": 1761307200,
+      "change": "0.015040",
+      "position_size": "13.046",
+      "rate": "0.000006",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 322945,
+      "market_id": 16,
+      "timestamp": 1761307200,
+      "change": "0.021168",
+      "position_size": "710.9",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323030,
+      "market_id": 7,
+      "timestamp": 1761310800,
+      "change": "0.009775",
+      "position_size": "788",
+      "rate": "0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323039,
+      "market_id": 16,
+      "timestamp": 1761310800,
+      "change": "0.015447",
+      "position_size": "514.4",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323133,
+      "market_id": 16,
+      "timestamp": 1761314400,
+      "change": "0.030084",
+      "position_size": "1003.2",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323227,
+      "market_id": 16,
+      "timestamp": 1761318000,
+      "change": "0.022133",
+      "position_size": "750.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323321,
+      "market_id": 16,
+      "timestamp": 1761321600,
+      "change": "0.022219",
+      "position_size": "750.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323415,
+      "market_id": 16,
+      "timestamp": 1761325200,
+      "change": "0.022163",
+      "position_size": "750.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 323510,
+      "market_id": 16,
+      "timestamp": 1761328800,
+      "change": "0.022274",
+      "position_size": "750.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 324840,
+      "market_id": 16,
+      "timestamp": 1761379200,
+      "change": "0.026010",
+      "position_size": "869.1",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 324935,
+      "market_id": 16,
+      "timestamp": 1761382800,
+      "change": "-0.002172",
+      "position_size": "869.1",
+      "rate": "-0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325030,
+      "market_id": 16,
+      "timestamp": 1761386400,
+      "change": "-0.004312",
+      "position_size": "869.1",
+      "rate": "-0.000002",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325125,
+      "market_id": 16,
+      "timestamp": 1761390000,
+      "change": "-0.008589",
+      "position_size": "869.1",
+      "rate": "-0.000004",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325220,
+      "market_id": 16,
+      "timestamp": 1761393600,
+      "change": "-0.069103",
+      "position_size": "869.1",
+      "rate": "-0.000032",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325695,
+      "market_id": 16,
+      "timestamp": 1761411600,
+      "change": "-0.023150",
+      "position_size": "1020.0",
+      "rate": "-0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325790,
+      "market_id": 16,
+      "timestamp": 1761415200,
+      "change": "-0.018063",
+      "position_size": "1020.0",
+      "rate": "-0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325885,
+      "market_id": 16,
+      "timestamp": 1761418800,
+      "change": "0.010429",
+      "position_size": "1020.0",
+      "rate": "0.000004",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 325980,
+      "market_id": 16,
+      "timestamp": 1761422400,
+      "change": "0.018220",
+      "position_size": "1020.0",
+      "rate": "0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326075,
+      "market_id": 16,
+      "timestamp": 1761426000,
+      "change": "0.018155",
+      "position_size": "1020.0",
+      "rate": "0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326170,
+      "market_id": 16,
+      "timestamp": 1761429600,
+      "change": "0.012935",
+      "position_size": "1020.0",
+      "rate": "0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326265,
+      "market_id": 16,
+      "timestamp": 1761433200,
+      "change": "0.031133",
+      "position_size": "1020.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326360,
+      "market_id": 16,
+      "timestamp": 1761436800,
+      "change": "0.000000",
+      "position_size": "1020.0",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326455,
+      "market_id": 16,
+      "timestamp": 1761440400,
+      "change": "-0.002577",
+      "position_size": "1020.0",
+      "rate": "-0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326550,
+      "market_id": 16,
+      "timestamp": 1761444000,
+      "change": "-0.025588",
+      "position_size": "1020.0",
+      "rate": "-0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326645,
+      "market_id": 16,
+      "timestamp": 1761447600,
+      "change": "-0.010213",
+      "position_size": "1020.0",
+      "rate": "-0.000004",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326740,
+      "market_id": 16,
+      "timestamp": 1761451200,
+      "change": "-0.043498",
+      "position_size": "1020.0",
+      "rate": "-0.000017",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326835,
+      "market_id": 16,
+      "timestamp": 1761454800,
+      "change": "-0.007727",
+      "position_size": "1020.0",
+      "rate": "-0.000003",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 326930,
+      "market_id": 16,
+      "timestamp": 1761458400,
+      "change": "-0.002586",
+      "position_size": "1020.0",
+      "rate": "-0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 327025,
+      "market_id": 16,
+      "timestamp": 1761462000,
+      "change": "0.020642",
+      "position_size": "1020.0",
+      "rate": "0.000008",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 327120,
+      "market_id": 16,
+      "timestamp": 1761465600,
+      "change": "0.025876",
+      "position_size": "1020.0",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 327215,
+      "market_id": 16,
+      "timestamp": 1761469200,
+      "change": "0.007788",
+      "position_size": "1020.0",
+      "rate": "0.000003",
       "position_side": "short"
     },
     {
@@ -498737,6 +500104,33 @@
       "position_side": "short"
     },
     {
+      "funding_id": 336534,
+      "market_id": 25,
+      "timestamp": 1761825600,
+      "change": "0.014677",
+      "position_size": "1.10",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 338456,
+      "market_id": 7,
+      "timestamp": 1761897600,
+      "change": "0.011969",
+      "position_size": "403",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 338654,
+      "market_id": 7,
+      "timestamp": 1761904800,
+      "change": "0.086998",
+      "position_size": "2916",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 338746,
       "market_id": 0,
       "timestamp": 1761908400,
@@ -498771,6 +500165,294 @@
       "position_size": "3.3024",
       "rate": "0.000008",
       "position_side": "short"
+    },
+    {
+      "funding_id": 339470,
+      "market_id": 32,
+      "timestamp": 1761933600,
+      "change": "0.017038",
+      "position_size": "8965.4",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 339562,
+      "market_id": 24,
+      "timestamp": 1761937200,
+      "change": "-0.047312",
+      "position_size": "92.05",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 339661,
+      "market_id": 24,
+      "timestamp": 1761940800,
+      "change": "-0.020837",
+      "position_size": "40.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 339760,
+      "market_id": 24,
+      "timestamp": 1761944400,
+      "change": "-0.020805",
+      "position_size": "40.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 339859,
+      "market_id": 24,
+      "timestamp": 1761948000,
+      "change": "-0.021084",
+      "position_size": "40.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 339958,
+      "market_id": 24,
+      "timestamp": 1761951600,
+      "change": "-0.012085",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340057,
+      "market_id": 24,
+      "timestamp": 1761955200,
+      "change": "-0.017026",
+      "position_size": "22.94",
+      "rate": "0.000017",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340156,
+      "market_id": 24,
+      "timestamp": 1761958800,
+      "change": "-0.012146",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340255,
+      "market_id": 24,
+      "timestamp": 1761962400,
+      "change": "-0.011866",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340354,
+      "market_id": 24,
+      "timestamp": 1761966000,
+      "change": "-0.012006",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340453,
+      "market_id": 24,
+      "timestamp": 1761969600,
+      "change": "-0.033437",
+      "position_size": "22.94",
+      "rate": "0.000033",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340552,
+      "market_id": 24,
+      "timestamp": 1761973200,
+      "change": "-0.012181",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340651,
+      "market_id": 24,
+      "timestamp": 1761976800,
+      "change": "-0.012089",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340750,
+      "market_id": 24,
+      "timestamp": 1761980400,
+      "change": "-0.011987",
+      "position_size": "22.94",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340849,
+      "market_id": 24,
+      "timestamp": 1761984000,
+      "change": "-0.025110",
+      "position_size": "22.94",
+      "rate": "0.000025",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 340948,
+      "market_id": 24,
+      "timestamp": 1761987600,
+      "change": "-0.010528",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341047,
+      "market_id": 24,
+      "timestamp": 1761991200,
+      "change": "-0.010351",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341146,
+      "market_id": 24,
+      "timestamp": 1761994800,
+      "change": "-0.013948",
+      "position_size": "20.00",
+      "rate": "0.000016",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341245,
+      "market_id": 24,
+      "timestamp": 1761998400,
+      "change": "-0.010482",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341344,
+      "market_id": 24,
+      "timestamp": 1762002000,
+      "change": "-0.010413",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341443,
+      "market_id": 24,
+      "timestamp": 1762005600,
+      "change": "-0.010465",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341542,
+      "market_id": 24,
+      "timestamp": 1762009200,
+      "change": "-0.005146",
+      "position_size": "10.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341641,
+      "market_id": 24,
+      "timestamp": 1762012800,
+      "change": "-0.010399",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341740,
+      "market_id": 24,
+      "timestamp": 1762016400,
+      "change": "-0.010519",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341839,
+      "market_id": 24,
+      "timestamp": 1762020000,
+      "change": "-0.010504",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 341938,
+      "market_id": 24,
+      "timestamp": 1762023600,
+      "change": "-0.010560",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 342037,
+      "market_id": 24,
+      "timestamp": 1762027200,
+      "change": "-0.010444",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 342136,
+      "market_id": 24,
+      "timestamp": 1762030800,
+      "change": "-0.010449",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 342235,
+      "market_id": 24,
+      "timestamp": 1762034400,
+      "change": "-0.010290",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 342334,
+      "market_id": 24,
+      "timestamp": 1762038000,
+      "change": "-0.010382",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 342433,
+      "market_id": 24,
+      "timestamp": 1762041600,
+      "change": "-0.010384",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 343408,
+      "market_id": 9,
+      "timestamp": 1762077600,
+      "change": "0.010384",
+      "position_size": "55.35",
+      "rate": "-0.000010",
+      "position_side": "long"
     },
     {
       "funding_id": 346370,
@@ -498827,6 +500509,105 @@
       "position_side": "long"
     },
     {
+      "funding_id": 346938,
+      "market_id": 71,
+      "timestamp": 1762203600,
+      "change": "-0.024517",
+      "position_size": "7343.8",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 347038,
+      "market_id": 71,
+      "timestamp": 1762207200,
+      "change": "-0.024365",
+      "position_size": "7304.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 347938,
+      "market_id": 71,
+      "timestamp": 1762239600,
+      "change": "-0.006107",
+      "position_size": "2000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 348038,
+      "market_id": 71,
+      "timestamp": 1762243200,
+      "change": "-0.006086",
+      "position_size": "2000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 348138,
+      "market_id": 71,
+      "timestamp": 1762246800,
+      "change": "-0.025270",
+      "position_size": "8000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 348238,
+      "market_id": 71,
+      "timestamp": 1762250400,
+      "change": "-0.023820",
+      "position_size": "7626.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 348338,
+      "market_id": 71,
+      "timestamp": 1762254000,
+      "change": "-0.045907",
+      "position_size": "7626.1",
+      "rate": "0.000023",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 348538,
+      "market_id": 71,
+      "timestamp": 1762261200,
+      "change": "0.015370",
+      "position_size": "5000.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 349090,
+      "market_id": 21,
+      "timestamp": 1762282800,
+      "change": "-0.024067",
+      "position_size": "8000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 349190,
+      "market_id": 21,
+      "timestamp": 1762286400,
+      "change": "-0.012052",
+      "position_size": "4000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 349289,
+      "market_id": 21,
+      "timestamp": 1762290000,
+      "change": "-0.012161",
+      "position_size": "4000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 349368,
       "market_id": 1,
       "timestamp": 1762293600,
@@ -498861,6 +500642,150 @@
       "position_size": "0.5000",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 365782,
+      "market_id": 71,
+      "timestamp": 1762880400,
+      "change": "-0.010233",
+      "position_size": "3000.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367414,
+      "market_id": 71,
+      "timestamp": 1762938000,
+      "change": "-0.005988",
+      "position_size": "1866.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367516,
+      "market_id": 71,
+      "timestamp": 1762941600,
+      "change": "-0.007233",
+      "position_size": "2248.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367618,
+      "market_id": 71,
+      "timestamp": 1762945200,
+      "change": "-0.007378",
+      "position_size": "2248.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367720,
+      "market_id": 71,
+      "timestamp": 1762948800,
+      "change": "-0.007335",
+      "position_size": "2248.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367822,
+      "market_id": 71,
+      "timestamp": 1762952400,
+      "change": "-0.007252",
+      "position_size": "2248.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 367924,
+      "market_id": 71,
+      "timestamp": 1762956000,
+      "change": "-0.007300",
+      "position_size": "2248.2",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368026,
+      "market_id": 71,
+      "timestamp": 1762959600,
+      "change": "-0.014994",
+      "position_size": "4729.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368128,
+      "market_id": 71,
+      "timestamp": 1762963200,
+      "change": "-0.011907",
+      "position_size": "3816.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368230,
+      "market_id": 71,
+      "timestamp": 1762966800,
+      "change": "-0.005968",
+      "position_size": "1959.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368332,
+      "market_id": 71,
+      "timestamp": 1762970400,
+      "change": "-0.018208",
+      "position_size": "5916.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368434,
+      "market_id": 71,
+      "timestamp": 1762974000,
+      "change": "-0.018268",
+      "position_size": "5916.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368536,
+      "market_id": 71,
+      "timestamp": 1762977600,
+      "change": "-0.018621",
+      "position_size": "5916.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368638,
+      "market_id": 71,
+      "timestamp": 1762981200,
+      "change": "-0.012821",
+      "position_size": "4022.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368740,
+      "market_id": 71,
+      "timestamp": 1762984800,
+      "change": "-0.012637",
+      "position_size": "4022.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 368842,
+      "market_id": 71,
+      "timestamp": 1762988400,
+      "change": "-0.012581",
+      "position_size": "4022.1",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 370815,
@@ -498953,6 +500878,420 @@
       "position_side": "long"
     },
     {
+      "funding_id": 372616,
+      "market_id": 71,
+      "timestamp": 1763121600,
+      "change": "-0.006024",
+      "position_size": "2170.8",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 372718,
+      "market_id": 71,
+      "timestamp": 1763125200,
+      "change": "-0.010247",
+      "position_size": "3733.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 372820,
+      "market_id": 71,
+      "timestamp": 1763128800,
+      "change": "-0.010288",
+      "position_size": "3733.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 372922,
+      "market_id": 71,
+      "timestamp": 1763132400,
+      "change": "-0.010338",
+      "position_size": "3733.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373024,
+      "market_id": 71,
+      "timestamp": 1763136000,
+      "change": "-0.010373",
+      "position_size": "3733.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373126,
+      "market_id": 71,
+      "timestamp": 1763139600,
+      "change": "-0.005335",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373228,
+      "market_id": 71,
+      "timestamp": 1763143200,
+      "change": "-0.005220",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373330,
+      "market_id": 71,
+      "timestamp": 1763146800,
+      "change": "-0.005276",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373432,
+      "market_id": 71,
+      "timestamp": 1763150400,
+      "change": "-0.005370",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373534,
+      "market_id": 71,
+      "timestamp": 1763154000,
+      "change": "-0.005268",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373636,
+      "market_id": 71,
+      "timestamp": 1763157600,
+      "change": "-0.005354",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373738,
+      "market_id": 71,
+      "timestamp": 1763161200,
+      "change": "-0.005295",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373840,
+      "market_id": 71,
+      "timestamp": 1763164800,
+      "change": "-0.005274",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 373942,
+      "market_id": 71,
+      "timestamp": 1763168400,
+      "change": "-0.005297",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 374044,
+      "market_id": 71,
+      "timestamp": 1763172000,
+      "change": "-0.005361",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 374146,
+      "market_id": 71,
+      "timestamp": 1763175600,
+      "change": "-0.005377",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 374248,
+      "market_id": 71,
+      "timestamp": 1763179200,
+      "change": "-0.005316",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 374350,
+      "market_id": 71,
+      "timestamp": 1763182800,
+      "change": "-0.005301",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 374452,
+      "market_id": 71,
+      "timestamp": 1763186400,
+      "change": "-0.005400",
+      "position_size": "1904.0",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378022,
+      "market_id": 71,
+      "timestamp": 1763312400,
+      "change": "-0.001757",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378124,
+      "market_id": 71,
+      "timestamp": 1763316000,
+      "change": "-0.001764",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378226,
+      "market_id": 71,
+      "timestamp": 1763319600,
+      "change": "-0.001757",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378328,
+      "market_id": 71,
+      "timestamp": 1763323200,
+      "change": "-0.001776",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378430,
+      "market_id": 71,
+      "timestamp": 1763326800,
+      "change": "-0.001770",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378532,
+      "market_id": 71,
+      "timestamp": 1763330400,
+      "change": "-0.001758",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378634,
+      "market_id": 71,
+      "timestamp": 1763334000,
+      "change": "-0.001800",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378736,
+      "market_id": 71,
+      "timestamp": 1763337600,
+      "change": "-0.001851",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378838,
+      "market_id": 71,
+      "timestamp": 1763341200,
+      "change": "-0.001833",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 378940,
+      "market_id": 71,
+      "timestamp": 1763344800,
+      "change": "-0.001823",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379042,
+      "market_id": 71,
+      "timestamp": 1763348400,
+      "change": "-0.001813",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379144,
+      "market_id": 71,
+      "timestamp": 1763352000,
+      "change": "-0.001842",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379246,
+      "market_id": 71,
+      "timestamp": 1763355600,
+      "change": "-0.001825",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379348,
+      "market_id": 71,
+      "timestamp": 1763359200,
+      "change": "-0.001825",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379450,
+      "market_id": 71,
+      "timestamp": 1763362800,
+      "change": "-0.001822",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379552,
+      "market_id": 71,
+      "timestamp": 1763366400,
+      "change": "-0.001818",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379654,
+      "market_id": 71,
+      "timestamp": 1763370000,
+      "change": "-0.001813",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379756,
+      "market_id": 71,
+      "timestamp": 1763373600,
+      "change": "-0.001843",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379858,
+      "market_id": 71,
+      "timestamp": 1763377200,
+      "change": "-0.001865",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 379960,
+      "market_id": 71,
+      "timestamp": 1763380800,
+      "change": "-0.001875",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380062,
+      "market_id": 71,
+      "timestamp": 1763384400,
+      "change": "-0.001878",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380164,
+      "market_id": 71,
+      "timestamp": 1763388000,
+      "change": "-0.001781",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380266,
+      "market_id": 71,
+      "timestamp": 1763391600,
+      "change": "-0.001852",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380368,
+      "market_id": 71,
+      "timestamp": 1763395200,
+      "change": "-0.001795",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380470,
+      "market_id": 71,
+      "timestamp": 1763398800,
+      "change": "-0.001863",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 380572,
+      "market_id": 71,
+      "timestamp": 1763402400,
+      "change": "-0.001811",
+      "position_size": "669.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 385366,
+      "market_id": 71,
+      "timestamp": 1763571600,
+      "change": "-0.013524",
+      "position_size": "4909.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 385401,
       "market_id": 1,
       "timestamp": 1763575200,
@@ -499005,6 +501344,114 @@
       "position_size": "0.08270",
       "rate": "0.000010",
       "position_side": "long"
+    },
+    {
+      "funding_id": 387767,
+      "market_id": 21,
+      "timestamp": 1763658000,
+      "change": "-0.001547",
+      "position_size": "486.1",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 387869,
+      "market_id": 21,
+      "timestamp": 1763661600,
+      "change": "-0.007521",
+      "position_size": "2393.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388079,
+      "market_id": 21,
+      "timestamp": 1763668800,
+      "change": "-0.020047",
+      "position_size": "1896.6",
+      "rate": "0.000038",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388184,
+      "market_id": 21,
+      "timestamp": 1763672400,
+      "change": "-0.020233",
+      "position_size": "1896.6",
+      "rate": "0.000039",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388289,
+      "market_id": 21,
+      "timestamp": 1763676000,
+      "change": "-0.034318",
+      "position_size": "1896.6",
+      "rate": "0.000065",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388394,
+      "market_id": 21,
+      "timestamp": 1763679600,
+      "change": "-0.006502",
+      "position_size": "1896.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388499,
+      "market_id": 21,
+      "timestamp": 1763683200,
+      "change": "-0.006109",
+      "position_size": "1896.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388604,
+      "market_id": 21,
+      "timestamp": 1763686800,
+      "change": "-0.006418",
+      "position_size": "1896.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388709,
+      "market_id": 21,
+      "timestamp": 1763690400,
+      "change": "-0.006266",
+      "position_size": "1896.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388814,
+      "market_id": 21,
+      "timestamp": 1763694000,
+      "change": "-0.006062",
+      "position_size": "1896.6",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 388919,
+      "market_id": 21,
+      "timestamp": 1763697600,
+      "change": "-0.015614",
+      "position_size": "1896.6",
+      "rate": "0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 408092,
+      "market_id": 7,
+      "timestamp": 1764345600,
+      "change": "0.000000",
+      "position_size": "443",
+      "rate": "0.000000",
+      "position_side": "short"
     },
     {
       "funding_id": 408545,
@@ -499673,6 +502120,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 430578,
+      "market_id": 71,
+      "timestamp": 1765047600,
+      "change": "-0.012445",
+      "position_size": "5913.8",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 430625,
       "market_id": 0,
       "timestamp": 1765051200,
@@ -499680,6 +502136,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 430693,
+      "market_id": 71,
+      "timestamp": 1765051200,
+      "change": "-0.024427",
+      "position_size": "11646.7",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 430740,
@@ -499691,6 +502156,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 430808,
+      "market_id": 71,
+      "timestamp": 1765054800,
+      "change": "-0.024505",
+      "position_size": "11646.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 430855,
       "market_id": 0,
       "timestamp": 1765058400,
@@ -499698,6 +502172,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 430923,
+      "market_id": 71,
+      "timestamp": 1765058400,
+      "change": "-0.024596",
+      "position_size": "11646.7",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 430970,
@@ -499709,6 +502192,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 431038,
+      "market_id": 71,
+      "timestamp": 1765062000,
+      "change": "-0.024622",
+      "position_size": "11646.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 431085,
       "market_id": 0,
       "timestamp": 1765065600,
@@ -499716,6 +502208,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 431153,
+      "market_id": 71,
+      "timestamp": 1765065600,
+      "change": "-0.012384",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 431200,
@@ -499727,6 +502228,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 431268,
+      "market_id": 71,
+      "timestamp": 1765069200,
+      "change": "-0.012409",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 431315,
       "market_id": 0,
       "timestamp": 1765072800,
@@ -499734,6 +502244,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 431383,
+      "market_id": 71,
+      "timestamp": 1765072800,
+      "change": "-0.012332",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 431430,
@@ -499745,6 +502264,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 431498,
+      "market_id": 71,
+      "timestamp": 1765076400,
+      "change": "-0.012409",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 431545,
       "market_id": 0,
       "timestamp": 1765080000,
@@ -499752,6 +502280,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 431613,
+      "market_id": 71,
+      "timestamp": 1765080000,
+      "change": "-0.012388",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 431660,
@@ -499763,6 +502300,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 431728,
+      "market_id": 71,
+      "timestamp": 1765083600,
+      "change": "-0.012371",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 431775,
       "market_id": 0,
       "timestamp": 1765087200,
@@ -499770,6 +502316,15 @@
       "position_size": "0.2515",
       "rate": "0.000011",
       "position_side": "short"
+    },
+    {
+      "funding_id": 431843,
+      "market_id": 71,
+      "timestamp": 1765087200,
+      "change": "-0.012394",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 431890,
@@ -499781,6 +502336,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 431958,
+      "market_id": 71,
+      "timestamp": 1765090800,
+      "change": "-0.012562",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 432005,
       "market_id": 0,
       "timestamp": 1765094400,
@@ -499790,6 +502354,15 @@
       "position_side": "short"
     },
     {
+      "funding_id": 432073,
+      "market_id": 71,
+      "timestamp": 1765094400,
+      "change": "-0.012432",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 432120,
       "market_id": 0,
       "timestamp": 1765098000,
@@ -499797,6 +502370,15 @@
       "position_size": "0.2515",
       "rate": "0.000012",
       "position_side": "short"
+    },
+    {
+      "funding_id": 432188,
+      "market_id": 71,
+      "timestamp": 1765098000,
+      "change": "-0.012276",
+      "position_size": "5823.3",
+      "rate": "0.000012",
+      "position_side": "long"
     },
     {
       "funding_id": 432235,
@@ -499970,6 +502552,465 @@
       "position_side": "short"
     },
     {
+      "funding_id": 465490,
+      "market_id": 7,
+      "timestamp": 1766131200,
+      "change": "-0.003012",
+      "position_size": "538",
+      "rate": "-0.000003",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465499,
+      "market_id": 16,
+      "timestamp": 1766131200,
+      "change": "0.006008",
+      "position_size": "349.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465607,
+      "market_id": 7,
+      "timestamp": 1766134800,
+      "change": "0.002008",
+      "position_size": "538",
+      "rate": "0.000002",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465616,
+      "market_id": 16,
+      "timestamp": 1766134800,
+      "change": "0.005986",
+      "position_size": "349.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465724,
+      "market_id": 7,
+      "timestamp": 1766138400,
+      "change": "0.011033",
+      "position_size": "538",
+      "rate": "0.000011",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465733,
+      "market_id": 16,
+      "timestamp": 1766138400,
+      "change": "0.005979",
+      "position_size": "349.0",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465841,
+      "market_id": 7,
+      "timestamp": 1766142000,
+      "change": "0.012050",
+      "position_size": "538",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465850,
+      "market_id": 16,
+      "timestamp": 1766142000,
+      "change": "0.011934",
+      "position_size": "698.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465958,
+      "market_id": 7,
+      "timestamp": 1766145600,
+      "change": "0.010058",
+      "position_size": "538",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465967,
+      "market_id": 16,
+      "timestamp": 1766145600,
+      "change": "0.011970",
+      "position_size": "698.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 465972,
+      "market_id": 21,
+      "timestamp": 1766145600,
+      "change": "0.006022",
+      "position_size": "1778.8",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466075,
+      "market_id": 7,
+      "timestamp": 1766149200,
+      "change": "0.006043",
+      "position_size": "1072",
+      "rate": "0.000003",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466084,
+      "market_id": 16,
+      "timestamp": 1766149200,
+      "change": "0.012016",
+      "position_size": "698.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466089,
+      "market_id": 21,
+      "timestamp": 1766149200,
+      "change": "0.011454",
+      "position_size": "1778.8",
+      "rate": "0.000023",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466192,
+      "market_id": 7,
+      "timestamp": 1766152800,
+      "change": "-0.010004",
+      "position_size": "1072",
+      "rate": "-0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466201,
+      "market_id": 16,
+      "timestamp": 1766152800,
+      "change": "0.012041",
+      "position_size": "698.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466206,
+      "market_id": 21,
+      "timestamp": 1766152800,
+      "change": "0.006966",
+      "position_size": "1778.8",
+      "rate": "0.000014",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466309,
+      "market_id": 7,
+      "timestamp": 1766156400,
+      "change": "0.000000",
+      "position_size": "1072",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466318,
+      "market_id": 16,
+      "timestamp": 1766156400,
+      "change": "0.012197",
+      "position_size": "698.6",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 466323,
+      "market_id": 21,
+      "timestamp": 1766156400,
+      "change": "0.006003",
+      "position_size": "1778.8",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 468649,
+      "market_id": 7,
+      "timestamp": 1766228400,
+      "change": "0.011964",
+      "position_size": "514",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 468766,
+      "market_id": 7,
+      "timestamp": 1766232000,
+      "change": "0.011983",
+      "position_size": "514",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 474031,
+      "market_id": 7,
+      "timestamp": 1766394000,
+      "change": "0.011914",
+      "position_size": "518",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 474396,
+      "market_id": 21,
+      "timestamp": 1766404800,
+      "change": "0.011928",
+      "position_size": "3187.5",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 474513,
+      "market_id": 21,
+      "timestamp": 1766408400,
+      "change": "0.048283",
+      "position_size": "12985.9",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 474630,
+      "market_id": 21,
+      "timestamp": 1766412000,
+      "change": "0.035742",
+      "position_size": "9744.7",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 474747,
+      "market_id": 21,
+      "timestamp": 1766415600,
+      "change": "0.025042",
+      "position_size": "6847.7",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 477892,
+      "market_id": 7,
+      "timestamp": 1766512800,
+      "change": "0.036591",
+      "position_size": "1632",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 479998,
+      "market_id": 7,
+      "timestamp": 1766577600,
+      "change": "0.010004",
+      "position_size": "1071",
+      "rate": "0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480115,
+      "market_id": 7,
+      "timestamp": 1766581200,
+      "change": "-0.010515",
+      "position_size": "1124",
+      "rate": "-0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480232,
+      "market_id": 7,
+      "timestamp": 1766584800,
+      "change": "-0.023110",
+      "position_size": "1124",
+      "rate": "-0.000011",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480349,
+      "market_id": 7,
+      "timestamp": 1766588400,
+      "change": "-0.023260",
+      "position_size": "1391",
+      "rate": "-0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480466,
+      "market_id": 7,
+      "timestamp": 1766592000,
+      "change": "0.000000",
+      "position_size": "1391",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480583,
+      "market_id": 7,
+      "timestamp": 1766595600,
+      "change": "-0.017932",
+      "position_size": "1928",
+      "rate": "-0.000005",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480700,
+      "market_id": 7,
+      "timestamp": 1766599200,
+      "change": "0.042800",
+      "position_size": "1928",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480738,
+      "market_id": 47,
+      "timestamp": 1766599200,
+      "change": "0.011906",
+      "position_size": "110472",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480817,
+      "market_id": 7,
+      "timestamp": 1766602800,
+      "change": "0.000000",
+      "position_size": "1928",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480855,
+      "market_id": 47,
+      "timestamp": 1766602800,
+      "change": "0.012043",
+      "position_size": "110472",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 480934,
+      "market_id": 7,
+      "timestamp": 1766606400,
+      "change": "-0.046632",
+      "position_size": "1928",
+      "rate": "-0.000013",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481051,
+      "market_id": 7,
+      "timestamp": 1766610000,
+      "change": "-0.014369",
+      "position_size": "1928",
+      "rate": "-0.000004",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481089,
+      "market_id": 47,
+      "timestamp": 1766610000,
+      "change": "0.023870",
+      "position_size": "217582",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481168,
+      "market_id": 7,
+      "timestamp": 1766613600,
+      "change": "-0.032319",
+      "position_size": "1928",
+      "rate": "-0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481206,
+      "market_id": 47,
+      "timestamp": 1766613600,
+      "change": "0.023990",
+      "position_size": "217582",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481285,
+      "market_id": 7,
+      "timestamp": 1766617200,
+      "change": "0.090348",
+      "position_size": "4836",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481402,
+      "market_id": 7,
+      "timestamp": 1766620800,
+      "change": "0.059999",
+      "position_size": "2686",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481519,
+      "market_id": 7,
+      "timestamp": 1766624400,
+      "change": "0.059841",
+      "position_size": "2686",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 481636,
+      "market_id": 7,
+      "timestamp": 1766628000,
+      "change": "-0.030053",
+      "position_size": "2686",
+      "rate": "-0.000006",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 482823,
+      "market_id": 25,
+      "timestamp": 1766664000,
+      "change": "0.310079",
+      "position_size": "11.95",
+      "rate": "-0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 482940,
+      "market_id": 25,
+      "timestamp": 1766667600,
+      "change": "0.440414",
+      "position_size": "11.95",
+      "rate": "-0.000044",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 483171,
+      "market_id": 21,
+      "timestamp": 1766674800,
+      "change": "-0.055713",
+      "position_size": "16046.7",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 483288,
+      "market_id": 21,
+      "timestamp": 1766678400,
+      "change": "-0.026733",
+      "position_size": "7594.5",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 483385,
       "market_id": 1,
       "timestamp": 1766682000,
@@ -499997,11 +503038,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 483634,
+      "market_id": 16,
+      "timestamp": 1766689200,
+      "change": "0.059917",
+      "position_size": "3538.4",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 483736,
       "market_id": 1,
       "timestamp": 1766692800,
       "change": "0.239888",
       "position_size": "0.22678",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 483751,
+      "market_id": 16,
+      "timestamp": 1766692800,
+      "change": "0.059891",
+      "position_size": "3538.4",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500060,6 +503119,402 @@
       "position_side": "short"
     },
     {
+      "funding_id": 485497,
+      "market_id": 7,
+      "timestamp": 1766746800,
+      "change": "-0.009007",
+      "position_size": "533",
+      "rate": "-0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 485614,
+      "market_id": 7,
+      "timestamp": 1766750400,
+      "change": "0.011962",
+      "position_size": "533",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 485731,
+      "market_id": 7,
+      "timestamp": 1766754000,
+      "change": "0.011968",
+      "position_size": "533",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 485848,
+      "market_id": 7,
+      "timestamp": 1766757600,
+      "change": "-0.010004",
+      "position_size": "533",
+      "rate": "-0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 485965,
+      "market_id": 7,
+      "timestamp": 1766761200,
+      "change": "0.000983",
+      "position_size": "533",
+      "rate": "0.000001",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 486611,
+      "market_id": 71,
+      "timestamp": 1766779200,
+      "change": "0.023879",
+      "position_size": "14109.7",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 486728,
+      "market_id": 71,
+      "timestamp": 1766782800,
+      "change": "0.023960",
+      "position_size": "14238.2",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 486845,
+      "market_id": 71,
+      "timestamp": 1766786400,
+      "change": "0.006062",
+      "position_size": "3630.7",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 488938,
+      "market_id": 58,
+      "timestamp": 1766851200,
+      "change": "0.015550",
+      "position_size": "2.089",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489055,
+      "market_id": 58,
+      "timestamp": 1766854800,
+      "change": "0.015501",
+      "position_size": "2.089",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489172,
+      "market_id": 58,
+      "timestamp": 1766858400,
+      "change": "0.024110",
+      "position_size": "3.234",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489289,
+      "market_id": 58,
+      "timestamp": 1766862000,
+      "change": "0.035786",
+      "position_size": "4.850",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489406,
+      "market_id": 58,
+      "timestamp": 1766865600,
+      "change": "0.036063",
+      "position_size": "4.850",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489523,
+      "market_id": 58,
+      "timestamp": 1766869200,
+      "change": "0.047955",
+      "position_size": "6.465",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489640,
+      "market_id": 58,
+      "timestamp": 1766872800,
+      "change": "0.048043",
+      "position_size": "6.465",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489757,
+      "market_id": 58,
+      "timestamp": 1766876400,
+      "change": "0.036064",
+      "position_size": "4.850",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489874,
+      "market_id": 58,
+      "timestamp": 1766880000,
+      "change": "0.039779",
+      "position_size": "5.323",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 489991,
+      "market_id": 58,
+      "timestamp": 1766883600,
+      "change": "0.036073",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490108,
+      "market_id": 58,
+      "timestamp": 1766887200,
+      "change": "0.035618",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490225,
+      "market_id": 58,
+      "timestamp": 1766890800,
+      "change": "0.035877",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490342,
+      "market_id": 58,
+      "timestamp": 1766894400,
+      "change": "0.035663",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490459,
+      "market_id": 58,
+      "timestamp": 1766898000,
+      "change": "0.035795",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490576,
+      "market_id": 58,
+      "timestamp": 1766901600,
+      "change": "0.035668",
+      "position_size": "4.841",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490693,
+      "market_id": 58,
+      "timestamp": 1766905200,
+      "change": "0.037877",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490810,
+      "market_id": 58,
+      "timestamp": 1766908800,
+      "change": "0.037815",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 490927,
+      "market_id": 58,
+      "timestamp": 1766912400,
+      "change": "0.037800",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491044,
+      "market_id": 58,
+      "timestamp": 1766916000,
+      "change": "0.037749",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491161,
+      "market_id": 58,
+      "timestamp": 1766919600,
+      "change": "0.037782",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491278,
+      "market_id": 58,
+      "timestamp": 1766923200,
+      "change": "0.037767",
+      "position_size": "5.077",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491395,
+      "market_id": 58,
+      "timestamp": 1766926800,
+      "change": "0.024063",
+      "position_size": "3.231",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491512,
+      "market_id": 58,
+      "timestamp": 1766930400,
+      "change": "0.024100",
+      "position_size": "3.231",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491581,
+      "market_id": 7,
+      "timestamp": 1766934000,
+      "change": "0.100574",
+      "position_size": "5379",
+      "rate": "0.000010",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491629,
+      "market_id": 58,
+      "timestamp": 1766934000,
+      "change": "0.060686",
+      "position_size": "8.029",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491698,
+      "market_id": 7,
+      "timestamp": 1766937600,
+      "change": "-0.059971",
+      "position_size": "10697",
+      "rate": "-0.000003",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491815,
+      "market_id": 7,
+      "timestamp": 1766941200,
+      "change": "-0.030076",
+      "position_size": "5375",
+      "rate": "-0.000003",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 491831,
+      "market_id": 24,
+      "timestamp": 1766941200,
+      "change": "-0.047906",
+      "position_size": "158.24",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 491932,
+      "market_id": 7,
+      "timestamp": 1766944800,
+      "change": "0.045148",
+      "position_size": "2687",
+      "rate": "0.000009",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 492416,
+      "market_id": 24,
+      "timestamp": 1766959200,
+      "change": "-0.018094",
+      "position_size": "60.19",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 492533,
+      "market_id": 24,
+      "timestamp": 1766962800,
+      "change": "-0.024292",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 492650,
+      "market_id": 24,
+      "timestamp": 1766966400,
+      "change": "-0.024375",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 492767,
+      "market_id": 24,
+      "timestamp": 1766970000,
+      "change": "-0.024976",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 492884,
+      "market_id": 24,
+      "timestamp": 1766973600,
+      "change": "-0.025078",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 493001,
+      "market_id": 24,
+      "timestamp": 1766977200,
+      "change": "-0.025066",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 493118,
+      "market_id": 24,
+      "timestamp": 1766980800,
+      "change": "-0.025080",
+      "position_size": "80.15",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 493213,
       "market_id": 1,
       "timestamp": 1766984400,
@@ -500105,6 +503560,105 @@
       "position_side": "short"
     },
     {
+      "funding_id": 493820,
+      "market_id": 24,
+      "timestamp": 1767002400,
+      "change": "-0.014612",
+      "position_size": "47.35",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494171,
+      "market_id": 24,
+      "timestamp": 1767013200,
+      "change": "-0.025806",
+      "position_size": "83.72",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494288,
+      "market_id": 24,
+      "timestamp": 1767016800,
+      "change": "-0.031236",
+      "position_size": "101.43",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494405,
+      "market_id": 24,
+      "timestamp": 1767020400,
+      "change": "-0.024003",
+      "position_size": "77.63",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494522,
+      "market_id": 24,
+      "timestamp": 1767024000,
+      "change": "-0.012113",
+      "position_size": "38.82",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494639,
+      "market_id": 24,
+      "timestamp": 1767027600,
+      "change": "-0.006113",
+      "position_size": "19.41",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 494820,
+      "market_id": 90,
+      "timestamp": 1767031200,
+      "change": "0.011939",
+      "position_size": "1.814",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 495035,
+      "market_id": 71,
+      "timestamp": 1767038400,
+      "change": "0.035886",
+      "position_size": "18752.4",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 496160,
+      "market_id": 24,
+      "timestamp": 1767074400,
+      "change": "-0.024095",
+      "position_size": "76.84",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 496277,
+      "market_id": 24,
+      "timestamp": 1767078000,
+      "change": "-0.012127",
+      "position_size": "38.42",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 496394,
+      "market_id": 24,
+      "timestamp": 1767081600,
+      "change": "-0.012039",
+      "position_size": "38.42",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 497073,
       "market_id": 0,
       "timestamp": 1767103200,
@@ -500112,6 +503666,69 @@
       "position_size": "0.4668",
       "rate": "0.000011",
       "position_side": "short"
+    },
+    {
+      "funding_id": 497314,
+      "market_id": 7,
+      "timestamp": 1767110400,
+      "change": "-0.026969",
+      "position_size": "532",
+      "rate": "-0.000027",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 497431,
+      "market_id": 7,
+      "timestamp": 1767114000,
+      "change": "-0.028976",
+      "position_size": "532",
+      "rate": "-0.000029",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 497548,
+      "market_id": 7,
+      "timestamp": 1767117600,
+      "change": "-0.057839",
+      "position_size": "1064",
+      "rate": "-0.000029",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 497665,
+      "market_id": 7,
+      "timestamp": 1767121200,
+      "change": "-0.085261",
+      "position_size": "2161",
+      "rate": "-0.000021",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 497782,
+      "market_id": 7,
+      "timestamp": 1767124800,
+      "change": "-0.158138",
+      "position_size": "2161",
+      "rate": "-0.000039",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 497899,
+      "market_id": 7,
+      "timestamp": 1767128400,
+      "change": "-0.177679",
+      "position_size": "2161",
+      "rate": "-0.000044",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 499715,
+      "market_id": 71,
+      "timestamp": 1767182400,
+      "change": "-0.105606",
+      "position_size": "15601.1",
+      "rate": "0.000040",
+      "position_side": "long"
     },
     {
       "funding_id": 505615,
@@ -500177,6 +503794,1644 @@
       "position_side": "short"
     },
     {
+      "funding_id": 507978,
+      "market_id": 7,
+      "timestamp": 1767438000,
+      "change": "-0.006990",
+      "position_size": "498",
+      "rate": "-0.000007",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 508026,
+      "market_id": 58,
+      "timestamp": 1767438000,
+      "change": "0.012069",
+      "position_size": "1.588",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 508096,
+      "market_id": 7,
+      "timestamp": 1767441600,
+      "change": "-0.018919",
+      "position_size": "498",
+      "rate": "-0.000019",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 508144,
+      "market_id": 58,
+      "timestamp": 1767441600,
+      "change": "0.035925",
+      "position_size": "4.711",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 508214,
+      "market_id": 7,
+      "timestamp": 1767445200,
+      "change": "-0.019946",
+      "position_size": "498",
+      "rate": "-0.000020",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 508262,
+      "market_id": 58,
+      "timestamp": 1767445200,
+      "change": "0.035955",
+      "position_size": "4.711",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 509528,
+      "market_id": 24,
+      "timestamp": 1767484800,
+      "change": "-0.001385",
+      "position_size": "4.55",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509622,
+      "market_id": 120,
+      "timestamp": 1767484800,
+      "change": "-0.005660",
+      "position_size": "26.24",
+      "rate": "0.000083",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509646,
+      "market_id": 24,
+      "timestamp": 1767488400,
+      "change": "-0.003833",
+      "position_size": "12.61",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509740,
+      "market_id": 120,
+      "timestamp": 1767488400,
+      "change": "-0.003528",
+      "position_size": "75.44",
+      "rate": "0.000018",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509764,
+      "market_id": 24,
+      "timestamp": 1767492000,
+      "change": "-0.006008",
+      "position_size": "19.81",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509858,
+      "market_id": 120,
+      "timestamp": 1767492000,
+      "change": "-0.024815",
+      "position_size": "124.64",
+      "rate": "0.000076",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509882,
+      "market_id": 24,
+      "timestamp": 1767495600,
+      "change": "-0.008141",
+      "position_size": "27.01",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 509976,
+      "market_id": 120,
+      "timestamp": 1767495600,
+      "change": "-0.022055",
+      "position_size": "173.84",
+      "rate": "0.000048",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510000,
+      "market_id": 24,
+      "timestamp": 1767499200,
+      "change": "-0.010380",
+      "position_size": "34.21",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510094,
+      "market_id": 120,
+      "timestamp": 1767499200,
+      "change": "-0.042096",
+      "position_size": "223.04",
+      "rate": "0.000071",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510118,
+      "market_id": 24,
+      "timestamp": 1767502800,
+      "change": "-0.012503",
+      "position_size": "41.41",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510212,
+      "market_id": 120,
+      "timestamp": 1767502800,
+      "change": "-0.049439",
+      "position_size": "271.98",
+      "rate": "0.000070",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510236,
+      "market_id": 24,
+      "timestamp": 1767506400,
+      "change": "-0.014678",
+      "position_size": "48.61",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510330,
+      "market_id": 120,
+      "timestamp": 1767506400,
+      "change": "-0.019967",
+      "position_size": "319.98",
+      "rate": "0.000024",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510354,
+      "market_id": 24,
+      "timestamp": 1767510000,
+      "change": "-0.016826",
+      "position_size": "55.81",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510448,
+      "market_id": 120,
+      "timestamp": 1767510000,
+      "change": "-0.016185",
+      "position_size": "367.98",
+      "rate": "0.000017",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510472,
+      "market_id": 24,
+      "timestamp": 1767513600,
+      "change": "-0.017852",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510566,
+      "market_id": 120,
+      "timestamp": 1767513600,
+      "change": "-0.019365",
+      "position_size": "390.78",
+      "rate": "0.000019",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510590,
+      "market_id": 24,
+      "timestamp": 1767517200,
+      "change": "-0.017738",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510684,
+      "market_id": 120,
+      "timestamp": 1767517200,
+      "change": "-0.025045",
+      "position_size": "390.78",
+      "rate": "0.000025",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510708,
+      "market_id": 24,
+      "timestamp": 1767520800,
+      "change": "-0.017774",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510802,
+      "market_id": 120,
+      "timestamp": 1767520800,
+      "change": "-0.032169",
+      "position_size": "390.78",
+      "rate": "0.000032",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510826,
+      "market_id": 24,
+      "timestamp": 1767524400,
+      "change": "-0.017945",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510920,
+      "market_id": 120,
+      "timestamp": 1767524400,
+      "change": "-0.078781",
+      "position_size": "390.78",
+      "rate": "0.000079",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 510944,
+      "market_id": 24,
+      "timestamp": 1767528000,
+      "change": "-0.017917",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 511038,
+      "market_id": 120,
+      "timestamp": 1767528000,
+      "change": "-0.042343",
+      "position_size": "390.78",
+      "rate": "0.000043",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 511062,
+      "market_id": 24,
+      "timestamp": 1767531600,
+      "change": "-0.017853",
+      "position_size": "59.17",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 511156,
+      "market_id": 120,
+      "timestamp": 1767531600,
+      "change": "-0.024009",
+      "position_size": "390.78",
+      "rate": "0.000024",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 513540,
+      "market_id": 24,
+      "timestamp": 1767607200,
+      "change": "0.000000",
+      "position_size": "9.18",
+      "rate": "0.000000",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 513572,
+      "market_id": 58,
+      "timestamp": 1767607200,
+      "change": "0.003418",
+      "position_size": "0.430",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 513658,
+      "market_id": 24,
+      "timestamp": 1767610800,
+      "change": "-0.001231",
+      "position_size": "23.58",
+      "rate": "0.000002",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 513690,
+      "market_id": 58,
+      "timestamp": 1767610800,
+      "change": "0.008156",
+      "position_size": "1.030",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 513776,
+      "market_id": 24,
+      "timestamp": 1767614400,
+      "change": "-0.012000",
+      "position_size": "37.98",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 513808,
+      "market_id": 58,
+      "timestamp": 1767614400,
+      "change": "0.012798",
+      "position_size": "1.630",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 513894,
+      "market_id": 24,
+      "timestamp": 1767618000,
+      "change": "-0.013699",
+      "position_size": "52.38",
+      "rate": "0.000010",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 513926,
+      "market_id": 58,
+      "timestamp": 1767618000,
+      "change": "0.017405",
+      "position_size": "2.230",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 514012,
+      "market_id": 24,
+      "timestamp": 1767621600,
+      "change": "-0.000524",
+      "position_size": "1.68",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 514044,
+      "market_id": 58,
+      "timestamp": 1767621600,
+      "change": "0.000821",
+      "position_size": "0.070",
+      "rate": "0.000018",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 514162,
+      "market_id": 58,
+      "timestamp": 1767625200,
+      "change": "0.014676",
+      "position_size": "1.887",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 514342,
+      "market_id": 120,
+      "timestamp": 1767628800,
+      "change": "-0.056948",
+      "position_size": "342.24",
+      "rate": "0.000056",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 514932,
+      "market_id": 120,
+      "timestamp": 1767646800,
+      "change": "-0.070171",
+      "position_size": "277.13",
+      "rate": "0.000084",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 515994,
+      "market_id": 120,
+      "timestamp": 1767679200,
+      "change": "-0.035472",
+      "position_size": "684.58",
+      "rate": "0.000017",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516112,
+      "market_id": 120,
+      "timestamp": 1767682800,
+      "change": "-0.024163",
+      "position_size": "97.89",
+      "rate": "0.000081",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516230,
+      "market_id": 120,
+      "timestamp": 1767686400,
+      "change": "-0.005643",
+      "position_size": "97.89",
+      "rate": "0.000019",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516348,
+      "market_id": 120,
+      "timestamp": 1767690000,
+      "change": "-0.043083",
+      "position_size": "233.97",
+      "rate": "0.000061",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516466,
+      "market_id": 120,
+      "timestamp": 1767693600,
+      "change": "-0.052386",
+      "position_size": "262.77",
+      "rate": "0.000065",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516584,
+      "market_id": 120,
+      "timestamp": 1767697200,
+      "change": "-0.045132",
+      "position_size": "291.57",
+      "rate": "0.000050",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516702,
+      "market_id": 120,
+      "timestamp": 1767700800,
+      "change": "-0.064185",
+      "position_size": "131.73",
+      "rate": "0.000152",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516820,
+      "market_id": 120,
+      "timestamp": 1767704400,
+      "change": "-0.078228",
+      "position_size": "160.53",
+      "rate": "0.000152",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516876,
+      "market_id": 58,
+      "timestamp": 1767708000,
+      "change": "0.008306",
+      "position_size": "1.093",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 516938,
+      "market_id": 120,
+      "timestamp": 1767708000,
+      "change": "-0.049989",
+      "position_size": "188.61",
+      "rate": "0.000083",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 516994,
+      "market_id": 58,
+      "timestamp": 1767711600,
+      "change": "0.011064",
+      "position_size": "1.453",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 517056,
+      "market_id": 120,
+      "timestamp": 1767711600,
+      "change": "-0.050305",
+      "position_size": "216.21",
+      "rate": "0.000074",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517112,
+      "market_id": 58,
+      "timestamp": 1767715200,
+      "change": "0.013730",
+      "position_size": "1.813",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 517174,
+      "market_id": 120,
+      "timestamp": 1767715200,
+      "change": "-0.009295",
+      "position_size": "243.81",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517230,
+      "market_id": 58,
+      "timestamp": 1767718800,
+      "change": "0.016499",
+      "position_size": "2.173",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 517292,
+      "market_id": 120,
+      "timestamp": 1767718800,
+      "change": "-0.118571",
+      "position_size": "497.67",
+      "rate": "0.000077",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517348,
+      "market_id": 58,
+      "timestamp": 1767722400,
+      "change": "0.019075",
+      "position_size": "2.533",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 517410,
+      "market_id": 120,
+      "timestamp": 1767722400,
+      "change": "-0.230850",
+      "position_size": "1067.72",
+      "rate": "0.000071",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517528,
+      "market_id": 120,
+      "timestamp": 1767726000,
+      "change": "-0.243738",
+      "position_size": "995.21",
+      "rate": "0.000080",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517646,
+      "market_id": 120,
+      "timestamp": 1767729600,
+      "change": "-0.037159",
+      "position_size": "1000.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517764,
+      "market_id": 120,
+      "timestamp": 1767733200,
+      "change": "-0.036795",
+      "position_size": "1000.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 517882,
+      "market_id": 120,
+      "timestamp": 1767736800,
+      "change": "-0.033376",
+      "position_size": "900.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518000,
+      "market_id": 120,
+      "timestamp": 1767740400,
+      "change": "-0.030136",
+      "position_size": "800.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518118,
+      "market_id": 120,
+      "timestamp": 1767744000,
+      "change": "-0.074133",
+      "position_size": "2000.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518236,
+      "market_id": 120,
+      "timestamp": 1767747600,
+      "change": "-0.043456",
+      "position_size": "1100.00",
+      "rate": "0.000013",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518354,
+      "market_id": 120,
+      "timestamp": 1767751200,
+      "change": "-0.072235",
+      "position_size": "1000.00",
+      "rate": "0.000024",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518472,
+      "market_id": 120,
+      "timestamp": 1767754800,
+      "change": "-0.043719",
+      "position_size": "1200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518590,
+      "market_id": 120,
+      "timestamp": 1767758400,
+      "change": "-0.088319",
+      "position_size": "1000.00",
+      "rate": "0.000029",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518708,
+      "market_id": 120,
+      "timestamp": 1767762000,
+      "change": "-0.066391",
+      "position_size": "1000.00",
+      "rate": "0.000022",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518826,
+      "market_id": 120,
+      "timestamp": 1767765600,
+      "change": "-0.021700",
+      "position_size": "600.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 518944,
+      "market_id": 120,
+      "timestamp": 1767769200,
+      "change": "-0.032749",
+      "position_size": "900.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 519062,
+      "market_id": 120,
+      "timestamp": 1767772800,
+      "change": "-0.018107",
+      "position_size": "500.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 519180,
+      "market_id": 120,
+      "timestamp": 1767776400,
+      "change": "-0.028644",
+      "position_size": "500.00",
+      "rate": "0.000019",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 519770,
+      "market_id": 120,
+      "timestamp": 1767794400,
+      "change": "-0.044713",
+      "position_size": "278.80",
+      "rate": "0.000054",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 519888,
+      "market_id": 120,
+      "timestamp": 1767798000,
+      "change": "-0.005099",
+      "position_size": "147.42",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520006,
+      "market_id": 120,
+      "timestamp": 1767801600,
+      "change": "-0.028405",
+      "position_size": "147.42",
+      "rate": "0.000067",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520124,
+      "market_id": 120,
+      "timestamp": 1767805200,
+      "change": "-0.015476",
+      "position_size": "147.42",
+      "rate": "0.000037",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520242,
+      "market_id": 120,
+      "timestamp": 1767808800,
+      "change": "-0.005051",
+      "position_size": "147.42",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520360,
+      "market_id": 120,
+      "timestamp": 1767812400,
+      "change": "-0.000785",
+      "position_size": "22.42",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520478,
+      "market_id": 120,
+      "timestamp": 1767816000,
+      "change": "-0.001585",
+      "position_size": "45.22",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520599,
+      "market_id": 120,
+      "timestamp": 1767819600,
+      "change": "-0.003436",
+      "position_size": "67.46",
+      "rate": "0.000018",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520720,
+      "market_id": 120,
+      "timestamp": 1767823200,
+      "change": "-0.003086",
+      "position_size": "89.06",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520841,
+      "market_id": 120,
+      "timestamp": 1767826800,
+      "change": "-0.004802",
+      "position_size": "110.66",
+      "rate": "0.000014",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 520962,
+      "market_id": 120,
+      "timestamp": 1767830400,
+      "change": "-0.004915",
+      "position_size": "132.26",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521083,
+      "market_id": 120,
+      "timestamp": 1767834000,
+      "change": "-0.019804",
+      "position_size": "153.86",
+      "rate": "0.000041",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521204,
+      "market_id": 120,
+      "timestamp": 1767837600,
+      "change": "-0.006499",
+      "position_size": "175.46",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521325,
+      "market_id": 120,
+      "timestamp": 1767841200,
+      "change": "-0.007233",
+      "position_size": "197.06",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521446,
+      "market_id": 120,
+      "timestamp": 1767844800,
+      "change": "-0.019259",
+      "position_size": "218.66",
+      "rate": "0.000029",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521567,
+      "market_id": 120,
+      "timestamp": 1767848400,
+      "change": "-0.008984",
+      "position_size": "240.26",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521688,
+      "market_id": 120,
+      "timestamp": 1767852000,
+      "change": "-0.009772",
+      "position_size": "261.86",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521809,
+      "market_id": 120,
+      "timestamp": 1767855600,
+      "change": "-0.010074",
+      "position_size": "283.46",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 521930,
+      "market_id": 120,
+      "timestamp": 1767859200,
+      "change": "-0.011119",
+      "position_size": "305.06",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522051,
+      "market_id": 120,
+      "timestamp": 1767862800,
+      "change": "-0.012522",
+      "position_size": "340.86",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522172,
+      "market_id": 120,
+      "timestamp": 1767866400,
+      "change": "-0.070774",
+      "position_size": "410.86",
+      "rate": "0.000057",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522293,
+      "market_id": 120,
+      "timestamp": 1767870000,
+      "change": "-0.034265",
+      "position_size": "410.86",
+      "rate": "0.000027",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522414,
+      "market_id": 120,
+      "timestamp": 1767873600,
+      "change": "-0.025504",
+      "position_size": "410.86",
+      "rate": "0.000020",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522535,
+      "market_id": 120,
+      "timestamp": 1767877200,
+      "change": "-0.058431",
+      "position_size": "410.86",
+      "rate": "0.000046",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522656,
+      "market_id": 120,
+      "timestamp": 1767880800,
+      "change": "-0.058297",
+      "position_size": "410.86",
+      "rate": "0.000046",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522777,
+      "market_id": 120,
+      "timestamp": 1767884400,
+      "change": "-0.056997",
+      "position_size": "410.86",
+      "rate": "0.000044",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 522898,
+      "market_id": 120,
+      "timestamp": 1767888000,
+      "change": "-0.015518",
+      "position_size": "410.86",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523019,
+      "market_id": 120,
+      "timestamp": 1767891600,
+      "change": "-0.068892",
+      "position_size": "300.86",
+      "rate": "0.000073",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523140,
+      "market_id": 120,
+      "timestamp": 1767895200,
+      "change": "-0.011316",
+      "position_size": "300.86",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523261,
+      "market_id": 120,
+      "timestamp": 1767898800,
+      "change": "-0.046901",
+      "position_size": "300.86",
+      "rate": "0.000050",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523382,
+      "market_id": 120,
+      "timestamp": 1767902400,
+      "change": "-0.011027",
+      "position_size": "300.86",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523503,
+      "market_id": 120,
+      "timestamp": 1767906000,
+      "change": "-0.059588",
+      "position_size": "300.86",
+      "rate": "0.000065",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523624,
+      "market_id": 120,
+      "timestamp": 1767909600,
+      "change": "-0.074237",
+      "position_size": "300.86",
+      "rate": "0.000080",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523745,
+      "market_id": 120,
+      "timestamp": 1767913200,
+      "change": "-0.074941",
+      "position_size": "300.86",
+      "rate": "0.000082",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523866,
+      "market_id": 120,
+      "timestamp": 1767916800,
+      "change": "-0.059318",
+      "position_size": "300.86",
+      "rate": "0.000065",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 523987,
+      "market_id": 120,
+      "timestamp": 1767920400,
+      "change": "-0.073277",
+      "position_size": "300.86",
+      "rate": "0.000081",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524108,
+      "market_id": 120,
+      "timestamp": 1767924000,
+      "change": "-0.057693",
+      "position_size": "300.86",
+      "rate": "0.000064",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524229,
+      "market_id": 120,
+      "timestamp": 1767927600,
+      "change": "-0.069488",
+      "position_size": "300.86",
+      "rate": "0.000078",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524350,
+      "market_id": 120,
+      "timestamp": 1767931200,
+      "change": "-0.087111",
+      "position_size": "625.86",
+      "rate": "0.000046",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524471,
+      "market_id": 120,
+      "timestamp": 1767934800,
+      "change": "-0.051734",
+      "position_size": "500.00",
+      "rate": "0.000034",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524592,
+      "market_id": 120,
+      "timestamp": 1767938400,
+      "change": "-0.018152",
+      "position_size": "500.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524713,
+      "market_id": 120,
+      "timestamp": 1767942000,
+      "change": "-0.040872",
+      "position_size": "500.00",
+      "rate": "0.000027",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524834,
+      "market_id": 120,
+      "timestamp": 1767945600,
+      "change": "-0.018160",
+      "position_size": "500.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 524955,
+      "market_id": 120,
+      "timestamp": 1767949200,
+      "change": "-0.032609",
+      "position_size": "500.00",
+      "rate": "0.000022",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525076,
+      "market_id": 120,
+      "timestamp": 1767952800,
+      "change": "-0.076237",
+      "position_size": "500.00",
+      "rate": "0.000051",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525197,
+      "market_id": 120,
+      "timestamp": 1767956400,
+      "change": "-0.080077",
+      "position_size": "500.00",
+      "rate": "0.000053",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525318,
+      "market_id": 120,
+      "timestamp": 1767960000,
+      "change": "-0.140033",
+      "position_size": "500.00",
+      "rate": "0.000092",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525439,
+      "market_id": 120,
+      "timestamp": 1767963600,
+      "change": "-0.013484",
+      "position_size": "300.00",
+      "rate": "0.000015",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525560,
+      "market_id": 120,
+      "timestamp": 1767967200,
+      "change": "-0.058894",
+      "position_size": "300.00",
+      "rate": "0.000064",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525681,
+      "market_id": 120,
+      "timestamp": 1767970800,
+      "change": "-0.064166",
+      "position_size": "300.00",
+      "rate": "0.000071",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525802,
+      "market_id": 120,
+      "timestamp": 1767974400,
+      "change": "-0.011085",
+      "position_size": "300.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 525923,
+      "market_id": 120,
+      "timestamp": 1767978000,
+      "change": "-0.012974",
+      "position_size": "300.00",
+      "rate": "0.000014",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526044,
+      "market_id": 120,
+      "timestamp": 1767981600,
+      "change": "-0.011176",
+      "position_size": "300.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526165,
+      "market_id": 120,
+      "timestamp": 1767985200,
+      "change": "-0.010939",
+      "position_size": "300.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526286,
+      "market_id": 120,
+      "timestamp": 1767988800,
+      "change": "-0.028245",
+      "position_size": "300.00",
+      "rate": "0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526528,
+      "market_id": 120,
+      "timestamp": 1767996000,
+      "change": "-0.010025",
+      "position_size": "40.53",
+      "rate": "0.000084",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526649,
+      "market_id": 120,
+      "timestamp": 1767999600,
+      "change": "-0.004534",
+      "position_size": "127.92",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526770,
+      "market_id": 120,
+      "timestamp": 1768003200,
+      "change": "-0.028708",
+      "position_size": "127.92",
+      "rate": "0.000076",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 526891,
+      "market_id": 120,
+      "timestamp": 1768006800,
+      "change": "-0.075985",
+      "position_size": "355.28",
+      "rate": "0.000074",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527012,
+      "market_id": 120,
+      "timestamp": 1768010400,
+      "change": "-0.135469",
+      "position_size": "383.17",
+      "rate": "0.000124",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527133,
+      "market_id": 120,
+      "timestamp": 1768014000,
+      "change": "-0.075817",
+      "position_size": "500.00",
+      "rate": "0.000055",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527254,
+      "market_id": 120,
+      "timestamp": 1768017600,
+      "change": "-0.097901",
+      "position_size": "500.00",
+      "rate": "0.000071",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527375,
+      "market_id": 120,
+      "timestamp": 1768021200,
+      "change": "-0.023695",
+      "position_size": "500.00",
+      "rate": "0.000017",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527496,
+      "market_id": 120,
+      "timestamp": 1768024800,
+      "change": "-0.086441",
+      "position_size": "500.00",
+      "rate": "0.000064",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527617,
+      "market_id": 120,
+      "timestamp": 1768028400,
+      "change": "-0.016654",
+      "position_size": "500.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527738,
+      "market_id": 120,
+      "timestamp": 1768032000,
+      "change": "-0.136867",
+      "position_size": "500.00",
+      "rate": "0.000099",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527859,
+      "market_id": 120,
+      "timestamp": 1768035600,
+      "change": "-0.062428",
+      "position_size": "250.00",
+      "rate": "0.000090",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 527980,
+      "market_id": 120,
+      "timestamp": 1768039200,
+      "change": "-0.062638",
+      "position_size": "250.00",
+      "rate": "0.000089",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528101,
+      "market_id": 120,
+      "timestamp": 1768042800,
+      "change": "-0.014923",
+      "position_size": "250.00",
+      "rate": "0.000021",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528222,
+      "market_id": 120,
+      "timestamp": 1768046400,
+      "change": "-0.027656",
+      "position_size": "250.00",
+      "rate": "0.000039",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528343,
+      "market_id": 120,
+      "timestamp": 1768050000,
+      "change": "-0.038021",
+      "position_size": "267.50",
+      "rate": "0.000050",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528464,
+      "market_id": 120,
+      "timestamp": 1768053600,
+      "change": "-0.025276",
+      "position_size": "320.00",
+      "rate": "0.000028",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528585,
+      "market_id": 120,
+      "timestamp": 1768057200,
+      "change": "-0.457682",
+      "position_size": "565.00",
+      "rate": "0.000294",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528706,
+      "market_id": 120,
+      "timestamp": 1768060800,
+      "change": "-0.141256",
+      "position_size": "565.00",
+      "rate": "0.000090",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528827,
+      "market_id": 120,
+      "timestamp": 1768064400,
+      "change": "-0.018778",
+      "position_size": "565.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 528948,
+      "market_id": 120,
+      "timestamp": 1768068000,
+      "change": "-0.315115",
+      "position_size": "600.00",
+      "rate": "0.000201",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529069,
+      "market_id": 120,
+      "timestamp": 1768071600,
+      "change": "-0.582552",
+      "position_size": "600.00",
+      "rate": "0.000372",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529190,
+      "market_id": 120,
+      "timestamp": 1768075200,
+      "change": "-0.221368",
+      "position_size": "600.00",
+      "rate": "0.000139",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529311,
+      "market_id": 120,
+      "timestamp": 1768078800,
+      "change": "-0.132864",
+      "position_size": "600.00",
+      "rate": "0.000084",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529432,
+      "market_id": 120,
+      "timestamp": 1768082400,
+      "change": "-0.124804",
+      "position_size": "600.00",
+      "rate": "0.000080",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529553,
+      "market_id": 120,
+      "timestamp": 1768086000,
+      "change": "-0.193105",
+      "position_size": "600.00",
+      "rate": "0.000128",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529674,
+      "market_id": 120,
+      "timestamp": 1768089600,
+      "change": "-0.125504",
+      "position_size": "600.00",
+      "rate": "0.000081",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529795,
+      "market_id": 120,
+      "timestamp": 1768093200,
+      "change": "-0.079845",
+      "position_size": "400.00",
+      "rate": "0.000077",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 529916,
+      "market_id": 120,
+      "timestamp": 1768096800,
+      "change": "-0.097500",
+      "position_size": "400.00",
+      "rate": "0.000094",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530037,
+      "market_id": 120,
+      "timestamp": 1768100400,
+      "change": "-0.032428",
+      "position_size": "400.00",
+      "rate": "0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530158,
+      "market_id": 120,
+      "timestamp": 1768104000,
+      "change": "-0.043569",
+      "position_size": "400.00",
+      "rate": "0.000042",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530279,
+      "market_id": 120,
+      "timestamp": 1768107600,
+      "change": "-0.103428",
+      "position_size": "400.00",
+      "rate": "0.000100",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530400,
+      "market_id": 120,
+      "timestamp": 1768111200,
+      "change": "-0.125181",
+      "position_size": "400.00",
+      "rate": "0.000121",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530521,
+      "market_id": 120,
+      "timestamp": 1768114800,
+      "change": "-0.132678",
+      "position_size": "400.00",
+      "rate": "0.000126",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530642,
+      "market_id": 120,
+      "timestamp": 1768118400,
+      "change": "-0.035661",
+      "position_size": "400.00",
+      "rate": "0.000034",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530763,
+      "market_id": 120,
+      "timestamp": 1768122000,
+      "change": "-0.032763",
+      "position_size": "400.00",
+      "rate": "0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 530884,
+      "market_id": 120,
+      "timestamp": 1768125600,
+      "change": "-0.032835",
+      "position_size": "400.00",
+      "rate": "0.000031",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531005,
+      "market_id": 120,
+      "timestamp": 1768129200,
+      "change": "-0.036856",
+      "position_size": "400.00",
+      "rate": "0.000035",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531126,
+      "market_id": 120,
+      "timestamp": 1768132800,
+      "change": "-0.012602",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531247,
+      "market_id": 120,
+      "timestamp": 1768136400,
+      "change": "-0.098669",
+      "position_size": "400.00",
+      "rate": "0.000093",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531368,
+      "market_id": 120,
+      "timestamp": 1768140000,
+      "change": "-0.012731",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531489,
+      "market_id": 120,
+      "timestamp": 1768143600,
+      "change": "-0.012882",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531610,
+      "market_id": 120,
+      "timestamp": 1768147200,
+      "change": "-0.012708",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531731,
+      "market_id": 120,
+      "timestamp": 1768150800,
+      "change": "-0.012718",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531852,
+      "market_id": 120,
+      "timestamp": 1768154400,
+      "change": "-0.012748",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 531973,
+      "market_id": 120,
+      "timestamp": 1768158000,
+      "change": "-0.006338",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 532094,
+      "market_id": 120,
+      "timestamp": 1768161600,
+      "change": "-0.006327",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 533987,
       "market_id": 77,
       "timestamp": 1768219200,
@@ -500231,11 +505486,38 @@
       "position_side": "short"
     },
     {
+      "funding_id": 537908,
+      "market_id": 2,
+      "timestamp": 1768338000,
+      "change": "0.036161",
+      "position_size": "20.950",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 538029,
+      "market_id": 2,
+      "timestamp": 1768341600,
+      "change": "0.017864",
+      "position_size": "10.382",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 538148,
       "market_id": 0,
       "timestamp": 1768345200,
       "change": "0.032907",
       "position_size": "0.8233",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 538150,
+      "market_id": 2,
+      "timestamp": 1768345200,
+      "change": "0.030400",
+      "position_size": "17.240",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500456,11 +505738,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 540938,
+      "market_id": 7,
+      "timestamp": 1768428000,
+      "change": "0.055573",
+      "position_size": "2156",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 541052,
       "market_id": 0,
       "timestamp": 1768431600,
       "change": "0.120570",
       "position_size": "3.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 541059,
+      "market_id": 7,
+      "timestamp": 1768431600,
+      "change": "0.076888",
+      "position_size": "3000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500474,12 +505774,30 @@
       "position_side": "short"
     },
     {
+      "funding_id": 541180,
+      "market_id": 7,
+      "timestamp": 1768435200,
+      "change": "0.051345",
+      "position_size": "2000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 541294,
       "market_id": 0,
       "timestamp": 1768438800,
       "change": "0.079947",
       "position_size": "2.0000",
       "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 541301,
+      "market_id": 7,
+      "timestamp": 1768438800,
+      "change": "-0.017061",
+      "position_size": "2000",
+      "rate": "-0.000004",
       "position_side": "short"
     },
     {
@@ -500492,11 +505810,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 541422,
+      "market_id": 7,
+      "timestamp": 1768442400,
+      "change": "0.000000",
+      "position_size": "2000",
+      "rate": "0.000000",
+      "position_side": "short"
+    },
+    {
       "funding_id": 541536,
       "market_id": 0,
       "timestamp": 1768446000,
       "change": "0.079539",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 541543,
+      "market_id": 7,
+      "timestamp": 1768446000,
+      "change": "0.050507",
+      "position_size": "2000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500510,11 +505846,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 541664,
+      "market_id": 7,
+      "timestamp": 1768449600,
+      "change": "0.050102",
+      "position_size": "2000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 541778,
       "market_id": 0,
       "timestamp": 1768453200,
       "change": "0.079322",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 541785,
+      "market_id": 7,
+      "timestamp": 1768453200,
+      "change": "0.050432",
+      "position_size": "2000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500528,11 +505882,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 541906,
+      "market_id": 7,
+      "timestamp": 1768456800,
+      "change": "0.050374",
+      "position_size": "2000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 542020,
       "market_id": 0,
       "timestamp": 1768460400,
       "change": "0.079586",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 542027,
+      "market_id": 7,
+      "timestamp": 1768460400,
+      "change": "0.050178",
+      "position_size": "2000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500546,11 +505918,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 542148,
+      "market_id": 7,
+      "timestamp": 1768464000,
+      "change": "0.050415",
+      "position_size": "2000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 542262,
       "market_id": 0,
       "timestamp": 1768467600,
       "change": "0.080082",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 542269,
+      "market_id": 7,
+      "timestamp": 1768467600,
+      "change": "0.025242",
+      "position_size": "1000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500573,11 +505963,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 542511,
+      "market_id": 7,
+      "timestamp": 1768474800,
+      "change": "0.055833",
+      "position_size": "2200",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 542625,
       "market_id": 0,
       "timestamp": 1768478400,
       "change": "0.080398",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 542632,
+      "market_id": 7,
+      "timestamp": 1768478400,
+      "change": "0.088322",
+      "position_size": "3486",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -500591,11 +505999,29 @@
       "position_side": "short"
     },
     {
+      "funding_id": 542753,
+      "market_id": 7,
+      "timestamp": 1768482000,
+      "change": "0.098460",
+      "position_size": "3875",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 542867,
       "market_id": 0,
       "timestamp": 1768485600,
       "change": "0.080911",
       "position_size": "2.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 542874,
+      "market_id": 7,
+      "timestamp": 1768485600,
+      "change": "0.076624",
+      "position_size": "3000",
       "rate": "0.000012",
       "position_side": "short"
     },
@@ -501221,12 +506647,381 @@
       "position_side": "short"
     },
     {
+      "funding_id": 563113,
+      "market_id": 120,
+      "timestamp": 1769079600,
+      "change": "-0.005375",
+      "position_size": "250.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563164,
+      "market_id": 48,
+      "timestamp": 1769083200,
+      "change": "0.058124",
+      "position_size": "1.0000",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 563235,
+      "market_id": 120,
+      "timestamp": 1769083200,
+      "change": "-0.005375",
+      "position_size": "250.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563357,
+      "market_id": 120,
+      "timestamp": 1769086800,
+      "change": "-0.005402",
+      "position_size": "250.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563479,
+      "market_id": 120,
+      "timestamp": 1769090400,
+      "change": "-0.005394",
+      "position_size": "250.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563601,
+      "market_id": 120,
+      "timestamp": 1769094000,
+      "change": "-0.009546",
+      "position_size": "455.30",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563723,
+      "market_id": 120,
+      "timestamp": 1769097600,
+      "change": "-0.010349",
+      "position_size": "489.85",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563850,
+      "market_id": 120,
+      "timestamp": 1769101200,
+      "change": "-0.010611",
+      "position_size": "489.85",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 563977,
+      "market_id": 120,
+      "timestamp": 1769104800,
+      "change": "-0.010620",
+      "position_size": "489.85",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564033,
+      "market_id": 48,
+      "timestamp": 1769108400,
+      "change": "0.001650",
+      "position_size": "0.0279",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564104,
+      "market_id": 120,
+      "timestamp": 1769108400,
+      "change": "-0.008653",
+      "position_size": "400.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564160,
+      "market_id": 48,
+      "timestamp": 1769112000,
+      "change": "0.008029",
+      "position_size": "0.1359",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564231,
+      "market_id": 120,
+      "timestamp": 1769112000,
+      "change": "-0.013675",
+      "position_size": "400.00",
+      "rate": "0.000019",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564287,
+      "market_id": 48,
+      "timestamp": 1769115600,
+      "change": "0.014431",
+      "position_size": "0.2439",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564358,
+      "market_id": 120,
+      "timestamp": 1769115600,
+      "change": "-0.020470",
+      "position_size": "200.00",
+      "rate": "0.000058",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564414,
+      "market_id": 48,
+      "timestamp": 1769119200,
+      "change": "0.020440",
+      "position_size": "0.3440",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564485,
+      "market_id": 120,
+      "timestamp": 1769119200,
+      "change": "-0.016170",
+      "position_size": "200.00",
+      "rate": "0.000046",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564541,
+      "market_id": 48,
+      "timestamp": 1769122800,
+      "change": "0.026188",
+      "position_size": "0.4400",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564612,
+      "market_id": 120,
+      "timestamp": 1769122800,
+      "change": "-0.004235",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564668,
+      "market_id": 48,
+      "timestamp": 1769126400,
+      "change": "0.032000",
+      "position_size": "0.5360",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564739,
+      "market_id": 120,
+      "timestamp": 1769126400,
+      "change": "-0.004212",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564795,
+      "market_id": 48,
+      "timestamp": 1769130000,
+      "change": "0.037737",
+      "position_size": "0.6320",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564866,
+      "market_id": 120,
+      "timestamp": 1769130000,
+      "change": "-0.004264",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 564922,
+      "market_id": 48,
+      "timestamp": 1769133600,
+      "change": "0.187907",
+      "position_size": "0.7280",
+      "rate": "0.000052",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 564993,
+      "market_id": 120,
+      "timestamp": 1769133600,
+      "change": "-0.004351",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 565049,
+      "market_id": 48,
+      "timestamp": 1769137200,
+      "change": "0.159590",
+      "position_size": "0.8240",
+      "rate": "0.000039",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565120,
+      "market_id": 120,
+      "timestamp": 1769137200,
+      "change": "-0.004295",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 565176,
+      "market_id": 48,
+      "timestamp": 1769140800,
+      "change": "0.114119",
+      "position_size": "0.9200",
+      "rate": "0.000025",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565247,
+      "market_id": 120,
+      "timestamp": 1769140800,
+      "change": "-0.004440",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 565303,
+      "market_id": 48,
+      "timestamp": 1769144400,
+      "change": "0.060567",
+      "position_size": "1.0160",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565374,
+      "market_id": 120,
+      "timestamp": 1769144400,
+      "change": "-0.004432",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 565430,
+      "market_id": 48,
+      "timestamp": 1769148000,
+      "change": "0.066350",
+      "position_size": "1.1120",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565501,
+      "market_id": 120,
+      "timestamp": 1769148000,
+      "change": "-0.004428",
+      "position_size": "200.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 565557,
+      "market_id": 48,
+      "timestamp": 1769151600,
+      "change": "0.071976",
+      "position_size": "1.2080",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565684,
+      "market_id": 48,
+      "timestamp": 1769155200,
+      "change": "0.077538",
+      "position_size": "1.3040",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565811,
+      "market_id": 48,
+      "timestamp": 1769158800,
+      "change": "0.220636",
+      "position_size": "1.4000",
+      "rate": "0.000032",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 565938,
+      "market_id": 48,
+      "timestamp": 1769162400,
+      "change": "0.061500",
+      "position_size": "1.0392",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 566644,
+      "market_id": 120,
+      "timestamp": 1769180400,
+      "change": "-0.007115",
+      "position_size": "347.33",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 566771,
+      "market_id": 120,
+      "timestamp": 1769184000,
+      "change": "-0.007264",
+      "position_size": "347.33",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 566898,
+      "market_id": 120,
+      "timestamp": 1769187600,
+      "change": "-0.006506",
+      "position_size": "300.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 566908,
       "market_id": 0,
       "timestamp": 1769191200,
       "change": "0.005975",
       "position_size": "1.0000",
       "rate": "0.000002",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 570514,
+      "market_id": 126,
+      "timestamp": 1769288400,
+      "change": "-0.068025",
+      "position_size": "2.000",
+      "rate": "-0.000640",
       "position_side": "short"
     },
     {
@@ -501284,6 +507079,15 @@
       "position_side": "long"
     },
     {
+      "funding_id": 573381,
+      "market_id": 24,
+      "timestamp": 1769371200,
+      "change": "-0.005228",
+      "position_size": "20.00",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
       "funding_id": 574649,
       "market_id": 1,
       "timestamp": 1769407200,
@@ -501329,6 +507133,24 @@
       "position_side": "long"
     },
     {
+      "funding_id": 575597,
+      "market_id": 48,
+      "timestamp": 1769432400,
+      "change": "-0.043399",
+      "position_size": "0.5000",
+      "rate": "-0.000017",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 575726,
+      "market_id": 48,
+      "timestamp": 1769436000,
+      "change": "0.015801",
+      "position_size": "0.2587",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 575810,
       "market_id": 1,
       "timestamp": 1769439600,
@@ -501338,11 +507160,65 @@
       "position_side": "long"
     },
     {
+      "funding_id": 575855,
+      "market_id": 48,
+      "timestamp": 1769439600,
+      "change": "0.059818",
+      "position_size": "0.9749",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
       "funding_id": 575939,
       "market_id": 1,
       "timestamp": 1769443200,
       "change": "-0.024912",
       "position_size": "0.02369",
+      "rate": "0.000012",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 578025,
+      "market_id": 24,
+      "timestamp": 1769500800,
+      "change": "0.005937",
+      "position_size": "18.06",
+      "rate": "0.000012",
+      "position_side": "short"
+    },
+    {
+      "funding_id": 579028,
+      "market_id": 126,
+      "timestamp": 1769526000,
+      "change": "0.905474",
+      "position_size": "3.467",
+      "rate": "-0.004326",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 579157,
+      "market_id": 126,
+      "timestamp": 1769529600,
+      "change": "0.838365",
+      "position_size": "3.467",
+      "rate": "-0.003784",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 579286,
+      "market_id": 126,
+      "timestamp": 1769533200,
+      "change": "0.590780",
+      "position_size": "1.733",
+      "rate": "-0.005000",
+      "position_side": "long"
+    },
+    {
+      "funding_id": 579315,
+      "market_id": 24,
+      "timestamp": 1769536800,
+      "change": "-0.012228",
+      "position_size": "36.71",
       "rate": "0.000012",
       "position_side": "long"
     },
@@ -501384,10 +507260,10 @@
     }
   ],
   "metadata": {
-    "total_count": 19009,
-    "fetched_at": "2026-01-28T12:52:28.227Z",
+    "total_count": 19011,
+    "fetched_at": "2026-01-28T13:00:20.740Z",
     "account_index": 132275,
-    "newest_trade_id": 845258850,
+    "newest_trade_id": 845272236,
     "newest_liquidation_id": 51235466589,
     "newest_funding_id": 581737
   }

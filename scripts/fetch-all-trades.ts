@@ -162,18 +162,16 @@ async function fetchFunding(
   accountApi: AccountApi,
   accountIndex: number,
   authToken: string,
-  marketIds: number[],
-  newestExistingId: number = 0
+  marketIds: number[]
 ): Promise<FundingPayment[]> {
+  // Always fetch ALL funding - it's small data and incremental by global ID
+  // misses historical funding for newly traded markets
   const allFunding: FundingPayment[] = [];
   const BATCH_SIZE = 100;
   const MAX_ITERATIONS = 100;
 
   console.log('\n--- Fetching Funding Payments ---');
-  console.log(`  Checking ${marketIds.length} markets for funding...`);
-  if (newestExistingId > 0) {
-    console.log(`  Looking for funding payments newer than ID ${newestExistingId}...`);
-  }
+  console.log(`  Fetching from ${marketIds.length} markets...`);
 
   for (const marketId of marketIds) {
     let cursor: string | undefined = undefined;
@@ -199,17 +197,12 @@ async function fetchFunding(
           break;
         }
 
-        if (iteration === 1) {
+        if (iteration === 1 && payments.length > 0) {
           console.log(`  Market ${marketId}: fetching...`);
         }
 
-        // Filter out ones we already have
-        const newPayments = payments.filter(
-          (p: any) => p.funding_id > newestExistingId
-        );
-
-        // Map to our interface (already matches API response)
-        const mappedPayments: FundingPayment[] = newPayments.map((p: any) => ({
+        // Map to our interface
+        const mappedPayments: FundingPayment[] = payments.map((p: any) => ({
           funding_id: p.funding_id,
           market_id: p.market_id,
           timestamp: p.timestamp,
@@ -221,11 +214,6 @@ async function fetchFunding(
 
         allFunding.push(...mappedPayments);
         marketFundingCount += mappedPayments.length;
-
-        // If we got fewer new ones than the batch, we've caught up
-        if (newPayments.length < payments.length) {
-          break;
-        }
 
         cursor = response.next_cursor;
         if (!cursor) {
@@ -248,7 +236,7 @@ async function fetchFunding(
     }
   }
 
-  console.log(`  Total new funding payments: ${allFunding.length}`);
+  console.log(`  Total funding payments: ${allFunding.length}`);
   return allFunding;
 }
 
@@ -448,8 +436,8 @@ async function main() {
     // Extract unique market IDs from all trades for funding fetch
     const tradedMarketIds = Array.from(new Set(uniqueTrades.map(t => t.market_id))).sort((a, b) => a - b);
 
-    // Fetch funding payments for all markets we've traded on
-    const newFunding = await fetchFunding(accountApi, ACCOUNT_INDEX, AUTH_TOKEN, tradedMarketIds, newestExistingFundingId);
+    // Fetch funding payments for all markets we've traded on (always full fetch)
+    const newFunding = await fetchFunding(accountApi, ACCOUNT_INDEX, AUTH_TOKEN, tradedMarketIds);
 
     // Merge funding
     const allFunding = [...existingFunding, ...newFunding];
