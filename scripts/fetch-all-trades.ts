@@ -158,83 +158,77 @@ async function fetchLiquidations(accountIndex: number, authToken: string, newest
   return allLiquidations;
 }
 
+async function fetchFundingForMarket(
+  accountApi: AccountApi,
+  accountIndex: number,
+  authToken: string,
+  marketId: number
+): Promise<FundingPayment[]> {
+  const payments: FundingPayment[] = [];
+  let cursor: string | undefined = undefined;
+  const BATCH_SIZE = 100;
+  const MAX_ITERATIONS = 50;
+
+  for (let i = 0; i < MAX_ITERATIONS; i++) {
+    try {
+      const response = await accountApi.positionFunding(
+        authToken,
+        accountIndex,
+        marketId,
+        BATCH_SIZE,
+        'all',
+        cursor
+      );
+
+      const data = response.position_fundings || [];
+      if (data.length === 0) break;
+
+      payments.push(...data.map((p: any) => ({
+        funding_id: p.funding_id,
+        market_id: p.market_id,
+        timestamp: p.timestamp,
+        change: p.change,
+        position_size: p.position_size,
+        rate: p.rate,
+        position_side: p.position_side
+      })));
+
+      cursor = response.next_cursor;
+      if (!cursor) break;
+
+      await new Promise(resolve => setTimeout(resolve, 50)); // Small delay between pages
+    } catch (error: any) {
+      if (error.status === 404 || error.message?.includes('not found')) break;
+      break;
+    }
+  }
+  return payments;
+}
+
 async function fetchFunding(
   accountApi: AccountApi,
   accountIndex: number,
   authToken: string,
   marketIds: number[]
 ): Promise<FundingPayment[]> {
-  // Always fetch ALL funding - it's small data and incremental by global ID
-  // misses historical funding for newly traded markets
-  const allFunding: FundingPayment[] = [];
-  const BATCH_SIZE = 100;
-  const MAX_ITERATIONS = 100;
-
   console.log('\n--- Fetching Funding Payments ---');
-  console.log(`  Fetching from ${marketIds.length} markets...`);
+  console.log(`  Fetching from ${marketIds.length} markets in parallel...`);
 
-  for (const marketId of marketIds) {
-    let cursor: string | undefined = undefined;
-    let iteration = 0;
-    let marketFundingCount = 0;
+  // Fetch all markets in parallel (API can handle it)
+  const results = await Promise.all(
+    marketIds.map(marketId => fetchFundingForMarket(accountApi, accountIndex, authToken, marketId))
+  );
 
-    while (iteration < MAX_ITERATIONS) {
-      iteration++;
+  const allFunding = results.flat();
 
-      try {
-        const response = await accountApi.positionFunding(
-          authToken,
-          accountIndex,
-          marketId,
-          BATCH_SIZE,
-          'all',
-          cursor
-        );
-
-        const payments = response.position_fundings || [];
-
-        if (payments.length === 0) {
-          break;
-        }
-
-        if (iteration === 1 && payments.length > 0) {
-          console.log(`  Market ${marketId}: fetching...`);
-        }
-
-        // Map to our interface
-        const mappedPayments: FundingPayment[] = payments.map((p: any) => ({
-          funding_id: p.funding_id,
-          market_id: p.market_id,
-          timestamp: p.timestamp,
-          change: p.change,
-          position_size: p.position_size,
-          rate: p.rate,
-          position_side: p.position_side
-        }));
-
-        allFunding.push(...mappedPayments);
-        marketFundingCount += mappedPayments.length;
-
-        cursor = response.next_cursor;
-        if (!cursor) {
-          break;
-        }
-
-        await new Promise(resolve => setTimeout(resolve, 300));
-      } catch (error: any) {
-        if (error.status === 404 || error.message?.includes('not found')) {
-          // No funding for this market, skip
-          break;
-        }
-        console.error(`  Error fetching funding for market ${marketId}:`, error.message || error);
-        break;
-      }
-    }
-
-    if (marketFundingCount > 0) {
-      console.log(`  Market ${marketId}: ${marketFundingCount} funding payments`);
-    }
-  }
+  // Log markets that had funding
+  const fundingByMarket = new Map<number, number>();
+  allFunding.forEach(f => {
+    fundingByMarket.set(f.market_id, (fundingByMarket.get(f.market_id) || 0) + 1);
+  });
+  fundingByMarket.forEach((count, marketId) => {
+    console.log(`  Market ${marketId}: ${count} funding payments`);
+  });
 
   console.log(`  Total funding payments: ${allFunding.length}`);
   return allFunding;
