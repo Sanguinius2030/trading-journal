@@ -42,11 +42,28 @@ interface PositionAnnotation {
   timeframe?: string | null;
 }
 
+const FEES_STORAGE_KEY = 'trading-journal-fees-expenses';
+
 export function StatsTab() {
   const { positions: rawPositions, loading } = usePositions();
   const positions = rawPositions as unknown as AggregatedPosition[];
 
   const [annotations, setAnnotations] = useState<Map<string, PositionAnnotation>>(new Map());
+
+  // Read fees/costs from localStorage
+  const [feesExpenses, setFeesExpenses] = useState<number>(() => {
+    const stored = localStorage.getItem(FEES_STORAGE_KEY);
+    return stored ? parseFloat(stored) : 0;
+  });
+
+  useEffect(() => {
+    const handleFeesChange = () => {
+      const stored = localStorage.getItem(FEES_STORAGE_KEY);
+      setFeesExpenses(stored ? parseFloat(stored) : 0);
+    };
+    window.addEventListener('fees-expenses-changed', handleFeesChange);
+    return () => window.removeEventListener('fees-expenses-changed', handleFeesChange);
+  }, []);
 
   // Load annotations from Supabase
   useEffect(() => {
@@ -104,10 +121,10 @@ export function StatsTab() {
 
     const totalWins = wins.reduce((sum, p) => sum + (p.pnl || 0), 0);
     const totalLosses = Math.abs(losses.reduce((sum, p) => sum + (p.pnl || 0), 0));
-    // Include realized PnL from open positions (partial closes)
+    // Include realized PnL from open positions (partial closes) and deduct fees
     const closedPnL = sorted.reduce((sum, p) => sum + (p.pnl || 0), 0);
     const openRealizedPnL = openPositions.reduce((sum, p) => sum + (p.realized_pnl || 0), 0);
-    const totalPnL = closedPnL + openRealizedPnL;
+    const totalPnL = closedPnL + openRealizedPnL - feesExpenses;
 
     // Find largest win/loss
     const pnls = sorted.map(p => p.pnl || 0);
@@ -196,7 +213,7 @@ export function StatsTab() {
       avgWinHoldTime,
       avgLossHoldTime,
     };
-  }, [closedPositions, openPositions]);
+  }, [closedPositions, openPositions, feesExpenses]);
 
   // Long vs Short comparison
   const sideStats = useMemo(() => {
