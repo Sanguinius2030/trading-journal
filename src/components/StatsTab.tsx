@@ -30,6 +30,7 @@ interface AggregatedPosition {
   total_entry_value: number;
   total_exit_value: number;
   pnl: number | null;
+  realized_pnl?: number;
   position_type: 'LONG' | 'SHORT';
   is_closed: boolean;
 }
@@ -79,9 +80,13 @@ export function StatsTab() {
     return positions.filter(p => p.is_closed && p.pnl !== null);
   }, [positions]);
 
+  const openPositions = useMemo(() => {
+    return positions.filter(p => !p.is_closed);
+  }, [positions]);
+
   // Core KPIs
   const coreStats = useMemo(() => {
-    if (closedPositions.length === 0) {
+    if (closedPositions.length === 0 && openPositions.length === 0) {
       return {
         totalPnL: 0, winRate: 0, profitFactor: 0, expectancy: 0,
         avgWin: 0, avgLoss: 0, largestWin: 0, largestLoss: 0,
@@ -99,7 +104,10 @@ export function StatsTab() {
 
     const totalWins = wins.reduce((sum, p) => sum + (p.pnl || 0), 0);
     const totalLosses = Math.abs(losses.reduce((sum, p) => sum + (p.pnl || 0), 0));
-    const totalPnL = sorted.reduce((sum, p) => sum + (p.pnl || 0), 0);
+    // Include realized PnL from open positions (partial closes)
+    const closedPnL = sorted.reduce((sum, p) => sum + (p.pnl || 0), 0);
+    const openRealizedPnL = openPositions.reduce((sum, p) => sum + (p.realized_pnl || 0), 0);
+    const totalPnL = closedPnL + openRealizedPnL;
 
     // Find largest win/loss
     const pnls = sorted.map(p => p.pnl || 0);
@@ -188,7 +196,7 @@ export function StatsTab() {
       avgWinHoldTime,
       avgLossHoldTime,
     };
-  }, [closedPositions]);
+  }, [closedPositions, openPositions]);
 
   // Long vs Short comparison
   const sideStats = useMemo(() => {
