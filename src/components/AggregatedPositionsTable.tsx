@@ -1237,7 +1237,7 @@ export function AggregatedPositionsTable() {
                               </div>
                               <div className="mob-pos-row">
                                 <span>Exit</span>
-                                <span>{position.avg_exit_price ? `$${position.avg_exit_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</span>
+                                <span>{position.avg_exit_price ? `$${position.avg_exit_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ''}</span>
                               </div>
                               {unrealizedPnl !== null && unrealizedPnl !== 0 && (
                                 <div className="mob-pos-row">
@@ -1433,7 +1433,7 @@ export function AggregatedPositionsTable() {
                             </div>
                             <div className="metric">
                               <span className="label">Avg Exit:</span>
-                              <span className="value">{position.avg_exit_price ? `$${position.avg_exit_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</span>
+                              <span className="value">{position.avg_exit_price ? `$${position.avg_exit_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : ''}</span>
                             </div>
                             {(() => {
                               // For closed positions, show full PnL; for open positions, show realized_pnl from partial closes
