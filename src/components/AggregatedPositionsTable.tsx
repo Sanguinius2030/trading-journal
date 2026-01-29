@@ -1219,8 +1219,8 @@ export function AggregatedPositionsTable() {
                                 {position.position_type}
                               </span>
                               <span className="mob-pos-symbol">{position.market_symbol}</span>
-                              <span className={`mob-pos-pnl ${pnlClass}`}>
-                                {hasRealizedPnl ? `$${Math.round(realizedPnl!).toLocaleString()}` : '—'}
+                              <span className={`mob-pos-pnl ${pnlClass}`} style={!hasRealizedPnl ? { color: '#ccc' } : undefined}>
+                                {hasRealizedPnl ? `$${Math.round(realizedPnl!).toLocaleString()}` : '$0'}
                               </span>
                             </div>
                             <div className="mob-pos-date">
@@ -1440,10 +1440,10 @@ export function AggregatedPositionsTable() {
                               const realizedPnl = position.is_closed ? position.pnl : (position.realized_pnl || 0);
                               const hasRealizedPnl = realizedPnl !== null && realizedPnl !== 0;
                               return (
-                                <div className={`metric pnl ${hasRealizedPnl ? (realizedPnl >= 0 ? 'profit' : 'loss') : ''}`}>
+                                <div className={`metric pnl ${hasRealizedPnl ? (realizedPnl >= 0 ? 'profit' : 'loss') : 'muted'}`}>
                                   <span className="label">PnL:</span>
                                   <span className="value">
-                                    {hasRealizedPnl ? `$${Math.round(realizedPnl).toLocaleString()}` : '—'}
+                                    {hasRealizedPnl ? `$${Math.round(realizedPnl).toLocaleString()}` : '$0'}
                                   </span>
                                 </div>
                               );
@@ -1455,10 +1455,10 @@ export function AggregatedPositionsTable() {
                                 : undefined;
                               const unrealizedPnl = balancePosition ? parseFloat(balancePosition.unrealized_pnl) : null;
                               return (
-                                <div className={`metric upnl ${unrealizedPnl !== null && unrealizedPnl !== 0 ? (unrealizedPnl >= 0 ? 'profit' : 'loss') : ''}`}>
+                                <div className={`metric upnl ${unrealizedPnl !== null && unrealizedPnl !== 0 ? (unrealizedPnl >= 0 ? 'profit' : 'loss') : 'muted'}`}>
                                   <span className="label">uPnL:</span>
                                   <span className="value">
-                                    {unrealizedPnl !== null && unrealizedPnl !== 0 ? `$${Math.round(unrealizedPnl).toLocaleString()}` : '—'}
+                                    {unrealizedPnl !== null && unrealizedPnl !== 0 ? `$${Math.round(unrealizedPnl).toLocaleString()}` : '$0'}
                                   </span>
                                 </div>
                               );
@@ -1467,10 +1467,10 @@ export function AggregatedPositionsTable() {
                               const funding = position.total_funding || 0;
                               const hasFunding = funding !== 0;
                               return (
-                                <div className={`metric funding ${hasFunding ? (funding >= 0 ? 'profit' : 'loss') : ''}`}>
+                                <div className={`metric funding ${hasFunding ? (funding >= 0 ? 'profit' : 'loss') : 'muted'}`}>
                                   <span className="label">Funding:</span>
                                   <span className="value">
-                                    {hasFunding ? `$${Math.round(funding).toLocaleString()}` : '—'}
+                                    {hasFunding ? `$${Math.round(funding).toLocaleString()}` : '$0'}
                                   </span>
                                 </div>
                               );
@@ -2103,6 +2103,10 @@ export function AggregatedPositionsTable() {
         .metric.upnl.loss .value,
         .metric.funding.loss .value {
           color: #dc2626;
+        }
+
+        .metric.muted .value {
+          color: #ccc;
         }
 
         .expand-icon {
