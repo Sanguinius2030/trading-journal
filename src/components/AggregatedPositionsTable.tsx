@@ -810,7 +810,10 @@ export function AggregatedPositionsTable() {
 
   const closedPositions = positions.filter(p => p.is_closed);
   const openPositions = positions.filter(p => !p.is_closed);
-  const totalPnL = closedPositions.reduce((sum, p) => sum + (p.pnl || 0), 0);
+  // Include realized PnL from open positions (partial closes)
+  const closedPnL = closedPositions.reduce((sum, p) => sum + (p.pnl || 0), 0);
+  const openRealizedPnL = openPositions.reduce((sum, p) => sum + (p.realized_pnl || 0), 0);
+  const totalPnL = closedPnL + openRealizedPnL;
 
   return (
     <div className="aggregated-positions-container">

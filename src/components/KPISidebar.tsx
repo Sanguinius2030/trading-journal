@@ -29,6 +29,7 @@ interface AggregatedPosition {
   total_entry_value: number;
   total_exit_value: number;
   pnl: number | null;
+  realized_pnl?: number;
   total_funding?: number;
   position_type: 'LONG' | 'SHORT';
   is_closed: boolean;
@@ -67,8 +68,9 @@ function calculateKPIs(positions: AggregatedPosition[]): KPIData {
   const closedPositions = positions
     .filter(p => p.is_closed && p.pnl !== null)
     .sort((a, b) => (a.exit_time || 0) - (b.exit_time || 0));
+  const openPositions = positions.filter(p => !p.is_closed);
 
-  if (closedPositions.length === 0) {
+  if (closedPositions.length === 0 && openPositions.length === 0) {
     return {
       winRate: 0,
       profitFactor: 0,
@@ -91,12 +93,15 @@ function calculateKPIs(positions: AggregatedPosition[]): KPIData {
   const totalWins = wins.reduce((sum, p) => sum + (p.pnl || 0), 0);
   const totalLosses = Math.abs(losses.reduce((sum, p) => sum + (p.pnl || 0), 0));
 
-  const winRate = (wins.length / closedPositions.length) * 100;
+  const winRate = closedPositions.length > 0 ? (wins.length / closedPositions.length) * 100 : 0;
   const profitFactor = totalLosses > 0 ? totalWins / totalLosses : totalWins > 0 ? Infinity : 0;
   const avgWin = wins.length > 0 ? totalWins / wins.length : 0;
   const avgLoss = losses.length > 0 ? totalLosses / losses.length : 0;
-  const totalPnL = closedPositions.reduce((sum, p) => sum + (p.pnl || 0), 0);
-  const expectancy = totalPnL / closedPositions.length;
+  // Include realized PnL from open positions (partial closes)
+  const closedPnL = closedPositions.reduce((sum, p) => sum + (p.pnl || 0), 0);
+  const openRealizedPnL = openPositions.reduce((sum, p) => sum + (p.realized_pnl || 0), 0);
+  const totalPnL = closedPnL + openRealizedPnL;
+  const expectancy = closedPositions.length > 0 ? closedPnL / closedPositions.length : 0;
 
   // Calculate drawdown
   let runningPnL = 0;
